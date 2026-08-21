@@ -3,262 +3,161 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#f5f7f3">
+<meta name="theme-color" content="#f4f6f3">
 <title>Сімейник</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--bg:#f5f7f3;--card:#fff;--ink:#1f2721;--muted:#6f786f;--brand:#6e9079;--brand2:#e6efe8;--line:#e5ebe6;--danger:#a94d4d}
+:root{--bg:#f4f6f3;--card:#fff;--ink:#1f2722;--muted:#707970;--brand:#6e9079;--brand2:#e6efe8;--line:#e4e9e5;--danger:#a94f4f}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
-.app{max-width:520px;margin:auto;min-height:100vh;padding-bottom:90px}.top{padding:18px 16px 12px;display:flex;align-items:center;justify-content:space-between}
-.logo{font-size:30px;font-weight:850}.sub{font-size:12px;color:var(--muted)}main{padding:8px 15px 28px}
-.card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:16px;margin-bottom:10px}
-.hero{background:linear-gradient(135deg,#fff,#edf4ef)}
-h1,h2,h3{margin-top:0}.field{margin:11px 0}.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px}
-.field input{width:100%;border:1px solid var(--line);border-radius:13px;background:#fafbfa;padding:13px;font:inherit}
-.btn{border:0;border-radius:14px;padding:13px 15px;font:inherit;font-weight:750}.primary{background:var(--brand);color:white;width:100%}
-.secondary{background:#fff;border:1px solid var(--line);color:var(--ink)}.danger{background:#fff0f0;border:1px solid #f0caca;color:var(--danger)}
-.actions{display:flex;gap:8px}.actions .btn{flex:1}.muted{color:var(--muted);font-size:13px}.error{color:var(--danger);font-size:13px;margin-top:8px}
-.ok{color:#476951;font-size:13px;margin-top:8px}.hidden{display:none!important}.row{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:16px;padding:13px;background:#fff;margin-bottom:8px}
-.grow{flex:1}.pill{font-size:11px;padding:5px 8px;background:var(--brand2);border-radius:999px}
-.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(520px,100%);display:grid;grid-template-columns:repeat(4,1fr);background:rgba(255,255,255,.96);border-top:1px solid var(--line);padding:7px 5px calc(7px + env(safe-area-inset-bottom))}
-.nav button{border:0;background:transparent;color:var(--muted);font-size:11px;padding:6px}.nav button.active{color:var(--brand);font-weight:800}.nav b{display:block;font-size:20px}
-.page{display:none}.page.active{display:block}.timer{font-size:36px;font-weight:850;margin:8px 0 12px}
-.invite{word-break:break-all;background:#f9fbf9;border:1px dashed var(--brand);padding:10px;border-radius:12px;font-size:13px}
+.app{max-width:560px;margin:auto;min-height:100vh;padding-bottom:94px}header{position:sticky;top:0;z-index:20;padding:16px;background:rgba(244,246,243,.95);display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:29px;font-weight:850}.sub{font-size:12px;color:var(--muted)}main{padding:5px 15px 25px}.page{display:none}.page.active{display:block}
+.card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:15px;margin-bottom:10px}.hero{background:linear-gradient(135deg,#fff,#edf4ef)}
+h2,h3{margin:0 0 8px}.muted{color:var(--muted);font-size:13px}.row{display:flex;align-items:center;gap:11px;padding:12px;border:1px solid var(--line);border-radius:15px;background:#fff;margin-top:7px}.grow{flex:1}
+.btn{border:0;border-radius:14px;padding:12px 14px;font:inherit;font-weight:750}.primary{background:var(--brand);color:#fff}.secondary{background:#fff;border:1px solid var(--line);color:var(--ink)}.danger{background:#fff0f0;border:1px solid #f1cccc;color:var(--danger)}.wide{width:100%}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.tile{background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;min-height:100px}.tile b{display:block;margin-top:7px}
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(560px,100%);display:grid;grid-template-columns:repeat(5,1fr);background:rgba(255,255,255,.97);border-top:1px solid var(--line);padding:7px 4px calc(7px + env(safe-area-inset-bottom));z-index:30}
+.nav button{border:0;background:transparent;color:var(--muted);font-size:10px;padding:5px 1px}.nav b{display:block;font-size:20px}.nav button.active{color:var(--brand);font-weight:800}
+.field{margin:9px 0}.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}.field input,.field select,.field textarea{width:100%;padding:12px;border:1px solid var(--line);border-radius:12px;background:#fafbfa;font:inherit}
+.actions{display:flex;gap:8px}.actions>*{flex:1}.hidden{display:none!important}.timer{font-size:38px;font-weight:850;margin:10px 0}.stat{font-size:24px;font-weight:800}.msg{font-size:13px;margin-top:8px}.ok{color:#43664d}.err{color:#a94f4f}
 </style>
 </head>
 <body>
 <div class="app">
-<div class="top">
-  <div><div class="logo">Сімейник</div><div class="sub">Уся сім’я — в одному місці</div></div>
-  <div id="topUser">👤</div>
-</div>
+<header><div><div class="logo">Сімейник</div><div class="sub">Уся сім’я — в одному місці</div></div><div>👤</div></header>
 <main>
-<section id="setupMissing" class="card hidden">
-<h2>Потрібне підключення</h2>
-<p class="muted">У файлі ще не вказані SUPABASE_URL і SUPABASE_ANON_KEY.</p>
+
+<section id="auth" class="card hero">
+<h2>Вхід</h2>
+<div class="field"><label>Email</label><input id="email" type="email"></div>
+<div class="field"><label>Пароль</label><input id="pass" type="password"></div>
+<div class="actions"><button class="btn secondary" onclick="register()">Реєстрація</button><button class="btn primary" onclick="login()">Увійти</button></div>
+<div id="authMsg" class="msg"></div>
 </section>
 
-<section id="authView">
-  <div class="card hero">
-    <h2>Вхід у Сімейник</h2>
-    <div class="field"><label>Email</label><input id="authEmail" type="email" placeholder="name@example.com"></div>
-    <div class="field"><label>Пароль</label><input id="authPassword" type="password" placeholder="мінімум 6 символів"></div>
-    <div class="actions">
-      <button class="btn secondary" onclick="register()">Реєстрація</button>
-      <button class="btn primary" onclick="login()">Увійти</button>
-    </div>
-    <div id="authMsg"></div>
-  </div>
-  <div class="card">
-    <h3>Запрошення</h3>
-    <p class="muted" id="inviteHint">Якщо тобі надіслали посилання на сім’ю, після реєстрації Сімейник запропонує приєднатися.</p>
-  </div>
+<div id="app" class="hidden">
+<section class="page active" id="home">
+<div class="card hero"><h2 id="hello">Мій Сімейник</h2><div class="muted">Сьогодні в одному місці</div></div>
+<div class="grid">
+<div class="tile" onclick="go('sleep')">😴<b>Сон</b><span class="muted">Таймер + аналітика</span></div>
+<div class="tile" onclick="go('expenses')">💳<b>Витрати</b><span class="muted">Хто і скільки витратив</span></div>
+<div class="tile" onclick="go('calendar')">📅<b>Календар</b><span class="muted">Особистий і сімейний</span></div>
+<div class="tile" onclick="go('family')">👨‍👩‍👧‍👦<b>Сім’я</b><span class="muted">Учасники й дні народження</span></div>
+<div class="tile" onclick="go('pets')">🐾<b>Тварини</b><span class="muted">Профілі та догляд</span></div>
+<div class="tile" onclick="go('cars')">🚗<b>Авто</b><span class="muted">ТО та пробіг</span></div>
+<div class="tile" onclick="go('location')">📍<b>Геолокація</b><span class="muted">Тільки добровільно</span></div>
+<div class="tile" onclick="go('profile')">👤<b>Профіль</b><span class="muted">Дата народження та вік</span></div>
+</div>
 </section>
 
-<section id="appView" class="hidden">
-  <section class="page active" id="homePage">
-    <div class="card hero">
-      <h2 id="welcome">Мій акаунт</h2>
-      <p class="muted">Твій особистий простір у Сімейнику.</p>
-    </div>
-    <div class="card">
-      <h3>Сон дитини</h3>
-      <div class="timer" id="sleepTimer">00:00:00</div>
-      <button class="btn primary" id="sleepBtn" onclick="toggleSleep()">🌙 Заснув — запустити</button>
-    </div>
-    <div class="card">
-      <h3>Мої сім’ї</h3>
-      <div id="homeFamilies"></div>
-      <button class="btn secondary" onclick="showPage('familyPage')" style="width:100%;margin-top:8px">Керувати сім’ями</button>
-    </div>
-  </section>
+<section class="page" id="profile">
+<div class="card"><h2>Мій профіль</h2>
+<div class="field"><label>Ім’я</label><input id="firstName"></div>
+<div class="field"><label>Прізвище</label><input id="lastName"></div>
+<div class="field"><label>Дата народження</label><input id="birthDate" type="date"></div>
+<div class="row"><div class="grow"><b>Вік</b><div class="muted" id="ageText">—</div></div></div>
+<button class="btn primary wide" onclick="saveProfile()">Зберегти</button><div id="profileMsg" class="msg"></div>
+</div></section>
 
-  <section class="page" id="familyPage">
-    <div class="card">
-      <h2>Сім’ї</h2>
-      <div class="field"><label>Назва нової сім’ї</label><input id="familyName" placeholder="Наприклад: Наша сім’я"></div>
-      <button class="btn primary" onclick="createFamily()">Створити сім’ю</button>
-      <div id="familyMsg"></div>
-    </div>
-    <div id="familiesList"></div>
-  </section>
-
-  <section class="page" id="calendarPage">
-    <div class="card"><h2>Календар</h2><p class="muted">Наступним кроком тут будуть особистий і сімейні календарі.</p></div>
-  </section>
-
-  <section class="page" id="profilePage">
-    <div class="card">
-      <h2>Мій профіль</h2>
-      <div class="field"><label>Як тебе показувати</label><input id="profileName" placeholder="Ім’я"></div>
-      <button class="btn primary" onclick="saveProfile()">Зберегти</button>
-      <div id="profileMsg"></div>
-    </div>
-    <div class="card">
-      <h3>Акаунт</h3>
-      <p class="muted" id="profileEmail"></p>
-      <button class="btn danger" onclick="logout()">Вийти</button>
-    </div>
-  </section>
+<section class="page" id="family">
+<div class="card"><h2>Мої сім’ї</h2><div id="families"></div></div>
+<div class="card"><h3>Учасники</h3><div id="members"></div></div>
 </section>
+
+<section class="page" id="expenses">
+<div class="card"><h2>Витрати</h2>
+<div class="field"><label>Сім’я</label><select id="expenseFamily"></select></div>
+<div class="field"><label>Сума</label><input id="expenseAmount" type="number" step="0.01"></div>
+<div class="field"><label>Категорія</label><select id="expenseCategory"><option>Продукти</option><option>Дім</option><option>Транспорт</option><option>Діти</option><option>Тварини</option><option>Здоров’я</option><option>Розваги</option><option>Інше</option></select></div>
+<div class="field"><label>Назва</label><input id="expenseTitle"></div>
+<button class="btn primary wide" onclick="addExpense()">Додати витрату</button></div>
+<div class="card"><div class="muted">Всього цього місяця</div><div class="stat" id="monthTotal">0 грн</div><div id="expenseList"></div></div>
+</section>
+
+<section class="page" id="calendar">
+<div class="card"><h2>Календар</h2>
+<div class="field"><label>Сім’я</label><select id="eventFamily"></select></div>
+<div class="field"><label>Подія</label><input id="eventTitle"></div>
+<div class="field"><label>Дата й час</label><input id="eventDate" type="datetime-local"></div>
+<button class="btn primary wide" onclick="addEvent()">Додати подію</button></div>
+<div class="card"><h3>Найближчі події</h3><div id="eventList"></div></div>
+</section>
+
+<section class="page" id="sleep">
+<div class="card hero"><h2>Сон дитини</h2>
+<div class="field"><label>Дитина</label><select id="sleepChild"></select></div>
+<div class="timer" id="sleepTimer">00:00:00</div>
+<button class="btn primary wide" id="sleepBtn" onclick="toggleSleep()">🌙 Заснув — запустити</button></div>
+<div class="card"><h3>Аналітика за 7 днів</h3>
+<div class="grid"><div><div class="muted">Загалом</div><div class="stat" id="sleepTotal">0 год</div></div><div><div class="muted">Середній сон</div><div class="stat" id="sleepAvg">0 хв</div></div></div>
+<div style="margin-top:12px" class="muted">Кількість снів: <b id="sleepCount">0</b></div>
+<div id="sleepList"></div></div>
+<div class="card"><h3>Додати дитину</h3><div class="field"><input id="childName" placeholder="Ім’я дитини"></div><div class="field"><input id="childBirth" type="date"></div><button class="btn secondary wide" onclick="addChild()">Додати</button></div>
+</section>
+
+<section class="page" id="pets">
+<div class="card"><h2>Тварини</h2><div class="field"><select id="petFamily"></select></div><div class="field"><input id="petName" placeholder="Кличка"></div><div class="field"><input id="petSpecies" placeholder="Вид: собака, кіт..."></div><button class="btn primary wide" onclick="addPet()">Додати тварину</button></div><div class="card"><div id="petList"></div></div>
+</section>
+
+<section class="page" id="cars">
+<div class="card"><h2>Автомобілі</h2><div class="field"><select id="carFamily"></select></div><div class="field"><input id="carName" placeholder="Назва авто"></div><div class="field"><input id="carMileage" type="number" placeholder="Пробіг"></div><div class="field"><input id="carService" type="date"></div><button class="btn primary wide" onclick="addCar()">Додати авто</button></div><div class="card"><div id="carList"></div></div>
+</section>
+
+<section class="page" id="location">
+<div class="card"><h2>Сімейна геолокація</h2><p class="muted">Кожен сам вмикає та вимикає поширення своєї геолокації.</p>
+<div class="field"><select id="locationFamily"></select></div>
+<div class="actions"><button class="btn primary" onclick="startLocation()">Ділитися</button><button class="btn danger" onclick="stopLocation()">Зупинити</button></div><div id="locationMsg" class="msg"></div></div>
+<div class="card"><h3>Останні позиції</h3><div id="locationList"></div></div>
+</section>
+</div>
 </main>
 
-<nav class="nav hidden" id="nav">
-<button class="active" onclick="showPage('homePage',this)"><b>⌂</b>Головна</button>
-<button onclick="showPage('familyPage',this)"><b>👥</b>Сім’я</button>
-<button onclick="showPage('calendarPage',this)"><b>◫</b>Календар</button>
-<button onclick="showPage('profilePage',this)"><b>👤</b>Профіль</button>
+<nav id="nav" class="nav hidden">
+<button class="active" data-page="home" onclick="go('home',this)"><b>⌂</b>Головна</button>
+<button data-page="family" onclick="go('family',this)"><b>👥</b>Сім’я</button>
+<button data-page="calendar" onclick="go('calendar',this)"><b>◫</b>Календар</button>
+<button data-page="expenses" onclick="go('expenses',this)"><b>₴</b>Витрати</button>
+<button data-page="profile" onclick="go('profile',this)"><b>👤</b>Профіль</button>
 </nav>
 </div>
 
 <script>
-const SUPABASE_URL = "https://yeqdpgjddwxiagwgrhtt.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_ybXS5RIEWMzEk99OoO8TiQ_w9hvsaBz";
-
-const configured = !SUPABASE_URL.includes("PASTE_") && !SUPABASE_ANON_KEY.includes("PASTE_");
-let sb = configured ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
-let currentUser = null;
-let sleepStart = Number(localStorage.getItem('sleepStart')||0);
-
-const qs = new URLSearchParams(location.search);
-const inviteCodeFromUrl = qs.get('invite');
-
-function msg(id,text,ok=false){const e=document.getElementById(id);e.className=ok?'ok':'error';e.textContent=text}
-function clearMsg(id){document.getElementById(id).textContent=''}
-function showPage(id,btn){
- document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
- document.getElementById(id).classList.add('active');
- document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
- if(btn) btn.classList.add('active');
- window.scrollTo(0,0);
-}
-async function init(){
- if(!configured){document.getElementById('setupMissing').classList.remove('hidden');return}
- const {data:{session}}=await sb.auth.getSession();
- if(session){currentUser=session.user;await afterLogin()}
- sb.auth.onAuthStateChange(async(_event,session)=>{
-   if(session){currentUser=session.user;await afterLogin()}
-   else{currentUser=null;showAuth()}
- });
-}
-async function register(){
- clearMsg('authMsg');
- const email=document.getElementById('authEmail').value.trim();
- const password=document.getElementById('authPassword').value;
- if(!email||password.length<6){msg('authMsg','Вкажи email і пароль від 6 символів.');return}
- const {data,error}=await sb.auth.signUp({email,password});
- if(error){msg('authMsg',error.message);return}
- if(data.session){currentUser=data.user;await afterLogin()}
- else msg('authMsg','Реєстрацію створено. Перевір email для підтвердження.',true);
-}
-async function login(){
- clearMsg('authMsg');
- const email=document.getElementById('authEmail').value.trim();
- const password=document.getElementById('authPassword').value;
- const {data,error}=await sb.auth.signInWithPassword({email,password});
- if(error){msg('authMsg',error.message);return}
- currentUser=data.user;await afterLogin();
-}
-async function logout(){await sb.auth.signOut()}
-function showAuth(){
- document.getElementById('authView').classList.remove('hidden');
- document.getElementById('appView').classList.add('hidden');
- document.getElementById('nav').classList.add('hidden');
-}
-async function afterLogin(){
- document.getElementById('authView').classList.add('hidden');
- document.getElementById('appView').classList.remove('hidden');
- document.getElementById('nav').classList.remove('hidden');
- document.getElementById('profileEmail').textContent=currentUser.email||'';
- await ensureProfile();
- await loadProfile();
- if(inviteCodeFromUrl) await tryJoinInvite(inviteCodeFromUrl);
- await loadFamilies();
- renderSleep();
-}
-async function ensureProfile(){
- await sb.from('profiles').upsert({id:currentUser.id,email:currentUser.email},{onConflict:'id'});
-}
-async function loadProfile(){
- const {data}=await sb.from('profiles').select('*').eq('id',currentUser.id).single();
- if(data){
-  document.getElementById('profileName').value=data.display_name||'';
-  document.getElementById('welcome').textContent=(data.display_name?data.display_name+', ':'')+'твій Сімейник';
- }
-}
-async function saveProfile(){
- const name=document.getElementById('profileName').value.trim();
- const {error}=await sb.from('profiles').update({display_name:name}).eq('id',currentUser.id);
- if(error)msg('profileMsg',error.message);else{msg('profileMsg','Збережено.',true);await loadProfile()}
-}
-async function createFamily(){
- const name=document.getElementById('familyName').value.trim();
- if(!name){msg('familyMsg','Введи назву сім’ї.');return}
- const {data,error}=await sb.rpc('create_family',{p_name:name});
- if(error){msg('familyMsg',error.message);return}
- document.getElementById('familyName').value='';
- msg('familyMsg','Сім’ю створено.',true);
- await loadFamilies();
-}
-async function loadFamilies(){
- const {data,error}=await sb.from('my_families').select('*');
- if(error){console.error(error);return}
- const list=document.getElementById('familiesList');
- const home=document.getElementById('homeFamilies');
- if(!data||!data.length){
-  list.innerHTML='<div class="card"><p class="muted">У тебе ще немає сімей.</p></div>';
-  home.innerHTML='<p class="muted">Створи першу сім’ю.</p>'; return;
- }
- home.innerHTML=data.map(f=>`<div class="row"><div>🏡</div><div class="grow"><strong>${esc(f.name)}</strong><div class="muted">${f.role}</div></div></div>`).join('');
- list.innerHTML='';
- for(const f of data){
-   const card=document.createElement('div');card.className='card';
-   card.innerHTML=`<h3>${esc(f.name)}</h3><p class="muted">Твоя роль: ${esc(f.role)}</p>
-   <button class="btn secondary" style="width:100%" onclick="makeInvite('${f.id}')">Створити посилання-запрошення</button>
-   <div id="invite-${f.id}" style="margin-top:10px"></div>
-   <div id="members-${f.id}" style="margin-top:10px"></div>`;
-   list.appendChild(card);
-   loadMembers(f.id);
- }
-}
-async function loadMembers(familyId){
- const {data}=await sb.from('family_members_public').select('*').eq('family_id',familyId);
- const e=document.getElementById('members-'+familyId);
- if(!e)return;
- e.innerHTML='<h4>Учасники</h4>'+(data||[]).map(m=>`<div class="row"><div>👤</div><div class="grow"><strong>${esc(m.display_name||m.email||'Користувач')}</strong><div class="muted">${esc(m.role)}</div></div></div>`).join('');
-}
-async function makeInvite(familyId){
- const {data,error}=await sb.rpc('create_family_invite',{p_family_id:familyId});
- const e=document.getElementById('invite-'+familyId);
- if(error){e.innerHTML='<div class="error">'+esc(error.message)+'</div>';return}
- const link=location.origin+location.pathname+'?invite='+encodeURIComponent(data);
- e.innerHTML=`<div class="invite">${esc(link)}</div><button class="btn primary" style="margin-top:8px" onclick="shareInvite('${encodeURIComponent(link)}')">Поділитися</button>`;
-}
-async function shareInvite(encoded){
- const link=decodeURIComponent(encoded);
- if(navigator.share){try{await navigator.share({title:'Сімейник',text:'Приєднуйся до моєї сім’ї в Сімейнику',url:link});return}catch(e){}}
- await navigator.clipboard.writeText(link);alert('Посилання скопійовано');
-}
-async function tryJoinInvite(code){
- const {data,error}=await sb.rpc('join_family_by_code',{p_code:code});
- if(error){console.warn(error.message);return}
- if(data===true){history.replaceState({},'',location.pathname);alert('Ти приєднався/приєдналася до сім’ї!')}
-}
-function toggleSleep(){
- if(!sleepStart){sleepStart=Date.now();localStorage.setItem('sleepStart',sleepStart)}
- else{sleepStart=0;localStorage.removeItem('sleepStart')}
- renderSleep();
-}
-function renderSleep(){
- const t=document.getElementById('sleepTimer'),b=document.getElementById('sleepBtn');
- if(!t)return;
- if(sleepStart){t.textContent=fmt(Date.now()-sleepStart);b.textContent='☀️ Прокинувся — зупинити'}
- else{t.textContent='00:00:00';b.textContent='🌙 Заснув — запустити'}
-}
-function fmt(ms){const s=Math.floor(ms/1000),h=Math.floor(s/3600),m=Math.floor((s%3600)/60),ss=s%60;return[h,m,ss].map(x=>String(x).padStart(2,'0')).join(':')}
+const URL="https://yeqdpgjddwxiagwgrhtt.supabase.co", KEY="sb_publishable_ybXS5RIEWMzEk99OoO8TiQ_w9hvsaBz";
+const sb=supabase.createClient(URL,KEY);
+let user=null,families=[],watchId=null;
+const $=id=>document.getElementById(id);
 function esc(s=''){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
-setInterval(renderSleep,1000);
-init();
+function msg(id,t,ok=true){$(id).className='msg '+(ok?'ok':'err');$(id).textContent=t}
+function age(d){if(!d)return null;const b=new Date(d),n=new Date();let a=n.getFullYear()-b.getFullYear();const m=n.getMonth()-b.getMonth();if(m<0||(m===0&&n.getDate()<b.getDate()))a--;return a}
+function go(id,btn){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active');window.scrollTo(0,0);refresh(id)}
+async function register(){const e=$('email').value.trim(),p=$('pass').value;if(!e||p.length<6)return msg('authMsg','Введи email і пароль від 6 символів',false);const {data,error}=await sb.auth.signUp({email:e,password:p});if(error)return msg('authMsg',error.message,false);msg('authMsg','Акаунт створено');if(data.session){user=data.user;afterLogin()}}
+async function login(){const {data,error}=await sb.auth.signInWithPassword({email:$('email').value.trim(),password:$('pass').value});if(error)return msg('authMsg',error.message,false);user=data.user;afterLogin()}
+async function init(){const {data:{session}}=await sb.auth.getSession();if(session){user=session.user;afterLogin()}}
+async function afterLogin(){$('auth').classList.add('hidden');$('app').classList.remove('hidden');$('nav').classList.remove('hidden');await sb.from('profiles').upsert({id:user.id,email:user.email},{onConflict:'id'});await loadProfile();await loadFamilies();await loadAll()}
+async function loadProfile(){const {data}=await sb.from('profiles').select('*').eq('id',user.id).single();if(!data)return;$('firstName').value=data.first_name||'';$('lastName').value=data.last_name||'';$('birthDate').value=data.birth_date||'';$('ageText').textContent=data.birth_date?age(data.birth_date)+' років':'Вкажи дату народження';$('hello').textContent=(data.first_name?data.first_name+', ':'')+'твій Сімейник'}
+async function saveProfile(){const payload={first_name:$('firstName').value.trim(),last_name:$('lastName').value.trim(),birth_date:$('birthDate').value||null,display_name:[$('firstName').value.trim(),$('lastName').value.trim()].filter(Boolean).join(' ')};const {error}=await sb.from('profiles').update(payload).eq('id',user.id);if(error)return msg('profileMsg',error.message,false);msg('profileMsg','Збережено');loadProfile();loadMembers()}
+async function loadFamilies(){const {data}=await sb.from('my_families').select('*');families=data||[];const opts=families.map(f=>`<option value="${f.id}">${esc(f.name)}</option>`).join('');['expenseFamily','eventFamily','petFamily','carFamily','locationFamily'].forEach(id=>$(id).innerHTML=opts);$('families').innerHTML=families.map(f=>`<div class="row"><div>🏡</div><div class="grow"><b>${esc(f.name)}</b><div class="muted">${esc(f.role)}</div></div></div>`).join('');loadMembers()}
+async function loadMembers(){if(!families.length)return;$('members').innerHTML='';const {data}=await sb.from('family_member_profiles').select('*').in('family_id',families.map(f=>f.id));$('members').innerHTML=(data||[]).map(m=>`<div class="row"><div>👤</div><div class="grow"><b>${esc(m.display_name||m.email||'Учасник')}</b><div class="muted">${m.birth_date?('ДН: '+m.birth_date+' · '+age(m.birth_date)+' років'):esc(m.role)}</div></div></div>`).join('')}
+async function addExpense(){const f=$('expenseFamily').value,a=Number($('expenseAmount').value),t=$('expenseTitle').value.trim();if(!f||!a||!t)return;await sb.from('expenses').insert({family_id:f,created_by:user.id,amount:a,category:$('expenseCategory').value,title:t});$('expenseAmount').value='';$('expenseTitle').value='';loadExpenses()}
+async function loadExpenses(){if(!families.length)return;const start=new Date();start.setDate(1);const {data}=await sb.from('expenses').select('*').in('family_id',families.map(f=>f.id)).gte('expense_date',start.toISOString().slice(0,10)).order('expense_date',{ascending:false});const rows=data||[];$('monthTotal').textContent=rows.reduce((s,x)=>s+Number(x.amount),0).toFixed(2)+' грн';$('expenseList').innerHTML=rows.map(x=>`<div class="row"><div>💳</div><div class="grow"><b>${esc(x.title)}</b><div class="muted">${esc(x.category)} · ${x.expense_date}</div></div><b>${Number(x.amount).toFixed(2)} ₴</b></div>`).join('')}
+async function addEvent(){const f=$('eventFamily').value,t=$('eventTitle').value.trim(),d=$('eventDate').value;if(!f||!t||!d)return;await sb.from('calendar_events').insert({family_id:f,owner_id:user.id,title:t,starts_at:new Date(d).toISOString(),visibility:'family'});$('eventTitle').value='';$('eventDate').value='';loadEvents()}
+async function loadEvents(){if(!families.length)return;const {data}=await sb.from('calendar_events').select('*').in('family_id',families.map(f=>f.id)).gte('starts_at',new Date().toISOString()).order('starts_at');$('eventList').innerHTML=(data||[]).map(e=>`<div class="row"><div>📅</div><div class="grow"><b>${esc(e.title)}</b><div class="muted">${new Date(e.starts_at).toLocaleString('uk-UA')}</div></div></div>`).join('')}
+async function addChild(){if(!families.length||!$('childName').value.trim())return;await sb.from('child_profiles').insert({family_id:families[0].id,created_by:user.id,name:$('childName').value.trim(),birth_date:$('childBirth').value||null});$('childName').value='';loadChildren()}
+async function loadChildren(){if(!families.length)return;const {data}=await sb.from('child_profiles').select('*').in('family_id',families.map(f=>f.id)).order('name');$('sleepChild').innerHTML=(data||[]).map(c=>`<option value="${c.id}" data-family="${c.family_id}">${esc(c.name)}</option>`).join('');loadSleep()}
+function sleepKey(){return 'run_sleep_'+user.id}
+async function toggleSleep(){const sel=$('sleepChild');if(!sel.value)return alert('Спочатку додай дитину');const raw=localStorage.getItem(sleepKey());if(!raw){localStorage.setItem(sleepKey(),JSON.stringify({startedAt:new Date().toISOString(),childId:sel.value,familyId:sel.options[sel.selectedIndex].dataset.family}))}else{const r=JSON.parse(raw);await sb.from('sleep_sessions').insert({family_id:r.familyId,child_id:r.childId,created_by:user.id,started_at:r.startedAt,ended_at:new Date().toISOString()});localStorage.removeItem(sleepKey());loadSleep()}renderTimer()}
+function renderTimer(){if(!user||!$('sleepTimer'))return;const raw=localStorage.getItem(sleepKey());if(raw){const r=JSON.parse(raw),ms=Date.now()-new Date(r.startedAt).getTime();$('sleepTimer').textContent=fmt(ms);$('sleepBtn').textContent='☀️ Прокинувся — зупинити'}else{$('sleepTimer').textContent='00:00:00';$('sleepBtn').textContent='🌙 Заснув — запустити'}}
+function fmt(ms){const s=Math.floor(ms/1000),h=Math.floor(s/3600),m=Math.floor((s%3600)/60),ss=s%60;return[h,m,ss].map(v=>String(v).padStart(2,'0')).join(':')}
+async function loadSleep(){if(!families.length)return;const since=new Date(Date.now()-7*86400000).toISOString();const {data}=await sb.from('sleep_sessions').select('*').in('family_id',families.map(f=>f.id)).gte('started_at',since).not('ended_at','is',null).order('started_at',{ascending:false});const rows=data||[],dur=rows.map(x=>new Date(x.ended_at)-new Date(x.started_at)),total=dur.reduce((a,b)=>a+b,0);$('sleepTotal').textContent=(total/3600000).toFixed(1)+' год';$('sleepAvg').textContent=(dur.length?Math.round(total/dur.length/60000):0)+' хв';$('sleepCount').textContent=rows.length;$('sleepList').innerHTML=rows.slice(0,10).map(x=>`<div class="row"><div>😴</div><div class="grow"><b>${new Date(x.started_at).toLocaleDateString('uk-UA')}</b><div class="muted">${Math.round((new Date(x.ended_at)-new Date(x.started_at))/60000)} хв</div></div></div>`).join('')}
+async function addPet(){if(!$('petFamily').value||!$('petName').value.trim())return;await sb.from('pets').insert({family_id:$('petFamily').value,name:$('petName').value.trim(),species:$('petSpecies').value.trim(),created_by:user.id});$('petName').value='';loadPets()}
+async function loadPets(){if(!families.length)return;const {data}=await sb.from('pets').select('*').in('family_id',families.map(f=>f.id));$('petList').innerHTML=(data||[]).map(p=>`<div class="row"><div>🐾</div><div class="grow"><b>${esc(p.name)}</b><div class="muted">${esc(p.species||'Тварина')}</div></div></div>`).join('')}
+async function addCar(){if(!$('carFamily').value||!$('carName').value.trim())return;await sb.from('vehicles').insert({family_id:$('carFamily').value,name:$('carName').value.trim(),mileage:Number($('carMileage').value)||0,next_service_date:$('carService').value||null,created_by:user.id});$('carName').value='';loadCars()}
+async function loadCars(){if(!families.length)return;const {data}=await sb.from('vehicles').select('*').in('family_id',families.map(f=>f.id));$('carList').innerHTML=(data||[]).map(c=>`<div class="row"><div>🚗</div><div class="grow"><b>${esc(c.name)}</b><div class="muted">${c.mileage||0} км${c.next_service_date?' · ТО '+c.next_service_date:''}</div></div></div>`).join('')}
+async function startLocation(){const f=$('locationFamily').value;if(!f)return;if(!navigator.geolocation)return msg('locationMsg','Геолокація не підтримується',false);watchId=navigator.geolocation.watchPosition(async p=>{await sb.from('location_shares').upsert({user_id:user.id,family_id:f,latitude:p.coords.latitude,longitude:p.coords.longitude,accuracy:p.coords.accuracy,sharing:true,updated_at:new Date().toISOString()},{onConflict:'user_id'});msg('locationMsg','Геолокація поширюється');loadLocations()},e=>msg('locationMsg',e.message,false),{enableHighAccuracy:true,maximumAge:30000,timeout:20000})}
+async function stopLocation(){if(watchId!==null)navigator.geolocation.clearWatch(watchId);watchId=null;await sb.from('location_shares').update({sharing:false}).eq('user_id',user.id);msg('locationMsg','Поширення зупинено');loadLocations()}
+async function loadLocations(){if(!families.length)return;const {data}=await sb.from('location_shares').select('*').in('family_id',families.map(f=>f.id)).eq('sharing',true);$('locationList').innerHTML=(data||[]).map(x=>`<div class="row"><div>📍</div><div class="grow"><b>Учасник сім’ї</b><div class="muted">${Number(x.latitude).toFixed(5)}, ${Number(x.longitude).toFixed(5)}</div></div></div>`).join('')}
+async function loadAll(){await Promise.all([loadExpenses(),loadEvents(),loadChildren(),loadPets(),loadCars(),loadLocations()]);renderTimer()}
+function refresh(id){if(id==='expenses')loadExpenses();if(id==='calendar')loadEvents();if(id==='family')loadMembers();if(id==='sleep')loadChildren();if(id==='pets')loadPets();if(id==='cars')loadCars();if(id==='location')loadLocations();if(id==='profile')loadProfile()}
+setInterval(renderTimer,1000);init();
 </script>
 </body>
 </html>
