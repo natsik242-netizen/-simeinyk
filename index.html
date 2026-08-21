@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f7f3">
-<title>Сімейник Family v8</title>
+<title>Сімейник Family v10</title>
 <style>
 :root{--bg:#f5f7f3;--card:#fff;--ink:#202820;--muted:#6f786f;--brand:#6e9079;--brand2:#e5eee7;--line:#e4e9e5;--danger:#a84f4f}
 *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
@@ -52,11 +52,24 @@
 .game-badge{display:inline-block;padding:7px 10px;border-radius:999px;background:#fff4cf;border:1px solid #ecd68e;font-size:12px;font-weight:800}
 .school-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:13px;margin-top:10px;color:var(--ink)}
 
+
+.hub-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.hub-card{border:1px solid var(--line);border-radius:20px;padding:17px;background:#fff;min-height:112px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer}
+.hub-card .hub-icon{font-size:30px}.hub-card b{font-size:17px}.hub-card span{font-size:12px;color:var(--muted)}
+.section-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}.section-head h2{margin:0}
+
+.today-card{background:linear-gradient(135deg,#ffffff,#eef4ef);border:1px solid var(--line);border-radius:22px;padding:15px;margin-bottom:12px}
+.today-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.today-mini{background:#fff;border:1px solid var(--line);border-radius:15px;padding:11px}
+.today-mini b{font-size:18px;display:block}
+.list-empty{color:var(--muted);font-size:13px;padding:10px 0}
+.metric{font-size:24px;font-weight:900}
+
 </style>
 </head>
 <body>
 <div class="app">
-<header><div><div class="logo">Сімейник</div><div class="sub">Family v8 · діти, тварини, нерухомість, нагадування</div></div><div>👶</div></header>
+<header><div><div class="logo">Сімейник</div><div class="sub">Family v10 · повний сімейний органайзер</div></div><div>👶</div></header>
 <main>
 <section id="authBox" class="card hero">
 <h2>Вхід</h2>
@@ -68,29 +81,46 @@
 
 <div id="appBox" class="hidden">
 <section class="page active" id="homePage">
-<div class="card hero"><h2>Дитячий модуль</h2><div class="muted">Усе важливе за день і повна історія</div></div>
-<div class="grid">
-<div class="tile" onclick="showBaby('today')">🗓️<b>Сьогодні</b><span class="muted">Стрічка дня</span></div>
-<div class="tile" onclick="showBaby('sleep')">😴<b>Сон</b><span class="muted">Таймер + 24г/7д/30д</span></div>
-<div class="tile" onclick="showBaby('feeding')">🍼<b>Годування</b><span class="muted">Груди, пляшечка, вода</span></div>
-<div class="tile" onclick="showBaby('food')">🥣<b>Прикорм</b><span class="muted">Продукти і реакції</span></div>
-<div class="tile" onclick="showBaby('diaper')">🧷<b>Підгузки</b><span class="muted">Швидкий запис</span></div>
-<div class="tile" onclick="showBaby('growth')">📏<b>Ріст</b><span class="muted">Вага, зріст, голова</span></div>
-<div class="tile" onclick="showBaby('meds')">💊<b>Ліки</b><span class="muted">Призначення і прийом</span></div>
-<div class="tile" onclick="showBaby('health')">🌡️<b>Здоров’я</b><span class="muted">Температура і симптоми</span></div>
-<div class="tile" onclick="showBaby('reminders')">⏰<b>Нагадування</b><span class="muted">Ліки, лікар, вакцинація</span></div>
-<div class="tile" onclick="showBaby('children')">👶<b>Діти</b><span class="muted">Додати або обрати</span></div>
-<div class="tile" onclick="showBaby('memories')">📸<b>Спогади</b><span class="muted">Фото, відео, відзнаки</span></div>
-<div class="tile" onclick="showBaby('books')">📚<b>Книжки</b><span class="muted">Читаємо, прочитано, улюблені</span></div>
-<div class="tile" onclick="showBaby('activities')">⚽<b>Гуртки</b><span class="muted">Секції, розклад, оплата</span></div>
-<div class="tile" onclick="showBaby('education')">🎒<b>Садочок / школа</b><span class="muted">Події, група, клас</span></div>
-<div class="tile" onclick="showBaby('familyReminders')">⏰<b>Сімейні нагадування</b><span class="muted">Оренда, ліки, дні народження</span></div>
-<div class="tile" onclick="showBaby('properties')">🏠<b>Нерухомість</b><span class="muted">Адреси, оренда, платежі</span></div>
-<div class="tile" onclick="showBaby('petAchievements')">🐕<b>Досягнення тварин</b><span class="muted">Команди й рівні</span></div>
-<div class="tile" onclick="showBaby('birthdays')">🎂<b>Дні народження</b><span class="muted">Найближчі в сім’ї</span></div>
-
-
+<div class="card hero"><h2>Сімейник</h2><div class="muted">Усе сімейне — по своїх розділах</div></div>
+<div class="today-card">
+  <div style="display:flex;justify-content:space-between;align-items:center">
+    <div><h3 style="margin:0">Сьогодні</h3><div class="muted">Найважливіше для сім’ї</div></div>
+    <button class="btn secondary" onclick="loadDashboard()">↻</button>
+  </div>
+  <div class="today-grid">
+    <div class="today-mini"><span class="muted">Нагадування</span><b id="dashReminders">0</b></div>
+    <div class="today-mini"><span class="muted">Події</span><b id="dashEvents">0</b></div>
+    <div class="today-mini"><span class="muted">Витрати місяця</span><b id="dashExpenses">0 ₴</b></div>
+    <div class="today-mini"><span class="muted">Найближчий ДН</span><b id="dashBirthday">—</b></div>
+  </div>
+  <div id="dashList"></div>
 </div>
+
+<div class="hub-grid">
+<div class="hub-card" onclick="openHub('profile')"><div class="hub-icon">👤</div><b>Мій профіль</b><span>Особисті дані, ліки, документи</span></div>
+<div class="hub-card" onclick="openHub('family')"><div class="hub-icon">👨‍👩‍👧‍👦</div><b>Сім’я</b><span>Учасники, дні народження, доступ</span></div>
+<div class="hub-card" onclick="openHub('children')"><div class="hub-icon">👶</div><b>Діти</b><span>Увесь дитячий модуль всередині</span></div>
+<div class="hub-card" onclick="openHub('pets')"><div class="hub-icon">🐾</div><b>Тварини</b><span>Профілі, здоров’я, досягнення</span></div>
+<div class="hub-card" onclick="openHub('cars')"><div class="hub-icon">🚗</div><b>Авто</b><span>Машини, ТО, страховка, витрати</span></div>
+<div class="hub-card" onclick="openHub('properties')"><div class="hub-icon">🏠</div><b>Нерухомість</b><span>Адреси, оренда, платежі</span></div>
+<div class="hub-card" onclick="openHub('expenses')"><div class="hub-icon">💳</div><b>Витрати</b><span>Сімейні витрати та статистика</span></div>
+<div class="hub-card" onclick="openHub('calendar')"><div class="hub-icon">📅</div><b>Календар</b><span>Події всієї сім’ї</span></div>
+<div class="hub-card" onclick="openHub('reminders')"><div class="hub-icon">⏰</div><b>Нагадування</b><span>Ліки, платежі, справи</span></div>
+<div class="hub-card" onclick="openHub('documents')"><div class="hub-icon">📁</div><b>Документи</b><span>Сім’я, авто, нерухомість</span></div>
+<div class="hub-card" onclick="openHub('location')"><div class="hub-icon">📍</div><b>Геолокація</b><span>Сімейна карта</span></div>
+</div>
+</section>
+
+<section class="page" id="hubPage">
+<div class="card">
+<div class="section-head"><button class="btn secondary" onclick="goHome()">←</button><h2 id="hubTitle">Розділ</h2></div>
+<div id="hubContent"></div>
+</div>
+</section>
+
+
+<section class="page" id="adultPage">
+<div class="card"><div class="section-head"><button class="btn secondary" onclick="goHome()">←</button><h2 id="adultTitle">Розділ</h2></div><div id="adultContent"></div></div>
 </section>
 
 <section class="page" id="babyPage">
@@ -370,7 +400,7 @@ function msg(id,t,ok=true){$(id).className='msg '+(ok?'ok':'err');$(id).textCont
 async function register(){await ensureSB();const e=$('email').value.trim(),p=$('password').value;if(!e||p.length<6)return msg('authMsg','Введи email і пароль від 6 символів',false);const {data,error}=await sb.auth.signUp({email:e,password:p});if(error)return msg('authMsg',error.message,false);msg('authMsg','Акаунт створено');if(data.session){user=data.user;await afterLogin()}}
 async function login(){await ensureSB();const {data,error}=await sb.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error)return msg('authMsg',error.message,false);user=data.user;await afterLogin()}
 async function init(){await ensureSB();const {data:{session}}=await sb.auth.getSession();if(session){user=session.user;await afterLogin()}}
-async function afterLogin(){$('authBox').classList.add('hidden');$('appBox').classList.remove('hidden');$('nav').classList.remove('hidden');await loadFamilies();await loadChildren();}
+async function afterLogin(){$('authBox').classList.add('hidden');$('appBox').classList.remove('hidden');$('nav').classList.remove('hidden');await loadFamilies();await loadChildren();await loadDashboard();}
 async function loadFamilies(){const {data}=await sb.from('my_families').select('*');families=data||[];}
 function familyId(){const c=children.find(x=>x.id===$('childSelect')?.value);return c?.family_id||families[0]?.id||null}
 function childId(){return $('childSelect')?.value||children[0]?.id||null}
@@ -391,7 +421,7 @@ async function addChild(){
 }
 function goHome(btn){$('quickFab')?.classList.add('hidden');
  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$('homePage').classList.add('active');
- document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active')); if(btn)btn.classList.add('active'); window.scrollTo(0,0);
+ document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active')); if(btn)btn.classList.add('active'); window.scrollTo(0,0);if($('homePage')?.classList.contains('active'))loadDashboard();
 }
 function showBaby(which,btn){$('quickFab')?.classList.remove('hidden');
  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$('babyPage').classList.add('active');
@@ -753,6 +783,150 @@ async function loadMemories(){
     out+=`<div class="memory-card">${media}<div class="memory-body"><span class="memory-badge">${esc(x.category)}</span><h3>${esc(x.title)}</h3><div class="muted">${new Date(x.occurred_at).toLocaleDateString('uk-UA')}</div>${x.note?`<p>${esc(x.note)}</p>`:''}</div></div>`;
   }
   $('memoryList').innerHTML=out||'<div class="muted" style="margin-top:12px">Поки немає спогадів</div>';
+}
+
+
+
+function showAdult(title,html){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  $('adultPage').classList.add('active');$('quickFab')?.classList.add('hidden');
+  $('adultTitle').textContent=title;$('adultContent').innerHTML=html;window.scrollTo(0,0);
+}
+function openAdultProfile(){
+  showAdult('👤 Мої дані',`
+    <div class="field"><label>Ім’я</label><input id="adultFirst"></div>
+    <div class="field"><label>Прізвище</label><input id="adultLast"></div>
+    <div class="field"><label>Дата народження</label><input id="adultBirth" type="date"></div>
+    <div class="field"><label>Телефон</label><input id="adultPhone"></div>
+    <button class="btn primary wide" onclick="saveAdultProfile()">Зберегти</button><div id="adultProfileMsg" class="msg"></div>`);
+  loadAdultProfile();
+}
+async function loadAdultProfile(){
+  const {data}=await sb.from('profiles').select('*').eq('id',user.id).single();
+  if(!data)return;$('adultFirst').value=data.first_name||'';$('adultLast').value=data.last_name||'';$('adultBirth').value=data.birth_date||'';$('adultPhone').value=data.phone||'';
+}
+async function saveAdultProfile(){
+  const {error}=await sb.from('profiles').update({
+    first_name:$('adultFirst').value.trim(),last_name:$('adultLast').value.trim(),
+    birth_date:$('adultBirth').value||null,phone:$('adultPhone').value.trim()||null,
+    display_name:[$('adultFirst').value.trim(),$('adultLast').value.trim()].filter(Boolean).join(' ')
+  }).eq('id',user.id);
+  msg('adultProfileMsg',error?error.message:'Збережено',!error);loadDashboard();
+}
+
+function openExpenses(){
+  showAdult('💳 Сімейні витрати',`
+    <div class="field"><label>Сума</label><input id="expAmount" type="number" step="0.01"></div>
+    <div class="field"><label>Категорія</label><select id="expCategory"><option>Продукти</option><option>Дім</option><option>Транспорт</option><option>Діти</option><option>Тварини</option><option>Здоров’я</option><option>Розваги</option><option>Інше</option></select></div>
+    <div class="field"><label>Назва</label><input id="expTitle"></div>
+    <div class="field"><label>Хто витратив</label><select id="expWho"></select></div>
+    <button class="btn primary wide" onclick="addExpenseV10()">Додати витрату</button>
+    <div class="today-grid" style="margin-top:12px"><div class="today-mini"><span class="muted">Цього місяця</span><b id="expMonth">0 ₴</b></div><div class="today-mini"><span class="muted">Записів</span><b id="expCount">0</b></div></div>
+    <div id="expByPerson"></div><div id="expList"></div>`);
+  loadExpenseMembers();loadExpensesV10();
+}
+async function loadExpenseMembers(){
+  const {data}=await sb.from('family_member_profiles').select('*').in('family_id',families.map(f=>f.id));
+  $('expWho').innerHTML=(data||[]).map(x=>`<option value="${x.user_id}">${esc(x.display_name||x.email||'Учасник')}</option>`).join('');
+}
+async function addExpenseV10(){
+  const amount=Number($('expAmount').value),title=$('expTitle').value.trim();if(!amount||!title)return;
+  const {error}=await sb.from('expenses').insert({
+    family_id:familyId(),created_by:user.id,spent_by:$('expWho').value||user.id,amount,
+    category:$('expCategory').value,title
+  });if(error)return alert(error.message);
+  $('expAmount').value='';$('expTitle').value='';loadExpensesV10();loadDashboard();
+}
+async function loadExpensesV10(){
+  const start=new Date();start.setDate(1);start.setHours(0,0,0,0);
+  const {data}=await sb.from('expenses').select('*').in('family_id',families.map(f=>f.id)).gte('expense_date',start.toISOString().slice(0,10)).order('expense_date',{ascending:false});
+  const rows=data||[];$('expMonth').textContent=rows.reduce((a,x)=>a+Number(x.amount),0).toFixed(2)+' ₴';$('expCount').textContent=rows.length;
+  const by={};rows.forEach(x=>by[x.spent_by||x.created_by]=(by[x.spent_by||x.created_by]||0)+Number(x.amount));
+  $('expByPerson').innerHTML=Object.entries(by).map(([id,sum])=>`<div class="row"><div>👤</div><div class="grow"><b>${id===user.id?'Я':'Учасник'}</b></div><b>${sum.toFixed(2)} ₴</b></div>`).join('');
+  $('expList').innerHTML=rows.map(x=>`<div class="row"><div>💳</div><div class="grow"><b>${esc(x.title)}</b><div class="muted">${esc(x.category)} · ${x.expense_date}</div></div><b>${Number(x.amount).toFixed(2)} ₴</b></div>`).join('');
+}
+
+function openCalendar(){
+  showAdult('📅 Сімейний календар',`
+    <div class="field"><label>Подія</label><input id="calTitle"></div>
+    <div class="field"><label>Дата й час</label><input id="calStart" type="datetime-local"></div>
+    <div class="field"><label>Тип</label><select id="calType"><option>Подія</option><option>Лікар</option><option>Авто</option><option>Оренда</option><option>Тварина</option><option>День народження</option><option>Інше</option></select></div>
+    <button class="btn primary wide" onclick="addCalendarEventV10()">Додати</button><div id="calendarListV10"></div>`);
+  loadCalendarV10();
+}
+async function addCalendarEventV10(){
+  const title=$('calTitle').value.trim(),d=$('calStart').value;if(!title||!d)return;
+  const {error}=await sb.from('calendar_events').insert({family_id:familyId(),owner_id:user.id,title,starts_at:new Date(d).toISOString(),event_type:$('calType').value,visibility:'family'});
+  if(error)return alert(error.message);$('calTitle').value='';$('calStart').value='';loadCalendarV10();loadDashboard();
+}
+async function loadCalendarV10(){
+  const {data}=await sb.from('calendar_events').select('*').in('family_id',families.map(f=>f.id)).gte('starts_at',new Date().toISOString()).order('starts_at').limit(50);
+  $('calendarListV10').innerHTML=(data||[]).map(x=>`<div class="row"><div>📅</div><div class="grow"><b>${esc(x.title)}</b><div class="muted">${esc(x.event_type||'Подія')} · ${new Date(x.starts_at).toLocaleString('uk-UA')}</div></div></div>`).join('');
+}
+
+function openCars(){
+ showAdult('🚗 Мої авто',`
+  <div class="field"><label>Назва</label><input id="carName2" placeholder="Сімейне авто"></div>
+  <div class="field"><label>Марка</label><input id="carMake2"></div><div class="field"><label>Модель</label><input id="carModel2"></div>
+  <div class="field"><label>Номер</label><input id="carPlate2"></div><div class="field"><label>VIN</label><input id="carVin2"></div>
+  <div class="field"><label>Пробіг</label><input id="carMileage2" type="number"></div>
+  <button class="btn primary wide" onclick="addCarV10()">Додати авто</button><div id="carsListV10"></div>`);loadCarsV10();
+}
+async function addCarV10(){
+ const name=$('carName2').value.trim();if(!name)return;
+ const {error}=await sb.from('vehicles').insert({family_id:familyId(),created_by:user.id,name,make:$('carMake2').value.trim()||null,model:$('carModel2').value.trim()||null,plate_number:$('carPlate2').value.trim()||null,vin:$('carVin2').value.trim()||null,mileage:Number($('carMileage2').value)||0});
+ if(error)return alert(error.message);['carName2','carMake2','carModel2','carPlate2','carVin2','carMileage2'].forEach(id=>$(id).value='');loadCarsV10();
+}
+async function loadCarsV10(){const {data}=await sb.from('vehicles').select('*').in('family_id',families.map(f=>f.id)).order('created_at',{ascending:false});$('carsListV10').innerHTML=(data||[]).map(x=>`<div class="row"><div>🚗</div><div class="grow"><b>${esc(x.name)}</b><div class="muted">${esc([x.make,x.model].filter(Boolean).join(' '))}${x.plate_number?' · '+esc(x.plate_number):''}${x.mileage?' · '+x.mileage+' км':''}</div></div></div>`).join('')}
+function openCarService(){showAdult('🔧 ТО та ремонти',`<div class="field"><label>Авто</label><select id="svcCar"></select></div><div class="field"><label>Тип</label><select id="svcType"><option>ТО</option><option>Ремонт</option><option>Шини</option><option>Страховка</option><option>Техогляд</option><option>Інше</option></select></div><div class="field"><label>Опис</label><input id="svcTitle"></div><div class="field"><label>Дата</label><input id="svcDate" type="date"></div><div class="field"><label>Пробіг</label><input id="svcMileage" type="number"></div><div class="field"><label>Вартість</label><input id="svcCost" type="number" step="0.01"></div><button class="btn primary wide" onclick="addCarServiceV10()">Додати</button><div id="svcList"></div>`);loadCarServiceV10()}
+async function loadCarServiceV10(){const {data:cars}=await sb.from('vehicles').select('*').in('family_id',families.map(f=>f.id));$('svcCar').innerHTML=(cars||[]).map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join('');const {data}=await sb.from('vehicle_service').select('*').in('family_id',families.map(f=>f.id)).order('service_date',{ascending:false});$('svcList').innerHTML=(data||[]).map(x=>`<div class="row"><div>🔧</div><div class="grow"><b>${esc(x.title)}</b><div class="muted">${esc(x.service_type)} · ${x.service_date}${x.cost?' · '+x.cost+' ₴':''}</div></div></div>`).join('')}
+async function addCarServiceV10(){const title=$('svcTitle').value.trim();if(!title||!$('svcCar').value)return;const {error}=await sb.from('vehicle_service').insert({family_id:familyId(),vehicle_id:$('svcCar').value,created_by:user.id,service_type:$('svcType').value,title,service_date:$('svcDate').value||new Date().toISOString().slice(0,10),mileage:Number($('svcMileage').value)||null,cost:Number($('svcCost').value)||null});if(error)return alert(error.message);$('svcTitle').value='';loadCarServiceV10()}
+
+function openPets(){showAdult('🐾 Профілі тварин',`<div class="field"><label>Кличка</label><input id="petName2"></div><div class="field"><label>Вид</label><input id="petSpecies2"></div><div class="field"><label>Порода</label><input id="petBreed2"></div><div class="field"><label>Дата народження</label><input id="petBirth2" type="date"></div><div class="field"><label>Вага, кг</label><input id="petWeight2" type="number" step="0.1"></div><button class="btn primary wide" onclick="addPetV10()">Додати</button><div id="petsListV10"></div>`);loadPetsV10()}
+async function addPetV10(){const name=$('petName2').value.trim();if(!name)return;const {error}=await sb.from('pets').insert({family_id:familyId(),created_by:user.id,name,species:$('petSpecies2').value.trim()||null,breed:$('petBreed2').value.trim()||null,birth_date:$('petBirth2').value||null,weight_kg:Number($('petWeight2').value)||null});if(error)return alert(error.message);$('petName2').value='';loadPetsV10()}
+async function loadPetsV10(){const {data}=await sb.from('pets').select('*').in('family_id',families.map(f=>f.id)).order('name');$('petsListV10').innerHTML=(data||[]).map(x=>`<div class="row"><div>🐾</div><div class="grow"><b>${esc(x.name)}</b><div class="muted">${esc(x.species||'')}${x.breed?' · '+esc(x.breed):''}${x.weight_kg?' · '+x.weight_kg+' кг':''}</div></div></div>`).join('')}
+function openPetHealth(){showAdult('🩺 Здоров’я тварин',`<div class="field"><label>Тварина</label><select id="petHealthPet"></select></div><div class="field"><label>Тип</label><select id="petHealthType"><option>Щеплення</option><option>Ліки</option><option>Ветеринар</option><option>Обробка</option><option>Грумінг</option><option>Інше</option></select></div><div class="field"><label>Назва</label><input id="petHealthTitle"></div><div class="field"><label>Дата</label><input id="petHealthDate" type="date"></div><div class="field"><label>Наступна дата</label><input id="petHealthNext" type="date"></div><button class="btn primary wide" onclick="addPetHealthV10()">Додати</button><div id="petHealthList"></div>`);loadPetHealthV10()}
+async function loadPetHealthV10(){const {data:pets}=await sb.from('pets').select('*').in('family_id',families.map(f=>f.id));$('petHealthPet').innerHTML=(pets||[]).map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join('');const {data}=await sb.from('pet_health').select('*').in('family_id',families.map(f=>f.id)).order('event_date',{ascending:false});$('petHealthList').innerHTML=(data||[]).map(x=>`<div class="row"><div>🩺</div><div class="grow"><b>${esc(x.title)}</b><div class="muted">${esc(x.event_type)} · ${x.event_date}${x.next_due?' · наступне '+x.next_due:''}</div></div></div>`).join('')}
+async function addPetHealthV10(){const title=$('petHealthTitle').value.trim();if(!title||!$('petHealthPet').value)return;const {error}=await sb.from('pet_health').insert({family_id:familyId(),pet_id:$('petHealthPet').value,created_by:user.id,event_type:$('petHealthType').value,title,event_date:$('petHealthDate').value||new Date().toISOString().slice(0,10),next_due:$('petHealthNext').value||null});if(error)return alert(error.message);$('petHealthTitle').value='';loadPetHealthV10()}
+
+function openDocuments(scope='all'){showAdult('📁 Документи',`<div class="field"><label>Назва</label><input id="docTitle"></div><div class="field"><label>Категорія</label><select id="docCategory"><option>Особистий</option><option>Сім’я</option><option>Авто</option><option>Нерухомість</option><option>Тварина</option><option>Інше</option></select></div><div class="field"><label>Термін дії</label><input id="docExpiry" type="date"></div><div class="field"><label>Файл</label><input id="docFile" type="file" accept="image/*,application/pdf"></div><button class="btn primary wide" onclick="addDocumentV10()">Додати документ</button><div id="docList"></div>`);loadDocumentsV10()}
+async function addDocumentV10(){const title=$('docTitle').value.trim();if(!title)return;let path=null;const file=$('docFile').files[0];if(file){if(file.size>20*1024*1024)return alert('Максимум 20 МБ');const ext=file.name.split('.').pop();path=`${familyId()}/${crypto.randomUUID()}.${ext}`;const {error:e}=await sb.storage.from('family-documents').upload(path,file,{contentType:file.type});if(e)return alert(e.message)}const {error}=await sb.from('family_documents').insert({family_id:familyId(),created_by:user.id,title,category:$('docCategory').value,expiry_date:$('docExpiry').value||null,file_path:path});if(error)return alert(error.message);$('docTitle').value='';$('docFile').value='';loadDocumentsV10()}
+async function loadDocumentsV10(){const {data}=await sb.from('family_documents').select('*').in('family_id',families.map(f=>f.id)).order('created_at',{ascending:false});$('docList').innerHTML=(data||[]).map(x=>`<div class="row"><div>📄</div><div class="grow"><b>${esc(x.title)}</b><div class="muted">${esc(x.category)}${x.expiry_date?' · до '+x.expiry_date:''}</div></div></div>`).join('')}
+
+async function loadDashboard(){
+  if(!families.length)return;
+  const todayStart=new Date();todayStart.setHours(0,0,0,0);const todayEnd=new Date(todayStart.getTime()+86400000);
+  const month=new Date();month.setDate(1);month.setHours(0,0,0,0);
+  const [r,e,x,b]=await Promise.all([
+    sb.from('family_reminders').select('*').in('family_id',families.map(f=>f.id)).gte('due_at',todayStart.toISOString()).lt('due_at',todayEnd.toISOString()).eq('completed',false),
+    sb.from('calendar_events').select('*').in('family_id',families.map(f=>f.id)).gte('starts_at',todayStart.toISOString()).lt('starts_at',todayEnd.toISOString()),
+    sb.from('expenses').select('amount').in('family_id',families.map(f=>f.id)).gte('expense_date',month.toISOString().slice(0,10)),
+    sb.from('family_member_profiles').select('*').in('family_id',families.map(f=>f.id))
+  ]);
+  $('dashReminders').textContent=(r.data||[]).length;$('dashEvents').textContent=(e.data||[]).length;$('dashExpenses').textContent=(x.data||[]).reduce((a,v)=>a+Number(v.amount),0).toFixed(0)+' ₴';
+  const birthdays=(b.data||[]).filter(v=>v.birth_date).map(v=>({...v,...nextBirthdayInfo(v.birth_date)})).sort((a,b)=>a.days-b.days);
+  $('dashBirthday').textContent=birthdays[0]?`${birthdays[0].days} дн.`:'—';
+  const items=[...(r.data||[]).map(v=>({i:'⏰',t:v.title,s:new Date(v.due_at).toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'})})),...(e.data||[]).map(v=>({i:'📅',t:v.title,s:new Date(v.starts_at).toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'})}))].slice(0,6);
+  $('dashList').innerHTML=items.length?items.map(v=>`<div class="row"><div>${v.i}</div><div class="grow"><b>${esc(v.t)}</b><div class="muted">${v.s}</div></div></div>`).join(''):'<div class="list-empty">На сьогодні нічого термінового.</div>';
+}
+
+function openHub(kind){
+ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+ $('hubPage').classList.add('active');$('quickFab')?.classList.add('hidden');
+ const M={
+ profile:['👤 Мій профіль',`<div class="hub-grid"><div class="hub-card" onclick="showBaby('meds')"><div class="hub-icon">💊</div><b>Ліки</b><span>Прийоми та курси</span></div><div class="hub-card" onclick="openAdultProfile()"><div class="hub-icon">👤</div><b>Мої дані</b><span>Дата народження, контакти</span></div><div class="hub-card" onclick="openDocuments('personal')"><div class="hub-icon">📁</div><b>Документи</b><span>Особисті файли</span></div></div>`],
+ family:['👨‍👩‍👧‍👦 Сім’я',`<div class="hub-grid"><div class="hub-card" onclick="showBaby('birthdays')"><div class="hub-icon">🎂</div><b>Дні народження</b><span>Найближчі дати та вік</span></div><div class="hub-card"><div class="hub-icon">👥</div><b>Учасники</b><span>Сімейний доступ</span></div></div>`],
+ children:['👶 Діти',`<div class="hub-grid"><div class="hub-card" onclick="showBaby('children')"><div class="hub-icon">👶</div><b>Обрати дитину</b><span>Профілі дітей</span></div><div class="hub-card" onclick="showBaby('today')"><div class="hub-icon">❤️</div><b>Відкрити дитячий профіль</b><span>Сон, їжа, розвиток, книжки, школа, спогади</span></div></div>`],
+ pets:['🐾 Тварини',`<div class="hub-grid"><div class="hub-card" onclick="openPets()"><div class="hub-icon">🐾</div><b>Профілі тварин</b><span>Порода, дата народження, вага</span></div><div class="hub-card" onclick="openPetHealth()"><div class="hub-icon">🩺</div><b>Здоров’я</b><span>Ветеринар, щеплення, ліки</span></div><div class="hub-card" onclick="showBaby('petAchievements')"><div class="hub-icon">🏆</div><b>Досягнення</b><span>Команди та рівні</span></div></div>`],
+ cars:['🚗 Авто',`<div class="hub-grid"><div class="hub-card" onclick="openCars()"><div class="hub-icon">🚘</div><b>Мої авто</b><span>Марка, модель, номер, VIN</span></div><div class="hub-card" onclick="openCarService()"><div class="hub-icon">🔧</div><b>ТО та ремонти</b><span>Пробіг, сервіс, страховка</span></div></div>`],
+ properties:['🏠 Нерухомість',`<div class="hub-card" onclick="showBaby('properties')"><div class="hub-icon">🏠</div><b>Мої об’єкти</b><span>Адреси, оренда та платежі</span></div>`],
+ expenses:['💳 Витрати',`<div class="hub-card" onclick="openExpenses()"><div class="hub-icon">💳</div><b>Сімейні витрати</b><span>Хто витратив, категорії, статистика</span></div>`],
+ calendar:['📅 Календар',`<div class="hub-card" onclick="openCalendar()"><div class="hub-icon">📅</div><b>Сімейний календар</b><span>Події, лікарі, ТО, оренда</span></div>`],
+ reminders:['⏰ Нагадування',`<div class="hub-card" onclick="showBaby('familyReminders')"><div class="hub-icon">⏰</div><b>Усі нагадування</b><span>Ліки, платежі, справи</span></div>`],
+ documents:['📁 Документи',`<div class="hub-card" onclick="openDocuments('all')"><div class="hub-icon">📁</div><b>Сховище документів</b><span>Сім’я, авто, нерухомість</span></div>`],
+ location:['📍 Геолокація',`<div class="hub-card"><div class="hub-icon">📍</div><b>Сімейна карта</b><span>Додамо окремо з дозволом кожного учасника</span></div>`]
+ };
+ const x=M[kind]||['Сімейник',''];$('hubTitle').textContent=x[0];$('hubContent').innerHTML=x[1];
 }
 
 function openQuick(){ $('quickOverlay').classList.remove('hidden');$('quickSheet').classList.remove('hidden') }
