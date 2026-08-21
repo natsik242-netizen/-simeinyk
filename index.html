@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f7f3">
-<title>Сімейник Baby v4</title>
+<title>Сімейник Baby v5</title>
 <style>
 :root{--bg:#f5f7f3;--card:#fff;--ink:#202820;--muted:#6f786f;--brand:#6e9079;--brand2:#e5eee7;--line:#e4e9e5;--danger:#a84f4f}
 *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
@@ -21,11 +21,32 @@
 .nav{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(560px,100%);display:grid;grid-template-columns:repeat(4,1fr);background:rgba(255,255,255,.97);border-top:1px solid var(--line);padding:7px 4px calc(7px + env(safe-area-inset-bottom));z-index:30}
 .nav button{border:0;background:transparent;color:var(--muted);font-size:10px;padding:6px} .nav b{display:block;font-size:20px} .nav button.active{color:var(--brand);font-weight:800}
 .msg{font-size:13px;margin-top:7px} .ok{color:#45684f} .err{color:#a84f4f}
+
+/* Baby v5 child profile */
+.baby-shell{background:#111814;color:#f7faf7;border-radius:24px;padding:14px;margin-bottom:12px;min-height:70vh}
+.baby-top{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;text-align:center;margin:4px 0 14px}
+.baby-stat-big{font-size:20px;font-weight:900}.baby-stat-label{font-size:11px;color:#b7c0b8;margin-top:2px}
+.avatar{width:84px;height:84px;border-radius:50%;background:linear-gradient(145deg,#6e9079,#93b39c);display:flex;align-items:center;justify-content:center;font-size:38px;margin:auto;border:3px solid rgba(255,255,255,.18)}
+.child-name{font-size:25px;font-weight:900;margin-top:6px}.child-age{font-size:13px;color:#cbd3cc}
+.status-live{background:linear-gradient(135deg,#3c4f43,#26362c);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:13px;margin:12px 0}
+.status-live b{font-size:17px}.status-live .muted{color:#c9d1ca}
+.day-title{text-align:center;font-weight:850;margin:18px 0 7px;color:#f1f5f2}
+.timeline-row{display:flex;align-items:center;gap:11px;background:#2a332d;border:1px solid #39453d;border-radius:18px;padding:12px;margin:7px 0}
+.timeline-icon{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#6753c9;font-size:21px;flex:0 0 auto}
+.timeline-row .muted{color:#c4cbc5}
+.quick-fab{position:fixed;right:max(22px,calc((100vw - 560px)/2 + 22px));bottom:100px;width:62px;height:62px;border-radius:50%;border:6px solid #1d2821;background:#e58daa;color:#fff;font-size:34px;font-weight:900;z-index:35;box-shadow:0 8px 25px rgba(0,0,0,.25)}
+.sheet{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(560px,100%);z-index:50;background:#fff;border-radius:24px 24px 0 0;padding:18px 15px calc(18px + env(safe-area-inset-bottom));box-shadow:0 -12px 40px rgba(0,0,0,.25)}
+.sheet-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.sheet-grid button{min-height:72px}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:45}
+.ach-card{background:linear-gradient(135deg,#fff7e8,#fff);border:1px solid #f0dfbd;border-radius:18px;padding:13px;margin-top:8px}
+.level{font-size:24px;font-weight:900}.progress{height:9px;border-radius:20px;background:#eee;overflow:hidden;margin-top:7px}.progress i{display:block;height:100%;background:#6e9079}
+.rec-card{border:1px solid var(--line);border-radius:16px;padding:12px;margin-top:8px;background:#fbfcfb}
+
 </style>
 </head>
 <body>
 <div class="app">
-<header><div><div class="logo">Сімейник</div><div class="sub">Baby v4 · повний дитячий модуль</div></div><div>👶</div></header>
+<header><div><div class="logo">Сімейник</div><div class="sub">Baby v5 · профіль, аналітика, досягнення</div></div><div>👶</div></header>
 <main>
 <section id="authBox" class="card hero">
 <h2>Вхід</h2>
@@ -53,26 +74,38 @@
 </section>
 
 <section class="page" id="babyPage">
-<div class="card">
-<button class="btn secondary" onclick="goHome()">← Головна</button>
-<div class="field"><label>Дитина</label><select id="childSelect" onchange="loadCurrent()"></select></div>
+<div class="baby-shell">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+<button class="btn secondary" onclick="goHome()">←</button>
+<select id="childSelect" onchange="loadCurrent()" style="max-width:210px;padding:10px;border-radius:12px;border:1px solid #46534a;background:#1f2a23;color:#fff"></select>
+<button class="btn secondary" onclick="panel('children')">⚙️</button>
+</div>
+
+<div class="baby-top">
+<div><div class="baby-stat-big" id="heroHeight">—</div><div class="baby-stat-label">Зріст</div></div>
+<div><div class="avatar" id="childAvatar">👶</div><div class="child-name" id="heroName">Дитина</div><div class="child-age" id="heroAge">—</div></div>
+<div><div class="baby-stat-big" id="heroWeight">—</div><div class="baby-stat-label">Вага</div></div>
+</div>
+
+<div class="status-live" id="liveStatus">
+<b>Стан зараз</b><div class="muted">Завантаження...</div>
+</div>
+
 <div class="tabs">
 <button class="btn secondary" onclick="panel('today')">Сьогодні</button>
 <button class="btn secondary" onclick="panel('sleep')">Сон</button>
 <button class="btn secondary" onclick="panel('feeding')">Годування</button>
 <button class="btn secondary" onclick="panel('food')">Прикорм</button>
-<button class="btn secondary" onclick="panel('diaper')">Підгузки</button>
-<button class="btn secondary" onclick="panel('growth')">Ріст</button>
+<button class="btn secondary" onclick="panel('achievements')">🏆 Досягнення</button>
 <button class="btn secondary" onclick="panel('meds')">Ліки</button>
 <button class="btn secondary" onclick="panel('health')">Здоров’я</button>
+<button class="btn secondary" onclick="panel('growth')">Ріст</button>
+<button class="btn secondary" onclick="panel('diaper')">Підгузки</button>
 <button class="btn secondary" onclick="panel('reminders')">Нагадування</button>
-<button class="btn secondary" onclick="panel('children')">Діти</button>
-</div>
 </div>
 
-<div class="panel active card" id="p-today"><h2>Сьогодні</h2><div id="timeline"></div></div>
-
-<div class="panel card" id="p-sleep">
+<div class="panel active" id="p-today"><h2>Історія</h2><div id="timeline"></div></div>
+<div class="panel" id="p-sleep">
 <h2>Сон</h2><div class="timer" id="sleepTimer">00:00:00</div>
 <button class="btn primary wide" id="sleepBtn" onclick="toggleSleep()">🌙 Заснув — запустити</button>
 <div style="display:flex;gap:8px;margin-top:8px"><button class="btn secondary" style="flex:1" onclick="openManualSleep()">+ Внести вручну</button></div>
@@ -92,7 +125,7 @@
 </div>
 </div>
 
-<div class="panel card" id="p-feeding"><h2>Годування</h2>
+<div class="panel" id="p-feeding"><h2>Годування</h2>
 <div class="field"><label>Тип</label><select id="feedingType"><option>Грудне</option><option>Пляшечка</option><option>Суміш</option><option>Вода</option></select></div>
 <div class="field"><label>Сторона</label><select id="breastSide"><option value="">—</option><option>Ліва</option><option>Права</option><option>Обидві</option></select></div>
 <div class="field"><label>Кількість, мл</label><input id="feedingAmount" type="number"></div>
@@ -100,55 +133,89 @@
 <div class="field"><label>Нотатка</label><input id="feedingNote"></div>
 <button class="btn primary wide" onclick="addFeeding()">Додати</button><div id="feedingList"></div></div>
 
-<div class="panel card" id="p-food"><h2>Прикорм</h2>
+<div class="panel" id="p-food"><h2>Прикорм</h2><div id="foodRecommendations"></div>
 <div class="field"><label>Продукт</label><input id="foodName" placeholder="Броколі"></div>
 <div class="field"><label>Статус</label><select id="foodStatus"><option>Пробувала</option><option>Сподобалось</option><option>Не сподобалось</option><option>Реакція</option></select></div>
 <div class="field"><label>Порція</label><input id="foodPortion" placeholder="2 ложки"></div>
 <div class="field"><label>Реакція / нотатка</label><input id="foodReaction"></div>
 <button class="btn primary wide" onclick="addFood()">Зберегти</button><div id="foodList"></div></div>
 
-<div class="panel card" id="p-diaper"><h2>Підгузки</h2>
+<div class="panel" id="p-diaper"><h2>Підгузки</h2>
 <div style="display:flex;gap:7px;flex-wrap:wrap">
 <button class="btn secondary" onclick="addDiaper('Мокрий')">💧 Мокрий</button>
 <button class="btn secondary" onclick="addDiaper('Брудний')">💩 Брудний</button>
 <button class="btn secondary" onclick="addDiaper('Змішаний')">🧷 Змішаний</button></div>
 <div id="diaperList"></div></div>
 
-<div class="panel card" id="p-growth"><h2>Ріст і вага</h2>
+<div class="panel" id="p-growth"><h2>Ріст і вага</h2>
 <div class="field"><label>Вага, кг</label><input id="weightKg" type="number" step="0.01"></div>
 <div class="field"><label>Зріст, см</label><input id="heightCm" type="number" step="0.1"></div>
 <div class="field"><label>Окружність голови, см</label><input id="headCm" type="number" step="0.1"></div>
 <button class="btn primary wide" onclick="addGrowth()">Додати</button><div id="growthList"></div></div>
 
-<div class="panel card" id="p-meds"><h2>Ліки</h2>
+<div class="panel" id="p-meds"><h2>Ліки</h2>
 <div class="field"><label>Назва</label><input id="medName"></div>
 <div class="field"><label>Призначена доза / опис</label><input id="medDose"></div>
-<div class="field"><label>Коли прийняти</label><input id="medDue" type="datetime-local"></div>
+<div class="field"><label>Перший прийом</label><input id="medDue" type="datetime-local"></div>
+<div class="field"><label>Кожні N годин (0 = без повтору)</label><input id="medEveryHours" type="number" min="0" value="0"></div>
+<div class="field"><label>Тривалість курсу, годин</label><input id="medCourseHours" type="number" min="0" value="0"></div>
 <div class="field"><label>Нотатка</label><input id="medNote"></div>
 <button class="btn primary wide" onclick="addMedication()">Додати</button>
 <div class="muted" style="margin-top:8px">Застосунок зберігає призначення, але не визначає дозування самостійно.</div>
 <div id="medList"></div></div>
 
-<div class="panel card" id="p-health"><h2>Здоров’я</h2>
+<div class="panel" id="p-health"><h2>Здоров’я</h2>
 <div class="field"><label>Температура, °C</label><input id="temperature" type="number" step="0.1"></div>
 <div class="field"><label>Симптом / стан</label><input id="symptom"></div>
 <div class="field"><label>Нотатка</label><input id="healthNote"></div>
 <button class="btn primary wide" onclick="addHealth()">Додати запис</button><div id="healthList"></div></div>
 
-<div class="panel card" id="p-reminders"><h2>Нагадування</h2>
+
+<div class="panel" id="p-achievements"><h2>🏆 Досягнення</h2>
+<div class="grid">
+<div class="ach-card"><div class="muted">Мовлення</div><div class="level" id="lvlSpeech">Рівень 0</div><div class="progress"><i id="barSpeech" style="width:0%"></i></div></div>
+<div class="ach-card"><div class="muted">Рух</div><div class="level" id="lvlMove">Рівень 0</div><div class="progress"><i id="barMove" style="width:0%"></i></div></div>
+<div class="ach-card"><div class="muted">Пізнання</div><div class="level" id="lvlThink">Рівень 0</div><div class="progress"><i id="barThink" style="width:0%"></i></div></div>
+<div class="ach-card"><div class="muted">Самостійність</div><div class="level" id="lvlSelf">Рівень 0</div><div class="progress"><i id="barSelf" style="width:0%"></i></div></div>
+</div>
+<div class="field"><label>Категорія</label><select id="achCategory"><option value="speech">Мовлення</option><option value="movement">Рух</option><option value="thinking">Пізнання</option><option value="self">Самостійність</option><option value="world">Навколишній світ</option></select></div>
+<div class="field"><label>Досягнення</label><input id="achTitle" placeholder="Наприклад: сказала перше слово"></div>
+<div class="field"><label>Бали / крок рівня</label><input id="achPoints" type="number" min="1" max="20" value="1"></div>
+<button class="btn primary wide" onclick="addAchievement()">Додати досягнення</button>
+<div id="achList"></div>
+</div>
+
+<div class="panel" id="p-reminders"><h2>Нагадування</h2>
 <div class="field"><label>Назва</label><input id="remTitle" placeholder="Дати ліки"></div>
 <div class="field"><label>Тип</label><select id="remType"><option>Ліки</option><option>Лікар</option><option>Вакцинація</option><option>Годування</option><option>Інше</option></select></div>
 <div class="field"><label>Дата й час</label><input id="remDue" type="datetime-local"></div>
 <div class="field"><label>Повторення</label><select id="remRepeat"><option value="none">Не повторювати</option><option value="daily">Щодня</option><option value="weekly">Щотижня</option><option value="monthly">Щомісяця</option></select></div>
 <button class="btn primary wide" onclick="addReminder()">Додати нагадування</button><div id="remList"></div></div>
 
-<div class="panel card" id="p-children"><h2>Діти</h2>
+<div class="panel" id="p-children"><h2>Діти</h2>
 <div class="field"><label>Ім’я</label><input id="newChildName"></div>
 <div class="field"><label>Дата народження</label><input id="newChildBirth" type="date"></div>
 <button class="btn primary wide" onclick="addChild()">Додати дитину</button><div id="childList"></div></div>
 </section>
 </div>
 </main>
+
+
+<button id="quickFab" class="quick-fab hidden" onclick="openQuick()">+</button>
+<div id="quickOverlay" class="overlay hidden" onclick="closeQuick()"></div>
+<div id="quickSheet" class="sheet hidden">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><h3 style="margin:0">Швидко додати</h3><button class="btn secondary" onclick="closeQuick()">✕</button></div>
+<div class="sheet-grid">
+<button class="btn secondary" onclick="closeQuick();panel('sleep')">😴<br>Сон</button>
+<button class="btn secondary" onclick="closeQuick();panel('feeding')">🍼<br>Годування</button>
+<button class="btn secondary" onclick="closeQuick();panel('food')">🥣<br>Прикорм</button>
+<button class="btn secondary" onclick="closeQuick();addDiaper('Мокрий')">💧<br>Підгузок</button>
+<button class="btn secondary" onclick="closeQuick();panel('meds')">💊<br>Ліки</button>
+<button class="btn secondary" onclick="closeQuick();panel('health')">🌡️<br>Температура</button>
+<button class="btn secondary" onclick="closeQuick();panel('growth')">📏<br>Ріст</button>
+<button class="btn secondary" onclick="closeQuick();panel('achievements')">🏆<br>Досягнення</button>
+</div>
+</div>
 
 <nav id="nav" class="nav hidden">
 <button class="active" onclick="goHome(this)"><b>⌂</b>Головна</button>
@@ -195,11 +262,11 @@ async function addChild(){
  if(error)return alert(error.message);
  $('newChildName').value='';$('newChildBirth').value='';await loadChildren();
 }
-function goHome(btn){
+function goHome(btn){$('quickFab')?.classList.add('hidden');
  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$('homePage').classList.add('active');
  document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active')); if(btn)btn.classList.add('active'); window.scrollTo(0,0);
 }
-function showBaby(which,btn){
+function showBaby(which,btn){$('quickFab')?.classList.remove('hidden');
  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$('babyPage').classList.add('active');
  document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active');
  panel(which);window.scrollTo(0,0);
@@ -209,7 +276,7 @@ function panel(which){
 }
 async function loadCurrent(){
  if(!childId())return;
- await Promise.all([loadTimeline(),loadSleep(),loadFeedings(),loadFoods(),loadDiapers(),loadGrowth(),loadMeds(),loadHealth(),loadReminders()]);
+ await Promise.all([loadTimeline(),loadSleep(),loadFeedings(),loadFoods(),loadDiapers(),loadGrowth(),loadMeds(),loadHealth(),loadReminders(),loadAchievements(),loadFoodRecommendations(),updateHero(),updateLiveStatus()]);
  renderSleepTimer();
 }
 function sleepKey(){return 'simeinyk_v4_sleep_'+user.id+'_'+childId()}
@@ -256,7 +323,20 @@ async function addDiaper(type){const {error}=await sb.from('baby_diapers').inser
 async function loadDiapers(){if(!childId())return;const {data}=await sb.from('baby_diapers').select('*').eq('child_id',childId()).order('occurred_at',{ascending:false}).limit(30);$('diaperList').innerHTML=(data||[]).map(x=>`<div class="row"><div>🧷</div><div class="grow"><b>${esc(x.diaper_type)}</b><div class="muted">${new Date(x.occurred_at).toLocaleString('uk-UA')}</div></div></div>`).join('')}
 async function addGrowth(){const {error}=await sb.from('baby_growth').insert({family_id:familyId(),child_id:childId(),created_by:user.id,weight_kg:Number($('weightKg').value)||null,height_cm:Number($('heightCm').value)||null,head_cm:Number($('headCm').value)||null});if(error)return alert(error.message);$('weightKg').value='';$('heightCm').value='';$('headCm').value='';loadGrowth()}
 async function loadGrowth(){if(!childId())return;const {data}=await sb.from('baby_growth').select('*').eq('child_id',childId()).order('measured_at',{ascending:false}).limit(30);$('growthList').innerHTML=(data||[]).map(x=>`<div class="row"><div>📏</div><div class="grow"><b>${new Date(x.measured_at).toLocaleDateString('uk-UA')}</b><div class="muted">${x.weight_kg?x.weight_kg+' кг ':''}${x.height_cm?x.height_cm+' см ':''}${x.head_cm?'· голова '+x.head_cm+' см':''}</div></div></div>`).join('')}
-async function addMedication(){const name=$('medName').value.trim();if(!name)return;const {error}=await sb.from('baby_medications').insert({family_id:familyId(),child_id:childId(),created_by:user.id,name,dose_note:$('medDose').value.trim()||null,due_at:$('medDue').value?new Date($('medDue').value).toISOString():null,note:$('medNote').value.trim()||null});if(error)return alert(error.message);$('medName').value='';$('medDose').value='';$('medDue').value='';$('medNote').value='';await loadMeds();await loadTimeline()}
+async function addMedication(){
+ const name=$('medName').value.trim();if(!name)return;
+ const start=$('medDue').value?new Date($('medDue').value):new Date();
+ const every=Number($('medEveryHours').value)||0;
+ const course=Number($('medCourseHours').value)||0;
+ const base={family_id:familyId(),child_id:childId(),created_by:user.id,name,dose_note:$('medDose').value.trim()||null,note:$('medNote').value.trim()||null};
+ let rows=[];
+ if(every>0 && course>0){
+   for(let h=0;h<=course;h+=every) rows.push({...base,due_at:new Date(start.getTime()+h*3600000).toISOString()});
+ }else rows=[{...base,due_at:start.toISOString()}];
+ const {error}=await sb.from('baby_medications').insert(rows);if(error)return alert(error.message);
+ $('medName').value='';$('medDose').value='';$('medDue').value='';$('medNote').value='';$('medEveryHours').value='0';$('medCourseHours').value='0';
+ await loadMeds();await loadTimeline()
+}
 async function markTaken(id){await sb.from('baby_medications').update({taken_at:new Date().toISOString()}).eq('id',id);await loadMeds();await loadTimeline()}
 async function loadMeds(){if(!childId())return;const {data}=await sb.from('baby_medications').select('*').eq('child_id',childId()).order('created_at',{ascending:false}).limit(40);$('medList').innerHTML=(data||[]).map(x=>`<div class="row"><div>💊</div><div class="grow"><b>${esc(x.name)}</b><div class="muted">${esc(x.dose_note||'')}${x.due_at?' · '+new Date(x.due_at).toLocaleString('uk-UA'):''}${x.taken_at?' · прийнято':''}</div></div>${x.taken_at?'✅':`<button class="btn secondary" onclick="markTaken('${x.id}')">Дано</button>`}</div>`).join('')}
 async function addHealth(){const {error}=await sb.from('baby_health_logs').insert({family_id:familyId(),child_id:childId(),created_by:user.id,temperature_c:Number($('temperature').value)||null,symptom:$('symptom').value.trim()||null,note:$('healthNote').value.trim()||null});if(error)return alert(error.message);$('temperature').value='';$('symptom').value='';$('healthNote').value='';await loadHealth();await loadTimeline()}
@@ -285,7 +365,98 @@ async function loadTimeline(){
  arr.sort((a,b)=>new Date(b.t)-new Date(a.t));
  $('timeline').innerHTML=arr.length?arr.map(x=>`<div class="row"><div>${x.i}</div><div class="grow"><b>${esc(x.a)}</b><div class="muted">${new Date(x.t).toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'})} · ${esc(x.b||'')}</div></div></div>`).join(''):'<div class="muted">Сьогодні ще немає записів</div>';
 }
-setInterval(renderSleepTimer,1000);init();
+
+function openQuick(){ $('quickOverlay').classList.remove('hidden');$('quickSheet').classList.remove('hidden') }
+function closeQuick(){ $('quickOverlay').classList.add('hidden');$('quickSheet').classList.add('hidden') }
+function childAgeText(birth){
+  if(!birth)return 'Дата народження не вказана';
+  const b=new Date(birth),n=new Date();
+  let months=(n.getFullYear()-b.getFullYear())*12+(n.getMonth()-b.getMonth());
+  if(n.getDate()<b.getDate())months--;
+  if(months<12)return months+' міс.';
+  const y=Math.floor(months/12),m=months%12;
+  return y+' р.'+(m?' '+m+' міс.':'');
+}
+async function updateHero(){
+  const c=children.find(x=>x.id===childId());
+  if(!c)return;
+  $('heroName').textContent=c.name||'Дитина';
+  $('heroAge').textContent=childAgeText(c.birth_date);
+  const {data}=await sb.from('baby_growth').select('*').eq('child_id',childId()).order('measured_at',{ascending:false}).limit(1);
+  const g=(data||[])[0];
+  $('heroHeight').textContent=g?.height_cm?g.height_cm+' см':'—';
+  $('heroWeight').textContent=g?.weight_kg?g.weight_kg+' кг':'—';
+}
+async function updateLiveStatus(){
+  const raw=localStorage.getItem(sleepKey());
+  if(raw){
+    const r=JSON.parse(raw);
+    $('liveStatus').innerHTML='<b>😴 Спить</b><div class="muted">'+fmt(Date.now()-new Date(r.started_at))+'</div>';
+    return;
+  }
+  const {data}=await sb.from('sleep_sessions').select('*').eq('child_id',childId()).not('ended_at','is',null).order('ended_at',{ascending:false}).limit(1);
+  if(data&&data.length){
+    const mins=Math.max(0,Math.round((Date.now()-new Date(data[0].ended_at))/60000));
+    $('liveStatus').innerHTML='<b>☀️ Не спить</b><div class="muted">Вікно неспання: '+mins+' хв</div>';
+  }else $('liveStatus').innerHTML='<b>Стан зараз</b><div class="muted">Ще немає записів сну</div>';
+}
+async function loadFoodRecommendations(){
+  const c=children.find(x=>x.id===childId());
+  if(!c||!$('foodRecommendations'))return;
+  let months=0;
+  if(c.birth_date){
+    const b=new Date(c.birth_date),n=new Date();
+    months=(n.getFullYear()-b.getFullYear())*12+n.getMonth()-b.getMonth();
+    if(n.getDate()<b.getDate())months--;
+  }
+  const {data}=await sb.from('baby_foods').select('food_name,status').eq('child_id',childId());
+  const tried=new Set((data||[]).map(x=>String(x.food_name).toLowerCase()));
+  let body='';
+  if(months<6){
+    body='<div class="rec-card"><b>Прикорм ще не потрібен</b><div class="muted">Для більшості дітей прикорм починають приблизно з 6 місяців. Орієнтуйся на рекомендації педіатра та готовність дитини.</div></div>';
+  }else{
+    const groups=[
+      ['Овочі',['броколі','кабачок','морква','гарбуз']],
+      ['Фрукти',['яблуко','груша','банан']],
+      ['Крупи',['гречка','вівсянка','рис']],
+      ['Білкові продукти',['яйце','курка','індичка','риба','сочевиця']],
+      ['Молочні продукти',['натуральний йогурт','сир']]
+    ];
+    body='<div class="rec-card"><b>Що ще можна відмітити</b><div class="muted">Це довідник різноманітності, не медичне призначення.</div></div>';
+    for(const [g,foods] of groups){
+      const missing=foods.filter(x=>!tried.has(x.toLowerCase()));
+      if(missing.length) body+=`<div class="rec-card"><b>${g}</b><div class="muted">Ще не відмічено: ${missing.map(esc).join(', ')}</div></div>`;
+    }
+    if(months<12) body+='<div class="rec-card"><b>⚠️ До 12 місяців</b><div class="muted">Не давай мед. Уникай небезпечної форми продуктів, якою дитина може вдавитися.</div></div>';
+  }
+  $('foodRecommendations').innerHTML=body;
+}
+async function addAchievement(){
+  const title=$('achTitle').value.trim(); if(!title)return;
+  const {error}=await sb.from('baby_achievements').insert({
+    family_id:familyId(),child_id:childId(),created_by:user.id,
+    category:$('achCategory').value,title,points:Number($('achPoints').value)||1
+  });
+  if(error)return alert(error.message);
+  $('achTitle').value='';$('achPoints').value='1';await loadAchievements();await loadTimeline();
+}
+function setLevel(prefix,points){
+  const lvl=Math.floor(points/5);
+  const pct=(points%5)/5*100;
+  $(prefix).textContent='Рівень '+lvl;
+  $('bar'+prefix.replace('lvl','')).style.width=pct+'%';
+}
+async function loadAchievements(){
+  if(!childId()||!$('achList'))return;
+  const {data}=await sb.from('baby_achievements').select('*').eq('child_id',childId()).order('achieved_at',{ascending:false});
+  const rows=data||[];
+  const sums={speech:0,movement:0,thinking:0,self:0,world:0};
+  rows.forEach(x=>sums[x.category]=(sums[x.category]||0)+Number(x.points||1));
+  setLevel('lvlSpeech',sums.speech||0);setLevel('lvlMove',sums.movement||0);setLevel('lvlThink',sums.thinking||0);setLevel('lvlSelf',sums.self||0);
+  $('achList').innerHTML=rows.map(x=>`<div class="row"><div>🏆</div><div class="grow"><b>${esc(x.title)}</b><div class="muted">${esc(x.category)} · +${x.points||1} · ${new Date(x.achieved_at).toLocaleDateString('uk-UA')}</div></div></div>`).join('');
+}
+
+setInterval(()=>{renderSleepTimer();updateLiveStatus()},1000);init();
 </script>
 </body>
 </html>
