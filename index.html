@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f6f7f2">
+<title>Сімейник</title>
+<style>
+:root{--bg:#f6f7f2;--card:#fff;--ink:#1d241f;--muted:#6e776f;--brand:#6e9079;--brand2:#e4eee7;--line:#e7ebe6;--shadow:0 10px 30px rgba(31,43,35,.08)}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+.app{max-width:520px;margin:0 auto;min-height:100vh;padding-bottom:92px} header{padding:22px 18px 10px;position:sticky;top:0;background:rgba(246,247,242,.93);backdrop-filter:blur(16px);z-index:10}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:12px}.logo{font-size:30px;font-weight:850;letter-spacing:-.7px}.sub{color:var(--muted);font-size:13px;margin-top:2px}.avatar{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:var(--brand2);font-size:20px}
+main{padding:8px 16px 24px}.page{display:none}.page.active{display:block}.hero{background:linear-gradient(135deg,#fff,#edf4ef);border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:var(--shadow);margin-bottom:14px}
+.hero h2{margin:0 0 6px;font-size:20px}.timer{font-size:38px;font-weight:850;letter-spacing:1px;margin:8px 0 12px}button{font:inherit}.primary{border:0;background:var(--brand);color:#fff;padding:13px 16px;border-radius:15px;font-weight:750;width:100%}
+.secondary{border:1px solid var(--line);background:#fff;color:var(--ink);padding:11px 14px;border-radius:14px;font-weight:700}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:19px;padding:15px;box-shadow:0 4px 18px rgba(31,43,35,.05)}.card h3{margin:6px 0 3px;font-size:16px}.card p{margin:0;color:var(--muted);font-size:13px;line-height:1.35}.icon{font-size:25px}
+.section-title{display:flex;justify-content:space-between;align-items:end;margin:20px 2px 10px}.section-title h2{font-size:18px;margin:0}.section-title span{font-size:12px;color:var(--muted)}.list{display:grid;gap:9px}
+.row{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);border-radius:17px;padding:13px}.row .grow{flex:1}.row strong{display:block;font-size:15px}.row small{color:var(--muted)}.pill{font-size:11px;padding:5px 8px;border-radius:999px;background:var(--brand2);color:#45634f;font-weight:700}
+.nav{position:fixed;left:50%;bottom:0;transform:translateX(-50%);max-width:520px;width:100%;display:grid;grid-template-columns:repeat(5,1fr);background:rgba(255,255,255,.96);backdrop-filter:blur(18px);border-top:1px solid var(--line);padding:8px 6px calc(8px + env(safe-area-inset-bottom));z-index:30}
+.nav button{border:0;background:transparent;padding:7px 2px;color:var(--muted);font-size:11px}.nav button b{display:block;font-size:21px;margin-bottom:2px}.nav button.active{color:var(--brand);font-weight:800}
+.modal{position:fixed;inset:0;background:rgba(15,20,17,.35);display:none;align-items:flex-end;justify-content:center;z-index:50}.modal.open{display:flex}.sheet{width:min(520px,100%);background:#fff;border-radius:25px 25px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom));max-height:82vh;overflow:auto}
+.sheet h2{margin:0 0 14px}.field{margin:11px 0}.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px}.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);background:#fafbfa;border-radius:13px;padding:12px;font:inherit}.actions{display:flex;gap:9px;margin-top:14px}.actions button{flex:1}.quick{display:flex;gap:8px;overflow:auto;padding-bottom:4px}.quick button{white-space:nowrap}.notice{background:#fff8dc;border:1px solid #f2df91;padding:11px 13px;border-radius:15px;font-size:12px;color:#65581f}.empty{color:var(--muted);text-align:center;padding:24px 10px}
+</style>
+</head>
+<body>
+<div class="app">
+<header><div class="brand"><div><div class="logo">Сімейник</div><div class="sub">Уся сім’я — в одному місці</div></div><div class="avatar">👤</div></div></header>
+<main>
+<section class="page active" id="home">
+<div class="hero"><h2>Сон дитини</h2><div class="sub" id="sleepStatus">Таймер не запущено</div><div class="timer" id="sleepTimer">00:00:00</div><button class="primary" id="sleepBtn" onclick="toggleSleep()">🌙 Заснув — запустити</button></div>
+<div class="quick"><button class="secondary" onclick="openAdd('Подія')">＋ Подія</button><button class="secondary" onclick="openAdd('Ліки')">💊 Ліки</button><button class="secondary" onclick="openAdd('Платіж')">💳 Платіж</button><button class="secondary" onclick="openAdd('Нотатка')">📝 Нотатка</button></div>
+<div class="section-title"><h2>Сьогодні</h2><span>найважливіше</span></div><div class="list" id="todayList"></div>
+<div class="section-title"><h2>Мої розділи</h2></div>
+<div class="grid">
+<div class="card" onclick="go('family')"><div class="icon">👨‍👩‍👧‍👦</div><h3>Сім’я</h3><p>Кілька сімей, діти та доступи</p></div>
+<div class="card" onclick="go('calendar')"><div class="icon">📅</div><h3>Календар</h3><p>Особисті й сімейні події</p></div>
+<div class="card" onclick="go('more')"><div class="icon">🐾</div><h3>Тварини</h3><p>Вакцинації, ліки, догляд</p></div>
+<div class="card" onclick="go('more')"><div class="icon">🚗</div><h3>Авто</h3><p>ТО, страховка, документи</p></div>
+</div></section>
+<section class="page" id="calendar">
+<div class="section-title"><h2>Календар</h2><span>особистий + сімейний</span></div>
+<div class="list">
+<div class="row"><div class="icon">👤</div><div class="grow"><strong>Мій календар</strong><small>Особисті події та нагадування</small></div><span>›</span></div>
+<div class="row"><div class="icon">👨‍👩‍👧</div><div class="grow"><strong>Сімейний календар</strong><small>Спільні події для вибраних людей</small></div><span>›</span></div>
+<div class="row"><div class="icon">🎂</div><div class="grow"><strong>Дні народження</strong><small>Щорічні нагадування</small></div><span class="pill">Авто</span></div>
+<div class="row"><div class="icon">⏰</div><div class="grow"><strong>Нагадування</strong><small>Ліки, платежі, ТО, події</small></div><span>›</span></div>
+</div><div class="section-title"><h2>Додані записи</h2></div><div class="list" id="eventsList"></div></section>
+<section class="page" id="family">
+<div class="section-title"><h2>Мій акаунт</h2><span>мої зв’язки</span></div><div class="notice">Дані інших людей видно лише тоді, коли вони самі відкрили вам доступ.</div>
+<div class="section-title"><h2>Сім’ї</h2></div><div class="list">
+<div class="row"><div class="icon">🏡</div><div class="grow"><strong>Моя сім’я</strong><small>Основна сімейна група</small></div><span class="pill">Адмін</span></div>
+<div class="row"><div class="icon">➕</div><div class="grow"><strong>Створити ще одну сім’ю</strong><small>Для інших дітей, родичів або окремого дому</small></div><span>›</span></div></div>
+<div class="section-title"><h2>Люди та профілі</h2></div><div class="list">
+<div class="row"><div class="icon">👤</div><div class="grow"><strong>Мій профіль</strong><small>Здоров’я, документи, календар</small></div><span>›</span></div>
+<div class="row"><div class="icon">👶</div><div class="grow"><strong>Мої діти</strong><small>Сон, харчування, розвиток, здоров’я</small></div><span>›</span></div>
+<div class="row"><div class="icon">🔐</div><div class="grow"><strong>Доступне мені</strong><small>Дані, які інші відкрили для мене</small></div><span>›</span></div></div></section>
+<section class="page" id="tasks">
+<div class="section-title"><h2>Справи</h2><span>сімейні й особисті</span></div><div class="list">
+<div class="row"><div class="icon">🛒</div><div class="grow"><strong>Список покупок</strong><small>Продукти, аптека, дім</small></div><span>›</span></div>
+<div class="row"><div class="icon">✅</div><div class="grow"><strong>Сімейні завдання</strong><small>Відповідальний + дедлайн</small></div><span>›</span></div>
+<div class="row"><div class="icon">💳</div><div class="grow"><strong>Платежі</strong><small>Оренда, комунальні, підписки</small></div><span>›</span></div></div></section>
+<section class="page" id="more">
+<div class="section-title"><h2>Усі модулі</h2></div><div class="grid">
+<div class="card"><div class="icon">❤️</div><h3>Здоров’я</h3><p>Група крові, лікарі, операції, цикл, лікування</p></div>
+<div class="card"><div class="icon">🐕</div><h3>Тварини</h3><p>Вакцинації, таблетки, ветеринар, документи</p></div>
+<div class="card"><div class="icon">🚙</div><h3>Автомобілі</h3><p>ТО за датою/пробігом, страховка</p></div>
+<div class="card"><div class="icon">📁</div><h3>Документи</h3><p>Приватні файли та гнучкі доступи</p></div>
+<div class="card"><div class="icon">🏠</div><h3>Майно</h3><p>Квартири, будинки, гаражі</p></div>
+<div class="card"><div class="icon">💰</div><h3>Платежі</h3><p>Оренда, рахунки та історія оплат</p></div></div>
+<div class="section-title"><h2>Приватність</h2></div><div class="row"><div class="icon">🛡️</div><div class="grow"><strong>Доступи</strong><small>Тільки я · конкретна людина · вибрані · сім’я</small></div><span>›</span></div></section>
+</main>
+<nav class="nav">
+<button class="active" data-page="home" onclick="go('home')"><b>⌂</b>Головна</button>
+<button data-page="calendar" onclick="go('calendar')"><b>◫</b>Календар</button>
+<button data-page="family" onclick="go('family')"><b>👥</b>Сім’я</button>
+<button data-page="tasks" onclick="go('tasks')"><b>✓</b>Справи</button>
+<button data-page="more" onclick="go('more')"><b>⋯</b>Ще</button>
+</nav></div>
+
+<div class="modal" id="modal"><div class="sheet"><h2 id="modalTitle">Додати</h2>
+<div class="field"><label>Назва</label><input id="entryTitle" placeholder="Наприклад: Оренда квартири"></div>
+<div class="field"><label>Дата / час</label><input id="entryWhen" type="datetime-local"></div>
+<div class="field"><label>Кому видно</label><select id="entryAccess"><option>Тільки мені</option><option>Моїй сім’ї</option><option>Вибраним людям</option></select></div>
+<div class="field"><label>Нотатка</label><textarea id="entryNote" rows="3" placeholder="Необов’язково"></textarea></div>
+<div class="actions"><button class="secondary" onclick="closeModal()">Скасувати</button><button class="primary" onclick="saveEntry()">Зберегти</button></div></div></div>
+<script>
+const $=s=>document.querySelector(s);let entryType='Подія';let sleepStart=Number(localStorage.getItem('sleepStart')||0);
+const defaults=[{icon:'💊',title:'Ліки',sub:'Сьогодні о 18:00'},{icon:'🐕',title:'Обробка тварини',sub:'Через 3 дні'},{icon:'🎂',title:'День народження',sub:'Через 6 днів'},{icon:'🏠',title:'Оренда',sub:'До 25 числа'},{icon:'🚗',title:'ТО автомобіля',sub:'Через 1 200 км'}];
+function go(id){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===id));window.scrollTo({top:0,behavior:'smooth'});renderEntries()}
+function fmt(ms){const s=Math.max(0,Math.floor(ms/1000)),h=Math.floor(s/3600),m=Math.floor((s%3600)/60),ss=s%60;return[h,m,ss].map(x=>String(x).padStart(2,'0')).join(':')}
+function renderSleep(){if(sleepStart){$('#sleepTimer').textContent=fmt(Date.now()-sleepStart);$('#sleepStatus').textContent='Сон триває';$('#sleepBtn').textContent='☀️ Прокинувся — зупинити'}else{$('#sleepTimer').textContent='00:00:00';$('#sleepStatus').textContent='Таймер не запущено';$('#sleepBtn').textContent='🌙 Заснув — запустити'}}
+function toggleSleep(){if(!sleepStart){sleepStart=Date.now();localStorage.setItem('sleepStart',sleepStart)}else{const dur=Date.now()-sleepStart,items=getEntries();items.unshift({type:'Сон',title:'Сон дитини',when:new Date().toISOString(),note:'Тривалість '+fmt(dur),access:'Моїй сім’ї'});saveEntries(items);sleepStart=0;localStorage.removeItem('sleepStart')}renderSleep();renderEntries()}
+function openAdd(type){entryType=type;$('#modalTitle').textContent='Додати: '+type;$('#entryTitle').value='';$('#entryWhen').value='';$('#entryNote').value='';$('#modal').classList.add('open')}
+function closeModal(){$('#modal').classList.remove('open')} function getEntries(){try{return JSON.parse(localStorage.getItem('entries')||'[]')}catch(e){return[]}} function saveEntries(v){localStorage.setItem('entries',JSON.stringify(v))}
+function saveEntry(){const title=$('#entryTitle').value.trim()||entryType,items=getEntries();items.unshift({type:entryType,title,when:$('#entryWhen').value,note:$('#entryNote').value,access:$('#entryAccess').value});saveEntries(items);closeModal();renderEntries()}
+function iconFor(t){return{Подія:'📅',Ліки:'💊',Платіж:'💳',Нотатка:'📝',Сон:'😴'}[t]||'•'} function esc(s=''){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function renderEntries(){const extra=getEntries();$('#todayList').innerHTML=[...extra.slice(0,3).map(e=>({icon:iconFor(e.type),title:e.title,sub:e.note||e.when||e.access})),...defaults].slice(0,7).map(x=>`<div class="row"><div class="icon">${x.icon}</div><div class="grow"><strong>${esc(x.title)}</strong><small>${esc(x.sub||'')}</small></div><span>›</span></div>`).join('');$('#eventsList').innerHTML=extra.length?extra.map(e=>`<div class="row"><div class="icon">${iconFor(e.type)}</div><div class="grow"><strong>${esc(e.title)}</strong><small>${esc(e.when||e.note||e.access)}</small></div><span class="pill">${esc(e.access)}</span></div>`).join(''):'<div class="empty">Поки немає ваших записів</div>'}
+renderSleep();renderEntries();setInterval(renderSleep,1000);
+</script>
+</body>
+</html>
