@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f4f6f3">
 <title>Сімейник</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--bg:#f4f6f3;--card:#fff;--ink:#1f2722;--muted:#707970;--brand:#6e9079;--brand2:#e6efe8;--line:#e4e9e5;--danger:#a94f4f}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
@@ -23,7 +22,7 @@ h2,h3{margin:0 0 8px}.muted{color:var(--muted);font-size:13px}.row{display:flex;
 </head>
 <body>
 <div class="app">
-<header><div><div class="logo">Сімейник</div><div class="sub">Уся сім’я — в одному місці</div></div><div>👤</div></header>
+<header><div><div class="logo">Сімейник</div><div class="sub">Уся сім’я — в одному місці · v2.1</div></div><div>👤</div></header>
 <main>
 
 <section id="auth" class="card hero">
@@ -121,17 +120,49 @@ h2,h3{margin:0 0 8px}.muted{color:var(--muted);font-size:13px}.row{display:flex;
 </div>
 
 <script>
-const URL="https://yeqdpgjddwxiagwgrhtt.supabase.co", KEY="sb_publishable_ybXS5RIEWMzEk99OoO8TiQ_w9hvsaBz";
-const sb=supabase.createClient(URL,KEY);
-let user=null,families=[],watchId=null;
+const SUPABASE_URL="https://yeqdpgjddwxiagwgrhtt.supabase.co";
+const SUPABASE_KEY="sb_publishable_ybXS5RIEWMzEk99OoO8TiQ_w9hvsaBz";
+let sb=null,user=null,families=[],watchId=null;
+
+function loadScript(url){
+  return new Promise((resolve,reject)=>{
+    const s=document.createElement('script');
+    s.src=url;
+    s.onload=resolve;
+    s.onerror=reject;
+    document.head.appendChild(s);
+  });
+}
+
+async function ensureSupabase(){
+  if(sb) return sb;
+  if(!window.supabase){
+    try{
+      await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2');
+    }catch(e){
+      try{
+        await loadScript('https://unpkg.com/@supabase/supabase-js@2');
+      }catch(e2){
+        const box=document.getElementById('authMsg');
+        if(box){
+          box.className='msg err';
+          box.textContent='Не вдалося підключитися до сервера. Онови сторінку та спробуй ще раз.';
+        }
+        throw e2;
+      }
+    }
+  }
+  sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+  return sb;
+}
 const $=id=>document.getElementById(id);
 function esc(s=''){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
 function msg(id,t,ok=true){$(id).className='msg '+(ok?'ok':'err');$(id).textContent=t}
 function age(d){if(!d)return null;const b=new Date(d),n=new Date();let a=n.getFullYear()-b.getFullYear();const m=n.getMonth()-b.getMonth();if(m<0||(m===0&&n.getDate()<b.getDate()))a--;return a}
 function go(id,btn){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active');window.scrollTo(0,0);refresh(id)}
-async function register(){const e=$('email').value.trim(),p=$('pass').value;if(!e||p.length<6)return msg('authMsg','Введи email і пароль від 6 символів',false);const {data,error}=await sb.auth.signUp({email:e,password:p});if(error)return msg('authMsg',error.message,false);msg('authMsg','Акаунт створено');if(data.session){user=data.user;afterLogin()}}
-async function login(){const {data,error}=await sb.auth.signInWithPassword({email:$('email').value.trim(),password:$('pass').value});if(error)return msg('authMsg',error.message,false);user=data.user;afterLogin()}
-async function init(){const {data:{session}}=await sb.auth.getSession();if(session){user=session.user;afterLogin()}}
+async function register(){try{await ensureSupabase();}catch(e){return;}const e=$('email').value.trim(),p=$('pass').value;if(!e||p.length<6)return msg('authMsg','Введи email і пароль від 6 символів',false);const {data,error}=await sb.auth.signUp({email:e,password:p});if(error)return msg('authMsg',error.message,false);msg('authMsg','Акаунт створено');if(data.session){user=data.user;afterLogin()}}
+async function login(){try{await ensureSupabase();}catch(e){return;}const {data,error}=await sb.auth.signInWithPassword({email:$('email').value.trim(),password:$('pass').value});if(error)return msg('authMsg',error.message,false);user=data.user;afterLogin()}
+async function init(){try{await ensureSupabase();}catch(e){return;}const {data:{session}}=await sb.auth.getSession();if(session){user=session.user;afterLogin()}}
 async function afterLogin(){$('auth').classList.add('hidden');$('app').classList.remove('hidden');$('nav').classList.remove('hidden');await sb.from('profiles').upsert({id:user.id,email:user.email},{onConflict:'id'});await loadProfile();await loadFamilies();await loadAll()}
 async function loadProfile(){const {data}=await sb.from('profiles').select('*').eq('id',user.id).single();if(!data)return;$('firstName').value=data.first_name||'';$('lastName').value=data.last_name||'';$('birthDate').value=data.birth_date||'';$('ageText').textContent=data.birth_date?age(data.birth_date)+' років':'Вкажи дату народження';$('hello').textContent=(data.first_name?data.first_name+', ':'')+'твій Сімейник'}
 async function saveProfile(){const payload={first_name:$('firstName').value.trim(),last_name:$('lastName').value.trim(),birth_date:$('birthDate').value||null,display_name:[$('firstName').value.trim(),$('lastName').value.trim()].filter(Boolean).join(' ')};const {error}=await sb.from('profiles').update(payload).eq('id',user.id);if(error)return msg('profileMsg',error.message,false);msg('profileMsg','Збережено');loadProfile();loadMembers()}
@@ -157,7 +188,7 @@ async function stopLocation(){if(watchId!==null)navigator.geolocation.clearWatch
 async function loadLocations(){if(!families.length)return;const {data}=await sb.from('location_shares').select('*').in('family_id',families.map(f=>f.id)).eq('sharing',true);$('locationList').innerHTML=(data||[]).map(x=>`<div class="row"><div>📍</div><div class="grow"><b>Учасник сім’ї</b><div class="muted">${Number(x.latitude).toFixed(5)}, ${Number(x.longitude).toFixed(5)}</div></div></div>`).join('')}
 async function loadAll(){await Promise.all([loadExpenses(),loadEvents(),loadChildren(),loadPets(),loadCars(),loadLocations()]);renderTimer()}
 function refresh(id){if(id==='expenses')loadExpenses();if(id==='calendar')loadEvents();if(id==='family')loadMembers();if(id==='sleep')loadChildren();if(id==='pets')loadPets();if(id==='cars')loadCars();if(id==='location')loadLocations();if(id==='profile')loadProfile()}
-setInterval(renderTimer,1000);init();
+document.documentElement.dataset.js='ready'; setInterval(renderTimer,1000); init();
 </script>
 </body>
 </html>
