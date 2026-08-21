@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f7f3">
-<title>Сімейник Baby v6</title>
+<title>Сімейник Baby v7</title>
 <style>
 :root{--bg:#f5f7f3;--card:#fff;--ink:#202820;--muted:#6f786f;--brand:#6e9079;--brand2:#e5eee7;--line:#e4e9e5;--danger:#a84f4f}
 *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
@@ -47,11 +47,16 @@
 .memory-media{width:100%;max-height:360px;object-fit:cover;background:#111;display:block}
 .memory-body{padding:12px}.memory-badge{display:inline-block;padding:5px 9px;border-radius:999px;background:#edf3ee;font-size:11px;font-weight:800}
 
+
+.badge-row{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
+.game-badge{display:inline-block;padding:7px 10px;border-radius:999px;background:#fff4cf;border:1px solid #ecd68e;font-size:12px;font-weight:800}
+.school-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:13px;margin-top:10px;color:var(--ink)}
+
 </style>
 </head>
 <body>
 <div class="app">
-<header><div><div class="logo">Сімейник</div><div class="sub">Baby v6 · спогади, медіа, сімейна стрічка</div></div><div>👶</div></header>
+<header><div><div class="logo">Сімейник</div><div class="sub">Baby v7 · книжки, гуртки, садочок, школа</div></div><div>👶</div></header>
 <main>
 <section id="authBox" class="card hero">
 <h2>Вхід</h2>
@@ -76,6 +81,10 @@
 <div class="tile" onclick="showBaby('reminders')">⏰<b>Нагадування</b><span class="muted">Ліки, лікар, вакцинація</span></div>
 <div class="tile" onclick="showBaby('children')">👶<b>Діти</b><span class="muted">Додати або обрати</span></div>
 <div class="tile" onclick="showBaby('memories')">📸<b>Спогади</b><span class="muted">Фото, відео, відзнаки</span></div>
+<div class="tile" onclick="showBaby('books')">📚<b>Книжки</b><span class="muted">Читаємо, прочитано, улюблені</span></div>
+<div class="tile" onclick="showBaby('activities')">⚽<b>Гуртки</b><span class="muted">Секції, розклад, оплата</span></div>
+<div class="tile" onclick="showBaby('education')">🎒<b>Садочок / школа</b><span class="muted">Події, група, клас</span></div>
+
 </div>
 </section>
 
@@ -104,6 +113,10 @@
 <button class="btn secondary" onclick="panel('food')">Прикорм</button>
 <button class="btn secondary" onclick="panel('achievements')">🏆 Досягнення</button>
 <button class="btn secondary" onclick="panel('memories')">📸 Спогади</button>
+<button class="btn secondary" onclick="panel('books')">📚 Книжки</button>
+<button class="btn secondary" onclick="panel('activities')">⚽ Гуртки</button>
+<button class="btn secondary" onclick="panel('education')">🎒 Освіта</button>
+
 <button class="btn secondary" onclick="panel('meds')">Ліки</button>
 <button class="btn secondary" onclick="panel('health')">Здоров’я</button>
 <button class="btn secondary" onclick="panel('growth')">Ріст</button>
@@ -191,6 +204,46 @@
 <div id="memoryList"></div>
 </div>
 
+
+<div class="panel" id="p-books"><h2>📚 Книжки</h2>
+<div class="field"><label>Назва книжки</label><input id="bookTitle" placeholder="Наприклад: Колобок"></div>
+<div class="field"><label>Автор</label><input id="bookAuthor"></div>
+<div class="field"><label>Статус</label><select id="bookStatus"><option>Хочемо прочитати</option><option>Читаємо</option><option>Прочитано</option><option>Улюблена</option></select></div>
+<div class="field"><label>Скільки разів прочитали</label><input id="bookTimes" type="number" min="0" value="0"></div>
+<div class="field"><label>Нотатка</label><input id="bookNote"></div>
+<button class="btn primary wide" onclick="addBook()">Додати книжку</button>
+<div id="bookStats" class="grid" style="margin-top:10px"></div>
+<div id="bookList"></div>
+</div>
+
+<div class="panel" id="p-activities"><h2>⚽ Гуртки та секції</h2>
+<div class="field"><label>Назва</label><input id="activityTitle" placeholder="Плавання"></div>
+<div class="field"><label>Тип</label><select id="activityType"><option>Спорт</option><option>Музика</option><option>Танці</option><option>Малювання</option><option>Мови</option><option>Розвиток</option><option>Інше</option></select></div>
+<div class="field"><label>День / розклад</label><input id="activitySchedule" placeholder="Вт і Чт, 17:30"></div>
+<div class="field"><label>Оплата</label><input id="activityCost" type="number" step="0.01" placeholder="0"></div>
+<div class="field"><label>Місце / адреса</label><input id="activityPlace"></div>
+<div class="field"><label>Контакт</label><input id="activityContact"></div>
+<button class="btn primary wide" onclick="addActivity()">Додати гурток</button>
+<div id="activityList"></div>
+</div>
+
+<div class="panel" id="p-education"><h2>🎒 Садочок / школа</h2>
+<div class="field"><label>Заклад</label><input id="eduInstitution" placeholder="Садочок №... / Школа №..."></div>
+<div class="field"><label>Етап</label><select id="eduStage"><option>Садочок</option><option>Підготовка до школи</option><option>Початкова школа</option><option>Середня школа</option><option>Інше</option></select></div>
+<div class="field"><label>Група / клас</label><input id="eduGroup"></div>
+<div class="field"><label>Вихователь / класний керівник</label><input id="eduTeacher"></div>
+<div class="field"><label>Нотатка</label><input id="eduNote"></div>
+<button class="btn primary wide" onclick="saveEducation()">Зберегти</button>
+
+<h3 style="margin-top:18px">Подія</h3>
+<div class="field"><label>Назва</label><input id="eduEventTitle" placeholder="Ранок у садочку"></div>
+<div class="field"><label>Дата й час</label><input id="eduEventDue" type="datetime-local"></div>
+<button class="btn secondary wide" onclick="addEducationEvent()">Додати подію</button>
+
+<div id="educationCard"></div>
+<div id="educationEvents"></div>
+</div>
+
 <div class="panel" id="p-achievements"><h2>🏆 Досягнення</h2>
 <div class="grid">
 <div class="ach-card"><div class="muted">Мовлення</div><div class="level" id="lvlSpeech">Рівень 0</div><div class="progress"><i id="barSpeech" style="width:0%"></i></div></div>
@@ -202,6 +255,7 @@
 <div class="field"><label>Досягнення</label><input id="achTitle" placeholder="Наприклад: сказала перше слово"></div>
 <div class="field"><label>Бали / крок рівня</label><input id="achPoints" type="number" min="1" max="20" value="1"></div>
 <button class="btn primary wide" onclick="addAchievement()">Додати досягнення</button>
+<div class="rec-card"><b>Ігрові бейджі</b><div class="muted" id="badgeSummary">Бейджі з’являються автоматично за книжки та досягнення.</div></div>
 <div id="achList"></div>
 </div>
 
@@ -235,6 +289,10 @@
 <button class="btn secondary" onclick="closeQuick();panel('growth')">📏<br>Ріст</button>
 <button class="btn secondary" onclick="closeQuick();panel('achievements')">🏆<br>Досягнення</button>
 <button class="btn secondary" onclick="closeQuick();panel('memories')">📸<br>Спогад</button>
+<button class="btn secondary" onclick="closeQuick();panel('books')">📚<br>Книжка</button>
+<button class="btn secondary" onclick="closeQuick();panel('activities')">⚽<br>Гурток</button>
+<button class="btn secondary" onclick="closeQuick();panel('education')">🎒<br>Освіта</button>
+
 </div>
 </div>
 
@@ -297,7 +355,7 @@ function panel(which){
 }
 async function loadCurrent(){
  if(!childId())return;
- await Promise.all([loadTimeline(),loadSleep(),loadFeedings(),loadFoods(),loadDiapers(),loadGrowth(),loadMeds(),loadHealth(),loadReminders(),loadAchievements(),loadMemories(),loadFoodRecommendations(),updateHero(),updateLiveStatus()]);
+ await Promise.all([loadTimeline(),loadSleep(),loadFeedings(),loadFoods(),loadDiapers(),loadGrowth(),loadMeds(),loadHealth(),loadReminders(),loadAchievements(),loadMemories(),loadBooks(),loadActivities(),loadEducation(),loadEducationEvents(),loadFoodRecommendations(),updateHero(),updateLiveStatus()]);
  renderSleepTimer();
 }
 function sleepKey(){return 'simeinyk_v4_sleep_'+user.id+'_'+childId()}
@@ -387,6 +445,94 @@ async function loadTimeline(){
  $('timeline').innerHTML=arr.length?arr.map(x=>`<div class="row"><div>${x.i}</div><div class="grow"><b>${esc(x.a)}</b><div class="muted">${new Date(x.t).toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'})} · ${esc(x.b||'')}</div></div></div>`).join(''):'<div class="muted">Сьогодні ще немає записів</div>';
 }
 
+
+
+async function addBook(){
+  const title=$('bookTitle').value.trim(); if(!title)return;
+  const {error}=await sb.from('child_books').insert({
+    family_id:familyId(),child_id:childId(),created_by:user.id,title,
+    author:$('bookAuthor').value.trim()||null,status:$('bookStatus').value,
+    times_read:Number($('bookTimes').value)||0,note:$('bookNote').value.trim()||null
+  });
+  if(error)return alert(error.message);
+  $('bookTitle').value='';$('bookAuthor').value='';$('bookTimes').value='0';$('bookNote').value='';
+  await loadBooks();await loadAchievements();await loadTimeline();
+}
+async function loadBooks(){
+  if(!childId()||!$('bookList'))return;
+  const {data,error}=await sb.from('child_books').select('*').eq('child_id',childId()).order('created_at',{ascending:false});
+  if(error)return;
+  const rows=data||[];
+  const read=rows.filter(x=>x.status==='Прочитано'||x.status==='Улюблена').length;
+  const fav=rows.filter(x=>x.status==='Улюблена').length;
+  $('bookStats').innerHTML=`<div class="ach-card"><div class="muted">Прочитано</div><div class="level">${read}</div></div><div class="ach-card"><div class="muted">Улюблені</div><div class="level">${fav}</div></div>`;
+  $('bookList').innerHTML=rows.map(x=>`<div class="row"><div>📚</div><div class="grow"><b>${esc(x.title)}</b><div class="muted">${esc(x.author||'')} · ${esc(x.status)}${x.times_read?' · '+x.times_read+' раз(и)':''}</div></div></div>`).join('');
+  updateBadges(rows);
+}
+function updateBadges(books=[]){
+  if(!$('badgeSummary'))return;
+  const total=books.filter(x=>x.status==='Прочитано'||x.status==='Улюблена').length;
+  const badges=[];
+  if(total>=1)badges.push('📖 Перша книжка');
+  if(total>=5)badges.push('📚 5 книжок');
+  if(total>=10)badges.push('🏅 10 книжок');
+  if(total>=25)badges.push('🌟 25 книжок');
+  $('badgeSummary').innerHTML=badges.length?`<div class="badge-row">${badges.map(x=>`<span class="game-badge">${x}</span>`).join('')}</div>`:'Поки немає відкритих бейджів.';
+}
+async function addActivity(){
+  const title=$('activityTitle').value.trim();if(!title)return;
+  const {error}=await sb.from('child_activities').insert({
+    family_id:familyId(),child_id:childId(),created_by:user.id,title,
+    activity_type:$('activityType').value,schedule_text:$('activitySchedule').value.trim()||null,
+    monthly_cost:Number($('activityCost').value)||null,place:$('activityPlace').value.trim()||null,
+    contact:$('activityContact').value.trim()||null
+  });
+  if(error)return alert(error.message);
+  ['activityTitle','activitySchedule','activityCost','activityPlace','activityContact'].forEach(id=>$(id).value='');
+  await loadActivities();
+}
+async function loadActivities(){
+  if(!childId()||!$('activityList'))return;
+  const {data}=await sb.from('child_activities').select('*').eq('child_id',childId()).order('created_at',{ascending:false});
+  $('activityList').innerHTML=(data||[]).map(x=>`<div class="row"><div>⚽</div><div class="grow"><b>${esc(x.title)}</b><div class="muted">${esc(x.activity_type)}${x.schedule_text?' · '+esc(x.schedule_text):''}${x.monthly_cost?' · '+x.monthly_cost+' грн':''}${x.place?' · '+esc(x.place):''}</div></div></div>`).join('');
+}
+async function saveEducation(){
+  if(!childId())return;
+  const payload={
+    child_id:childId(),family_id:familyId(),created_by:user.id,
+    institution:$('eduInstitution').value.trim()||null,stage:$('eduStage').value,
+    group_name:$('eduGroup').value.trim()||null,teacher:$('eduTeacher').value.trim()||null,
+    note:$('eduNote').value.trim()||null
+  };
+  const {error}=await sb.from('child_education').upsert(payload,{onConflict:'child_id'});
+  if(error)return alert(error.message);await loadEducation();
+}
+async function addEducationEvent(){
+  const title=$('eduEventTitle').value.trim(),due=$('eduEventDue').value;if(!title||!due)return;
+  const {error}=await sb.from('child_education_events').insert({
+    family_id:familyId(),child_id:childId(),created_by:user.id,title,due_at:new Date(due).toISOString()
+  });
+  if(error)return alert(error.message);$('eduEventTitle').value='';$('eduEventDue').value='';await loadEducationEvents();await loadTimeline();
+}
+async function loadEducation(){
+  if(!childId()||!$('educationCard'))return;
+  const {data}=await sb.from('child_education').select('*').eq('child_id',childId()).maybeSingle();
+  const x=data;
+  if(x){
+    $('eduInstitution').value=x.institution||'';$('eduStage').value=x.stage||'Садочок';$('eduGroup').value=x.group_name||'';$('eduTeacher').value=x.teacher||'';$('eduNote').value=x.note||'';
+    $('educationCard').innerHTML=`<div class="school-card"><b>${esc(x.institution||x.stage||'Освіта')}</b><div class="muted">${esc(x.stage||'')}${x.group_name?' · '+esc(x.group_name):''}${x.teacher?' · '+esc(x.teacher):''}</div></div>`;
+  }else $('educationCard').innerHTML='';
+}
+async function loadEducationEvents(){
+  if(!childId()||!$('educationEvents'))return;
+  const {data}=await sb.from('child_education_events').select('*').eq('child_id',childId()).order('due_at',{ascending:true}).limit(30);
+  $('educationEvents').innerHTML=(data||[]).map(x=>`<div class="row"><div>🎒</div><div class="grow"><b>${esc(x.title)}</b><div class="muted">${new Date(x.due_at).toLocaleString('uk-UA')}</div></div></div>`).join('');
+}
+async function shareAchievement(title,category,points){
+  const text=`🏆 ${title}\nКатегорія: ${category}\n+${points} до прогресу в «Сімейнику»`;
+  if(navigator.share){try{await navigator.share({title:'Досягнення',text});return}catch(e){}}
+  try{await navigator.clipboard.writeText(text);alert('Текст досягнення скопійовано')}catch(e){alert(text)}
+}
 
 async function addMemory(){
   const title=$('memoryTitle').value.trim(); if(!title)return msg('memoryMsg','Напиши назву події',false);
@@ -522,7 +668,7 @@ async function loadAchievements(){
   const sums={speech:0,movement:0,thinking:0,self:0,world:0};
   rows.forEach(x=>sums[x.category]=(sums[x.category]||0)+Number(x.points||1));
   setLevel('lvlSpeech',sums.speech||0);setLevel('lvlMove',sums.movement||0);setLevel('lvlThink',sums.thinking||0);setLevel('lvlSelf',sums.self||0);
-  $('achList').innerHTML=rows.map(x=>`<div class="row"><div>🏆</div><div class="grow"><b>${esc(x.title)}</b><div class="muted">${esc(x.category)} · +${x.points||1} · ${new Date(x.achieved_at).toLocaleDateString('uk-UA')}</div></div></div>`).join('');
+  $('achList').innerHTML=rows.map(x=>`<div class="row"><div>🏆</div><div class="grow"><b>${esc(x.title)}</b><div class="muted">${esc(x.category)} · +${x.points||1} · ${new Date(x.achieved_at).toLocaleDateString('uk-UA')}</div></div><button class="btn secondary" onclick="shareAchievement('${x.title.replace(/'/g,"&#39;")}','${x.category}',${x.points||1})">↗</button></div>`).join('');
 }
 
 setInterval(()=>{renderSleepTimer();updateLiveStatus()},1000);init();
