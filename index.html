@@ -22,7 +22,7 @@ h2,h3{margin:0 0 8px}.muted{color:var(--muted);font-size:13px}.row{display:flex;
 </head>
 <body>
 <div class="app">
-<header><div><div class="logo">Сімейник</div><div class="sub">Уся сім’я — в одному місці · v2.1</div></div><div>👤</div></header>
+<header><div><div class="logo">Сімейник</div><div class="sub">Уся сім’я — в одному місці · Baby v3</div></div><div>👤</div></header>
 <main>
 
 <section id="auth" class="card hero">
@@ -37,7 +37,7 @@ h2,h3{margin:0 0 8px}.muted{color:var(--muted);font-size:13px}.row{display:flex;
 <section class="page active" id="home">
 <div class="card hero"><h2 id="hello">Мій Сімейник</h2><div class="muted">Сьогодні в одному місці</div></div>
 <div class="grid">
-<div class="tile" onclick="go('sleep')">😴<b>Сон</b><span class="muted">Таймер + аналітика</span></div>
+<div class="tile" onclick="go('baby')">👶<b>Дитина</b><span class="muted">Сон, годування, прикорм, здоров’я</span></div>
 <div class="tile" onclick="go('expenses')">💳<b>Витрати</b><span class="muted">Хто і скільки витратив</span></div>
 <div class="tile" onclick="go('calendar')">📅<b>Календар</b><span class="muted">Особистий і сімейний</span></div>
 <div class="tile" onclick="go('family')">👨‍👩‍👧‍👦<b>Сім’я</b><span class="muted">Учасники й дні народження</span></div>
@@ -107,6 +107,96 @@ h2,h3{margin:0 0 8px}.muted{color:var(--muted);font-size:13px}.row{display:flex;
 <div class="actions"><button class="btn primary" onclick="startLocation()">Ділитися</button><button class="btn danger" onclick="stopLocation()">Зупинити</button></div><div id="locationMsg" class="msg"></div></div>
 <div class="card"><h3>Останні позиції</h3><div id="locationList"></div></div>
 </section>
+
+<section class="page" id="baby">
+<div class="card hero">
+  <h2>Дитячий модуль</h2>
+  <div class="field"><label>Дитина</label><select id="babyChild"></select></div>
+  <div class="grid">
+    <div class="tile" onclick="babyTab('babyToday')">🗓️<b>Сьогодні</b><span class="muted">Вся стрічка дня</span></div>
+    <div class="tile" onclick="babyTab('babySleep')">😴<b>Сон</b><span class="muted">Таймер, вікна, аналітика</span></div>
+    <div class="tile" onclick="babyTab('babyFeed')">🍼<b>Годування</b><span class="muted">Груди, пляшечка, вода</span></div>
+    <div class="tile" onclick="babyTab('babyFood')">🥣<b>Прикорм</b><span class="muted">Що пробувала і реакції</span></div>
+    <div class="tile" onclick="babyTab('babyDiaper')">🧷<b>Підгузки</b><span class="muted">Мокрий, брудний, змішаний</span></div>
+    <div class="tile" onclick="babyTab('babyGrowth')">📏<b>Ріст</b><span class="muted">Вага і зріст</span></div>
+    <div class="tile" onclick="babyTab('babyMeds')">💊<b>Ліки</b><span class="muted">Призначення і прийоми</span></div>
+    <div class="tile" onclick="babyTab('babyHealth')">🌡️<b>Здоров’я</b><span class="muted">Температура і самопочуття</span></div>
+  </div>
+</div>
+
+<div id="babyToday" class="babyPanel card">
+  <h3>Сьогодні</h3>
+  <div id="babyTimeline"></div>
+</div>
+
+<div id="babySleep" class="babyPanel card hidden">
+  <h3>Сон</h3>
+  <div class="timer" id="babySleepTimer">00:00:00</div>
+  <button class="btn primary wide" id="babySleepBtn" onclick="toggleBabySleep()">🌙 Заснув — запустити</button>
+  <div class="grid" style="margin-top:12px">
+    <div><div class="muted">За 24 год</div><div class="stat" id="babySleep24">0 год</div></div>
+    <div><div class="muted">Вікно неспання</div><div class="stat" id="babyWakeWindow">—</div></div>
+    <div><div class="muted">Снів за 7 днів</div><div class="stat" id="babySleepCount">0</div></div>
+    <div><div class="muted">Середній сон</div><div class="stat" id="babySleepAvg">0 хв</div></div>
+  </div>
+  <div id="babySleepList"></div>
+</div>
+
+<div id="babyFeed" class="babyPanel card hidden">
+  <h3>Годування</h3>
+  <div class="field"><label>Тип</label><select id="feedType"><option>Грудне</option><option>Пляшечка</option><option>Суміш</option><option>Вода</option></select></div>
+  <div class="field"><label>Кількість, мл (необов’язково)</label><input id="feedAmount" type="number"></div>
+  <div class="field"><label>Нотатка</label><input id="feedNote"></div>
+  <button class="btn primary wide" onclick="addFeed()">Додати годування</button>
+  <div id="feedList"></div>
+</div>
+
+<div id="babyFood" class="babyPanel card hidden">
+  <h3>Прикорм</h3>
+  <div class="field"><label>Продукт</label><input id="foodName" placeholder="Наприклад: броколі"></div>
+  <div class="field"><label>Статус</label><select id="foodStatus"><option>Пробувала</option><option>Сподобалось</option><option>Не сподобалось</option><option>Реакція</option></select></div>
+  <div class="field"><label>Нотатка про реакцію</label><input id="foodReaction"></div>
+  <button class="btn primary wide" onclick="addFood()">Зберегти продукт</button>
+  <div id="foodList"></div>
+</div>
+
+<div id="babyDiaper" class="babyPanel card hidden">
+  <h3>Підгузки</h3>
+  <div class="actions">
+    <button class="btn secondary" onclick="addDiaper('Мокрий')">💧 Мокрий</button>
+    <button class="btn secondary" onclick="addDiaper('Брудний')">💩 Брудний</button>
+    <button class="btn secondary" onclick="addDiaper('Змішаний')">🧷 Змішаний</button>
+  </div>
+  <div id="diaperList"></div>
+</div>
+
+<div id="babyGrowth" class="babyPanel card hidden">
+  <h3>Ріст і вага</h3>
+  <div class="field"><label>Вага, кг</label><input id="growthWeight" type="number" step="0.01"></div>
+  <div class="field"><label>Зріст, см</label><input id="growthHeight" type="number" step="0.1"></div>
+  <button class="btn primary wide" onclick="addGrowth()">Додати вимірювання</button>
+  <div id="growthList"></div>
+</div>
+
+<div id="babyMeds" class="babyPanel card hidden">
+  <h3>Ліки</h3>
+  <div class="field"><label>Назва</label><input id="medName"></div>
+  <div class="field"><label>Призначена доза / нотатка</label><input id="medDose"></div>
+  <div class="field"><label>Час</label><input id="medTime" type="datetime-local"></div>
+  <button class="btn primary wide" onclick="addMed()">Додати призначення</button>
+  <div class="muted" style="margin-top:8px">Сімейник зберігає призначення та нагадує, але не розраховує дозування.</div>
+  <div id="medList"></div>
+</div>
+
+<div id="babyHealth" class="babyPanel card hidden">
+  <h3>Здоров’я</h3>
+  <div class="field"><label>Температура, °C</label><input id="healthTemp" type="number" step="0.1"></div>
+  <div class="field"><label>Самопочуття / нотатка</label><input id="healthNote"></div>
+  <button class="btn primary wide" onclick="addHealth()">Додати запис</button>
+  <div id="healthList"></div>
+</div>
+</section>
+
 </div>
 </main>
 
@@ -163,7 +253,7 @@ function go(id,btn){document.querySelectorAll('.page').forEach(x=>x.classList.re
 async function register(){try{await ensureSupabase();}catch(e){return;}const e=$('email').value.trim(),p=$('pass').value;if(!e||p.length<6)return msg('authMsg','Введи email і пароль від 6 символів',false);const {data,error}=await sb.auth.signUp({email:e,password:p});if(error)return msg('authMsg',error.message,false);msg('authMsg','Акаунт створено');if(data.session){user=data.user;afterLogin()}}
 async function login(){try{await ensureSupabase();}catch(e){return;}const {data,error}=await sb.auth.signInWithPassword({email:$('email').value.trim(),password:$('pass').value});if(error)return msg('authMsg',error.message,false);user=data.user;afterLogin()}
 async function init(){try{await ensureSupabase();}catch(e){return;}const {data:{session}}=await sb.auth.getSession();if(session){user=session.user;afterLogin()}}
-async function afterLogin(){$('auth').classList.add('hidden');$('app').classList.remove('hidden');$('nav').classList.remove('hidden');await sb.from('profiles').upsert({id:user.id,email:user.email},{onConflict:'id'});await loadProfile();await loadFamilies();await loadAll()}
+async function afterLogin(){$('auth').classList.add('hidden');$('app').classList.remove('hidden');$('nav').classList.remove('hidden');await sb.from('profiles').upsert({id:user.id,email:user.email},{onConflict:'id'});await loadProfile();await loadFamilies();await loadAll();await loadBabyChildren()}
 async function loadProfile(){const {data}=await sb.from('profiles').select('*').eq('id',user.id).single();if(!data)return;$('firstName').value=data.first_name||'';$('lastName').value=data.last_name||'';$('birthDate').value=data.birth_date||'';$('ageText').textContent=data.birth_date?age(data.birth_date)+' років':'Вкажи дату народження';$('hello').textContent=(data.first_name?data.first_name+', ':'')+'твій Сімейник'}
 async function saveProfile(){const payload={first_name:$('firstName').value.trim(),last_name:$('lastName').value.trim(),birth_date:$('birthDate').value||null,display_name:[$('firstName').value.trim(),$('lastName').value.trim()].filter(Boolean).join(' ')};const {error}=await sb.from('profiles').update(payload).eq('id',user.id);if(error)return msg('profileMsg',error.message,false);msg('profileMsg','Збережено');loadProfile();loadMembers()}
 async function loadFamilies(){const {data}=await sb.from('my_families').select('*');families=data||[];const opts=families.map(f=>`<option value="${f.id}">${esc(f.name)}</option>`).join('');['expenseFamily','eventFamily','petFamily','carFamily','locationFamily'].forEach(id=>$(id).innerHTML=opts);$('families').innerHTML=families.map(f=>`<div class="row"><div>🏡</div><div class="grow"><b>${esc(f.name)}</b><div class="muted">${esc(f.role)}</div></div></div>`).join('');loadMembers()}
@@ -187,8 +277,159 @@ async function startLocation(){const f=$('locationFamily').value;if(!f)return;if
 async function stopLocation(){if(watchId!==null)navigator.geolocation.clearWatch(watchId);watchId=null;await sb.from('location_shares').update({sharing:false}).eq('user_id',user.id);msg('locationMsg','Поширення зупинено');loadLocations()}
 async function loadLocations(){if(!families.length)return;const {data}=await sb.from('location_shares').select('*').in('family_id',families.map(f=>f.id)).eq('sharing',true);$('locationList').innerHTML=(data||[]).map(x=>`<div class="row"><div>📍</div><div class="grow"><b>Учасник сім’ї</b><div class="muted">${Number(x.latitude).toFixed(5)}, ${Number(x.longitude).toFixed(5)}</div></div></div>`).join('')}
 async function loadAll(){await Promise.all([loadExpenses(),loadEvents(),loadChildren(),loadPets(),loadCars(),loadLocations()]);renderTimer()}
-function refresh(id){if(id==='expenses')loadExpenses();if(id==='calendar')loadEvents();if(id==='family')loadMembers();if(id==='sleep')loadChildren();if(id==='pets')loadPets();if(id==='cars')loadCars();if(id==='location')loadLocations();if(id==='profile')loadProfile()}
-document.documentElement.dataset.js='ready'; setInterval(renderTimer,1000); init();
+function refresh(id){if(id==='baby')loadBabyChildren();if(id==='expenses')loadExpenses();if(id==='calendar')loadEvents();if(id==='family')loadMembers();if(id==='sleep')loadChildren();if(id==='pets')loadPets();if(id==='cars')loadCars();if(id==='location')loadLocations();if(id==='profile')loadProfile()}
+document.documentElement.dataset.js='ready'; 
+function babyChildId(){return $('babyChild')?.value || $('sleepChild')?.value || null}
+function babyFamilyId(){
+  const s=$('babyChild');
+  if(!s||!s.value)return families[0]?.id||null;
+  const o=s.options[s.selectedIndex];
+  return o?.dataset.family || families[0]?.id || null;
+}
+function babyTab(id){
+  document.querySelectorAll('.babyPanel').forEach(x=>x.classList.add('hidden'));
+  $(id)?.classList.remove('hidden');
+  loadBabyAll();
+}
+async function loadBabyChildren(){
+  if(!families.length)return;
+  const {data}=await sb.from('child_profiles').select('*').in('family_id',families.map(f=>f.id)).order('name');
+  const rows=data||[];
+  const opts=rows.map(c=>`<option value="${c.id}" data-family="${c.family_id}">${esc(c.name)}</option>`).join('');
+  if($('babyChild')) $('babyChild').innerHTML=opts;
+  if($('sleepChild')) $('sleepChild').innerHTML=opts;
+  await loadBabyAll();
+}
+function babySleepKey(){return user?('baby_sleep_'+user.id+'_'+(babyChildId()||'')):'baby_sleep'}
+function fmtDur(ms){const s=Math.max(0,Math.floor(ms/1000)),h=Math.floor(s/3600),m=Math.floor((s%3600)/60),ss=s%60;return[h,m,ss].map(v=>String(v).padStart(2,'0')).join(':')}
+async function toggleBabySleep(){
+  const child=babyChildId(),family=babyFamilyId();
+  if(!child||!family)return alert('Спочатку додай дитину');
+  const key=babySleepKey(),raw=localStorage.getItem(key);
+  if(!raw){
+    localStorage.setItem(key,JSON.stringify({started_at:new Date().toISOString(),child_id:child,family_id:family}));
+  }else{
+    const r=JSON.parse(raw);
+    await sb.from('sleep_sessions').insert({family_id:r.family_id,child_id:r.child_id,created_by:user.id,started_at:r.started_at,ended_at:new Date().toISOString()});
+    localStorage.removeItem(key);
+  }
+  renderBabySleepTimer(); await loadBabySleep();
+}
+function renderBabySleepTimer(){
+  if(!$('babySleepTimer'))return;
+  const raw=localStorage.getItem(babySleepKey());
+  if(raw){
+    const r=JSON.parse(raw);
+    $('babySleepTimer').textContent=fmtDur(Date.now()-new Date(r.started_at).getTime());
+    $('babySleepBtn').textContent='☀️ Прокинувся — зупинити';
+  }else{
+    $('babySleepTimer').textContent='00:00:00';
+    $('babySleepBtn').textContent='🌙 Заснув — запустити';
+  }
+}
+async function loadBabySleep(){
+  const child=babyChildId(); if(!child)return;
+  const since7=new Date(Date.now()-7*86400000).toISOString();
+  const {data}=await sb.from('sleep_sessions').select('*').eq('child_id',child).gte('started_at',since7).not('ended_at','is',null).order('started_at',{ascending:false});
+  const rows=data||[];
+  const durations=rows.map(x=>new Date(x.ended_at)-new Date(x.started_at));
+  const total7=durations.reduce((a,b)=>a+b,0);
+  $('babySleepCount').textContent=rows.length;
+  $('babySleepAvg').textContent=(rows.length?Math.round(total7/rows.length/60000):0)+' хв';
+  const since24=Date.now()-86400000;
+  const total24=rows.filter(x=>new Date(x.ended_at).getTime()>=since24).reduce((a,x)=>a+(new Date(x.ended_at)-new Date(x.started_at)),0);
+  $('babySleep24').textContent=(total24/3600000).toFixed(1)+' год';
+  if(rows.length){
+    const last=rows[0];
+    $('babyWakeWindow').textContent=Math.max(0,Math.round((Date.now()-new Date(last.ended_at).getTime())/60000))+' хв';
+  }else $('babyWakeWindow').textContent='—';
+  $('babySleepList').innerHTML=rows.slice(0,12).map(x=>`<div class="row"><div>😴</div><div class="grow"><b>${new Date(x.started_at).toLocaleDateString('uk-UA')}</b><div class="muted">${new Date(x.started_at).toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'})}–${new Date(x.ended_at).toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'})}</div></div><b>${Math.round((new Date(x.ended_at)-new Date(x.started_at))/60000)} хв</b></div>`).join('');
+}
+async function addFeed(){
+  const child=babyChildId(),family=babyFamilyId(); if(!child)return;
+  await sb.from('baby_feedings').insert({family_id:family,child_id:child,created_by:user.id,feeding_type:$('feedType').value,amount_ml:Number($('feedAmount').value)||null,note:$('feedNote').value.trim()||null});
+  $('feedAmount').value='';$('feedNote').value='';loadBabyFeed();loadBabyTimeline();
+}
+async function loadBabyFeed(){
+  const child=babyChildId();if(!child)return;
+  const {data}=await sb.from('baby_feedings').select('*').eq('child_id',child).order('occurred_at',{ascending:false}).limit(20);
+  $('feedList').innerHTML=(data||[]).map(x=>`<div class="row"><div>🍼</div><div class="grow"><b>${esc(x.feeding_type)}</b><div class="muted">${new Date(x.occurred_at).toLocaleString('uk-UA')}${x.amount_ml?' · '+x.amount_ml+' мл':''}</div></div></div>`).join('');
+}
+async function addFood(){
+  const child=babyChildId(),family=babyFamilyId();if(!child||!$('foodName').value.trim())return;
+  await sb.from('baby_foods').insert({family_id:family,child_id:child,created_by:user.id,food_name:$('foodName').value.trim(),status:$('foodStatus').value,reaction_note:$('foodReaction').value.trim()||null});
+  $('foodName').value='';$('foodReaction').value='';loadBabyFood();loadBabyTimeline();
+}
+async function loadBabyFood(){
+  const child=babyChildId();if(!child)return;
+  const {data}=await sb.from('baby_foods').select('*').eq('child_id',child).order('tried_at',{ascending:false}).limit(30);
+  $('foodList').innerHTML=(data||[]).map(x=>`<div class="row"><div>🥣</div><div class="grow"><b>${esc(x.food_name)}</b><div class="muted">${esc(x.status)}${x.reaction_note?' · '+esc(x.reaction_note):''}</div></div></div>`).join('');
+}
+async function addDiaper(type){
+  const child=babyChildId(),family=babyFamilyId();if(!child)return;
+  await sb.from('baby_diapers').insert({family_id:family,child_id:child,created_by:user.id,diaper_type:type});
+  loadBabyDiaper();loadBabyTimeline();
+}
+async function loadBabyDiaper(){
+  const child=babyChildId();if(!child)return;
+  const {data}=await sb.from('baby_diapers').select('*').eq('child_id',child).order('occurred_at',{ascending:false}).limit(20);
+  $('diaperList').innerHTML=(data||[]).map(x=>`<div class="row"><div>🧷</div><div class="grow"><b>${esc(x.diaper_type)}</b><div class="muted">${new Date(x.occurred_at).toLocaleString('uk-UA')}</div></div></div>`).join('');
+}
+async function addGrowth(){
+  const child=babyChildId(),family=babyFamilyId();if(!child)return;
+  await sb.from('baby_growth').insert({family_id:family,child_id:child,created_by:user.id,weight_kg:Number($('growthWeight').value)||null,height_cm:Number($('growthHeight').value)||null});
+  $('growthWeight').value='';$('growthHeight').value='';loadBabyGrowth();
+}
+async function loadBabyGrowth(){
+  const child=babyChildId();if(!child)return;
+  const {data}=await sb.from('baby_growth').select('*').eq('child_id',child).order('measured_at',{ascending:false}).limit(20);
+  $('growthList').innerHTML=(data||[]).map(x=>`<div class="row"><div>📏</div><div class="grow"><b>${new Date(x.measured_at).toLocaleDateString('uk-UA')}</b><div class="muted">${x.weight_kg?x.weight_kg+' кг ':''}${x.height_cm?x.height_cm+' см':''}</div></div></div>`).join('');
+}
+async function addMed(){
+  const child=babyChildId(),family=babyFamilyId();if(!child||!$('medName').value.trim())return;
+  await sb.from('baby_medications').insert({family_id:family,child_id:child,created_by:user.id,name:$('medName').value.trim(),dose_note:$('medDose').value.trim()||null,due_at:$('medTime').value?new Date($('medTime').value).toISOString():null});
+  $('medName').value='';$('medDose').value='';$('medTime').value='';loadBabyMeds();loadBabyTimeline();
+}
+async function loadBabyMeds(){
+  const child=babyChildId();if(!child)return;
+  const {data}=await sb.from('baby_medications').select('*').eq('child_id',child).order('created_at',{ascending:false}).limit(30);
+  $('medList').innerHTML=(data||[]).map(x=>`<div class="row"><div>💊</div><div class="grow"><b>${esc(x.name)}</b><div class="muted">${x.dose_note?esc(x.dose_note):''}${x.due_at?' · '+new Date(x.due_at).toLocaleString('uk-UA'):''}</div></div></div>`).join('');
+}
+async function addHealth(){
+  const child=babyChildId(),family=babyFamilyId();if(!child)return;
+  await sb.from('baby_health_logs').insert({family_id:family,child_id:child,created_by:user.id,temperature_c:Number($('healthTemp').value)||null,note:$('healthNote').value.trim()||null});
+  $('healthTemp').value='';$('healthNote').value='';loadBabyHealth();loadBabyTimeline();
+}
+async function loadBabyHealth(){
+  const child=babyChildId();if(!child)return;
+  const {data}=await sb.from('baby_health_logs').select('*').eq('child_id',child).order('occurred_at',{ascending:false}).limit(30);
+  $('healthList').innerHTML=(data||[]).map(x=>`<div class="row"><div>🌡️</div><div class="grow"><b>${x.temperature_c?x.temperature_c+' °C':'Запис'}</b><div class="muted">${esc(x.note||'')} · ${new Date(x.occurred_at).toLocaleString('uk-UA')}</div></div></div>`).join('');
+}
+async function loadBabyTimeline(){
+  const child=babyChildId();if(!child)return;
+  const start=new Date();start.setHours(0,0,0,0); const iso=start.toISOString();
+  const [s,f,d,h,m]=await Promise.all([
+    sb.from('sleep_sessions').select('*').eq('child_id',child).gte('started_at',iso).not('ended_at','is',null),
+    sb.from('baby_feedings').select('*').eq('child_id',child).gte('occurred_at',iso),
+    sb.from('baby_diapers').select('*').eq('child_id',child).gte('occurred_at',iso),
+    sb.from('baby_health_logs').select('*').eq('child_id',child).gte('occurred_at',iso),
+    sb.from('baby_medications').select('*').eq('child_id',child).gte('created_at',iso)
+  ]);
+  let items=[];
+  (s.data||[]).forEach(x=>items.push({t:x.started_at,icon:'😴',title:'Сон',sub:`${Math.round((new Date(x.ended_at)-new Date(x.started_at))/60000)} хв`}));
+  (f.data||[]).forEach(x=>items.push({t:x.occurred_at,icon:'🍼',title:x.feeding_type,sub:x.amount_ml?x.amount_ml+' мл':''}));
+  (d.data||[]).forEach(x=>items.push({t:x.occurred_at,icon:'🧷',title:'Підгузок',sub:x.diaper_type}));
+  (h.data||[]).forEach(x=>items.push({t:x.occurred_at,icon:'🌡️',title:'Здоров’я',sub:(x.temperature_c?x.temperature_c+' °C ':'')+(x.note||'')}));
+  (m.data||[]).forEach(x=>items.push({t:x.created_at,icon:'💊',title:x.name,sub:x.dose_note||''}));
+  items.sort((a,b)=>new Date(b.t)-new Date(a.t));
+  $('babyTimeline').innerHTML=items.length?items.map(x=>`<div class="row"><div>${x.icon}</div><div class="grow"><b>${esc(x.title)}</b><div class="muted">${new Date(x.t).toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'})} · ${esc(x.sub||'')}</div></div></div>`).join(''):'<div class="muted">Сьогодні ще немає записів</div>';
+}
+async function loadBabyAll(){
+  await Promise.all([loadBabySleep(),loadBabyFeed(),loadBabyFood(),loadBabyDiaper(),loadBabyGrowth(),loadBabyMeds(),loadBabyHealth(),loadBabyTimeline()]);
+  renderBabySleepTimer();
+}
+
+setInterval(()=>{renderTimer();renderBabySleepTimer()},1000); init();
 </script>
 </body>
 </html>
