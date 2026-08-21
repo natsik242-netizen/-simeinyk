@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f7f3">
-<title>Сімейник Family v10.2</title>
+<title>Сімейник Family v11</title>
 <style>
 :root{--bg:#f5f7f3;--card:#fff;--ink:#202820;--muted:#6f786f;--brand:#6e9079;--brand2:#e5eee7;--line:#e4e9e5;--danger:#a84f4f}
 *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
@@ -74,11 +74,22 @@
 .search-hit{border:1px solid var(--line);border-radius:14px;padding:10px;margin-top:7px;background:#fff}
 .select-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .history-card{border:1px solid var(--line);border-radius:15px;padding:10px;margin-top:7px;background:#fff}
+
+.smart-card{border:1px solid var(--line);border-radius:18px;padding:13px;background:#fff;margin-top:8px}
+.smart-card.urgent{border-color:#e8c4c4;background:#fff7f7}
+.smart-card.warn{border-color:#eadfb9;background:#fffdf5}
+.chartbar{height:10px;background:#ecefec;border-radius:999px;overflow:hidden;margin-top:6px}
+.chartbar i{display:block;height:100%;background:#6e9079}
+.entity-card{border:1px solid var(--line);border-radius:20px;padding:14px;background:#fff;margin-top:9px}
+.entity-head{display:flex;align-items:flex-start;gap:10px}.entity-icon{font-size:28px}
+.pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#eef4ef;font-size:11px;margin:2px}
+.deadline{font-weight:800}
+
 </style>
 </head>
 <body>
 <div class="app">
-<header><div><div class="logo">Сімейник</div><div class="sub">Family v10.2 · пошук, авто, тварини, витрати</div></div><div>👶</div></header>
+<header><div><div class="logo">Сімейник</div><div class="sub">Family v11 · розумний сімейний центр</div></div><div>👶</div></header>
 <main>
 <section id="authBox" class="card hero">
 <h2>Вхід</h2>
@@ -98,8 +109,8 @@
 
 <div class="today-card">
   <div style="display:flex;justify-content:space-between;align-items:center">
-    <div><h3 style="margin:0">Сьогодні</h3><div class="muted">Найважливіше для сім’ї</div></div>
-    <button class="btn secondary" onclick="loadDashboard()">↻</button>
+    <div><h3 style="margin:0">Сьогодні</h3><div class="muted">Автоматично з усіх розділів</div></div>
+    <div style="display:flex;gap:6px"><button class="btn secondary" onclick="openSmartToday11()">Розгорнути</button><button class="btn secondary" onclick="loadDashboard()">↻</button></div>
   </div>
   <div class="today-grid">
     <div class="today-mini"><span class="muted">Нагадування</span><b id="dashReminders">0</b></div>
@@ -414,7 +425,7 @@ function msg(id,t,ok=true){$(id).className='msg '+(ok?'ok':'err');$(id).textCont
 async function register(){await ensureSB();const e=$('email').value.trim(),p=$('password').value;if(!e||p.length<6)return msg('authMsg','Введи email і пароль від 6 символів',false);const {data,error}=await sb.auth.signUp({email:e,password:p});if(error)return msg('authMsg',error.message,false);msg('authMsg','Акаунт створено');if(data.session){user=data.user;await afterLogin()}}
 async function login(){await ensureSB();const {data,error}=await sb.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error)return msg('authMsg',error.message,false);user=data.user;await afterLogin()}
 async function init(){await ensureSB();const {data:{session}}=await sb.auth.getSession();if(session){user=session.user;await afterLogin()}}
-async function afterLogin(){$('authBox').classList.add('hidden');$('appBox').classList.remove('hidden');$('nav').classList.remove('hidden');await loadFamilies();await loadChildren();await loadDashboard();renderNav101();}
+async function afterLogin(){$('authBox').classList.add('hidden');$('appBox').classList.remove('hidden');$('nav').classList.remove('hidden');await loadFamilies();await loadChildren();await loadDashboard();await generateAutoReminders11();renderNav101();}
 async function loadFamilies(){const {data}=await sb.from('my_families').select('*');families=data||[];}
 function familyId(){const c=children.find(x=>x.id===$('childSelect')?.value);return c?.family_id||families[0]?.id||null}
 function childId(){return $('childSelect')?.value||children[0]?.id||null}
@@ -1084,6 +1095,130 @@ async function runGlobalSearch(){
  out.innerHTML=hits.slice(0,20).map(h=>`<div class="search-hit"><b>${h.icon} ${esc(h.title)}</b><div class="muted">${esc(h.type)}${h.sub?' · '+esc(h.sub):''}</div></div>`).join('')||'<div class="muted">Нічого не знайдено</div>';
 }
 
+
+function daysUntil11(d){
+ const n=new Date();n.setHours(0,0,0,0);const x=new Date(d);x.setHours(0,0,0,0);
+ return Math.ceil((x-n)/86400000);
+}
+function severity11(days){if(days<=1)return 'urgent';if(days<=7)return 'warn';return ''}
+
+async function openSmartToday11(){
+ showAdult('🧠 Розумне «Сьогодні»',`<div id="smartToday11"><div class="muted">Збираю важливе…</div></div>`);
+ await loadSmartToday11();
+}
+async function loadSmartToday11(){
+ if(!families.length)return;
+ const now=new Date(), soon=new Date(now.getTime()+30*86400000);
+ const [rem,cal,docs,svc,pet,work,meds]=await Promise.all([
+  sb.from('family_reminders').select('*').in('family_id',families.map(f=>f.id)).gte('due_at',now.toISOString()).lte('due_at',soon.toISOString()).eq('completed',false),
+  sb.from('calendar_events').select('*').in('family_id',families.map(f=>f.id)).gte('starts_at',now.toISOString()).lte('starts_at',soon.toISOString()),
+  sb.from('family_documents').select('*').in('family_id',families.map(f=>f.id)).not('expiry_date','is',null),
+  sb.from('vehicle_service').select('*').in('family_id',families.map(f=>f.id)),
+  sb.from('pet_health').select('*').in('family_id',families.map(f=>f.id)).not('next_due','is',null),
+  sb.from('work_tasks').select('*').eq('user_id',user.id).eq('completed',false),
+  sb.from('baby_medications').select('*').in('family_id',families.map(f=>f.id)).is('taken_at',null)
+ ]);
+ let items=[];
+ (rem.data||[]).forEach(x=>items.push({icon:'⏰',title:x.title,date:x.due_at,type:'Нагадування'}));
+ (cal.data||[]).forEach(x=>items.push({icon:'📅',title:x.title,date:x.starts_at,type:'Календар'}));
+ (docs.data||[]).forEach(x=>{const d=daysUntil11(x.expiry_date);if(d>=0&&d<=30)items.push({icon:'📄',title:x.title,date:x.expiry_date,type:'Документ'})});
+ (pet.data||[]).forEach(x=>{const d=daysUntil11(x.next_due);if(d>=0&&d<=30)items.push({icon:'🐾',title:x.title,date:x.next_due,type:'Тварина'})});
+ (work.data||[]).forEach(x=>{if(x.due_at)items.push({icon:'💼',title:x.title,date:x.due_at,type:'Робота'})});
+ (meds.data||[]).forEach(x=>{if(x.due_at)items.push({icon:'💊',title:x.name,date:x.due_at,type:'Ліки'})});
+ items.sort((a,b)=>new Date(a.date)-new Date(b.date));
+ $('smartToday11').innerHTML=items.length?items.slice(0,30).map(x=>{const d=daysUntil11(x.date);return `<div class="smart-card ${severity11(d)}"><div class="entity-head"><div class="entity-icon">${x.icon}</div><div class="grow"><b>${esc(x.title)}</b><div class="muted">${esc(x.type)} · ${new Date(x.date).toLocaleString('uk-UA')}</div></div><div class="deadline">${d===0?'сьогодні':d===1?'завтра':d+' дн.'}</div></div></div>`}).join(''):'<div class="muted">Нічого термінового на найближчі 30 днів.</div>';
+}
+
+async function openExpenseAnalytics11(){
+ showAdult('📊 Аналітика витрат',`<div id="expenseAnalytics11"><div class="muted">Рахую…</div></div>`);
+ const start=new Date();start.setDate(1);start.setHours(0,0,0,0);
+ const {data}=await sb.from('expenses').select('*').in('family_id',families.map(f=>f.id)).gte('expense_date',start.toISOString().slice(0,10));
+ const rows=data||[],total=rows.reduce((a,x)=>a+Number(x.amount||0),0);
+ const byCat={};rows.forEach(x=>byCat[x.category||'Інше']=(byCat[x.category||'Інше']||0)+Number(x.amount||0));
+ const cats=Object.entries(byCat).sort((a,b)=>b[1]-a[1]);
+ $('expenseAnalytics11').innerHTML=`<div class="entity-card"><div class="muted">Витрати цього місяця</div><div class="metric">${total.toFixed(2)} ₴</div></div>`+
+ cats.map(([k,v])=>`<div class="entity-card"><div style="display:flex;justify-content:space-between"><b>${esc(k)}</b><b>${v.toFixed(2)} ₴</b></div><div class="chartbar"><i style="width:${total?Math.min(100,v/total*100):0}%"></i></div></div>`).join('');
+}
+
+async function openDocumentDeadlines11(){
+ showAdult('⏳ Терміни документів',`<div id="docDeadlines11"></div>`);
+ const {data}=await sb.from('family_documents').select('*').in('family_id',families.map(f=>f.id)).not('expiry_date','is',null).order('expiry_date');
+ const rows=(data||[]).map(x=>({...x,days:daysUntil11(x.expiry_date)})).filter(x=>x.days>=0);
+ $('docDeadlines11').innerHTML=rows.length?rows.map(x=>`<div class="smart-card ${severity11(x.days)}"><div class="entity-head"><div class="entity-icon">📄</div><div class="grow"><b>${esc(x.title)}</b><div class="muted">${esc(x.category)} · до ${x.expiry_date}</div></div><div class="deadline">${x.days} дн.</div></div></div>`).join(''):'<div class="muted">Немає документів із терміном дії.</div>';
+}
+
+async function ensureAutoReminder11(title,type,due_at,source_type,source_id){
+ if(!due_at||!families.length)return;
+ const {data:existing}=await sb.from('family_reminders').select('id').eq('family_id',familyId()).eq('auto_source_type',source_type).eq('auto_source_id',source_id).limit(1);
+ if(existing&&existing.length)return;
+ await sb.from('family_reminders').insert({family_id:familyId(),created_by:user.id,title,reminder_type:type,due_at,repeat_rule:'none',visibility:'family',auto_source_type:source_type,auto_source_id:source_id});
+}
+async function generateAutoReminders11(){
+ const now=new Date(), horizon=new Date(now.getTime()+60*86400000);
+ const [docs,pets]=await Promise.all([
+   sb.from('family_documents').select('*').in('family_id',families.map(f=>f.id)).not('expiry_date','is',null),
+   sb.from('pet_health').select('*').in('family_id',families.map(f=>f.id)).not('next_due','is',null)
+ ]);
+ for(const x of docs.data||[]){
+   const d=new Date(x.expiry_date+'T09:00:00');if(d>=now&&d<=horizon){
+     const r=new Date(d.getTime()-7*86400000);
+     await ensureAutoReminder11('Закінчується документ: '+x.title,'Документ',r.toISOString(),'document',x.id);
+   }
+ }
+ for(const x of pets.data||[]){
+   const d=new Date(x.next_due+'T09:00:00');if(d>=now&&d<=horizon){
+     const r=new Date(d.getTime()-3*86400000);
+     await ensureAutoReminder11('Тварина: '+x.title,'Тварина',r.toISOString(),'pet_health',x.id);
+   }
+ }
+}
+
+async function openVehicleCards11(){
+ showAdult('🧾 Картки авто',`<div id="vehicleCards11"></div>`);
+ const {data:cars}=await sb.from('vehicles').select('*').in('family_id',families.map(f=>f.id)).order('created_at',{ascending:false});
+ let out='';
+ for(const c of cars||[]){
+  const [svc,fuel,docs,rem]=await Promise.all([
+   sb.from('vehicle_service').select('*').eq('vehicle_id',c.id),
+   sb.from('vehicle_fuel_logs').select('*').eq('vehicle_id',c.id),
+   sb.from('family_documents').select('*').eq('vehicle_id',c.id),
+   sb.from('family_reminders').select('*').eq('vehicle_id',c.id).eq('completed',false)
+  ]);
+  const cost=(svc.data||[]).reduce((a,x)=>a+Number(x.cost||0),0)+(fuel.data||[]).reduce((a,x)=>a+Number(x.total_cost||0),0);
+  out+=`<div class="entity-card"><div class="entity-head"><div class="entity-icon">🚗</div><div class="grow"><b>${esc(c.name)}</b><div class="muted">${esc([c.make,c.model,c.year].filter(Boolean).join(' '))}</div><span class="pill">${c.mileage||0} км</span><span class="pill">${esc(c.fuel_type||'')}</span></div></div><div class="today-grid"><div class="today-mini"><span class="muted">Витрати</span><b>${cost.toFixed(0)} ₴</b></div><div class="today-mini"><span class="muted">Документи</span><b>${(docs.data||[]).length}</b></div><div class="today-mini"><span class="muted">Сервіс</span><b>${(svc.data||[]).length}</b></div><div class="today-mini"><span class="muted">Нагадування</span><b>${(rem.data||[]).length}</b></div></div></div>`;
+ }
+ $('vehicleCards11').innerHTML=out||'<div class="muted">Ще немає авто.</div>';
+}
+
+async function openPetCards11(){
+ showAdult('🧾 Картки тварин',`<div id="petCards11"></div>`);
+ const {data:pets}=await sb.from('pets').select('*').in('family_id',families.map(f=>f.id)).order('name');
+ let out='';
+ for(const p of pets||[]){
+  const [health,ach,docs]=await Promise.all([
+    sb.from('pet_health').select('*').eq('pet_id',p.id),
+    sb.from('pet_achievements').select('*').eq('pet_id',p.id),
+    sb.from('family_documents').select('*').eq('pet_id',p.id)
+  ]);
+  out+=`<div class="entity-card"><div class="entity-head"><div class="entity-icon">🐾</div><div class="grow"><b>${esc(p.name)}</b><div class="muted">${esc(p.species||'')}${p.breed?' · '+esc(p.breed):''}</div>${p.profile_mode==='group'?`<span class="pill">${p.animal_count} шт.</span>`:''}${p.weight_kg?`<span class="pill">${p.weight_kg} кг</span>`:''}</div></div><div class="today-grid"><div class="today-mini"><span class="muted">Здоров’я</span><b>${(health.data||[]).length}</b></div><div class="today-mini"><span class="muted">Досягнення</span><b>${(ach.data||[]).length}</b></div><div class="today-mini"><span class="muted">Документи</span><b>${(docs.data||[]).length}</b></div></div></div>`;
+ }
+ $('petCards11').innerHTML=out||'<div class="muted">Ще немає тварин.</div>';
+}
+
+async function openPropertyCards11(){
+ showAdult('🧾 Картки нерухомості',`<div id="propertyCards11"></div>`);
+ const {data:props}=await sb.from('family_properties').select('*').in('family_id',families.map(f=>f.id)).order('created_at',{ascending:false});
+ let out='';
+ for(const p of props||[]){
+  const [docs,rem]=await Promise.all([
+    sb.from('family_documents').select('*').eq('property_id',p.id),
+    sb.from('family_reminders').select('*').eq('property_id',p.id).eq('completed',false)
+  ]);
+  out+=`<div class="entity-card"><div class="entity-head"><div class="entity-icon">🏠</div><div class="grow"><b>${esc(p.name)}</b><div class="muted">${esc(p.address||'')} · ${esc(p.status||'')}</div>${p.monthly_rent?`<span class="pill">${p.monthly_rent} ₴/міс</span>`:''}${p.due_day?`<span class="pill">оплата ${p.due_day} числа</span>`:''}</div></div><div class="today-grid"><div class="today-mini"><span class="muted">Документи</span><b>${(docs.data||[]).length}</b></div><div class="today-mini"><span class="muted">Нагадування</span><b>${(rem.data||[]).length}</b></div></div></div>`;
+ }
+ $('propertyCards11').innerHTML=out||'<div class="muted">Ще немає нерухомості.</div>';
+}
+
 function openHub(kind){
  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
  $('hubPage').classList.add('active');$('quickFab')?.classList.add('hidden');
@@ -1091,13 +1226,13 @@ function openHub(kind){
  profile:['👤 Мій профіль',`<div class="hub-grid"><div class="hub-card" onclick="showBaby('meds')"><div class="hub-icon">💊</div><b>Ліки</b><span>Прийоми та курси</span></div><div class="hub-card" onclick="openAdultProfile()"><div class="hub-icon">👤</div><b>Мої дані</b><span>Дата народження, контакти</span></div><div class="hub-card" onclick="openDocuments('personal')"><div class="hub-icon">📁</div><b>Документи</b><span>Особисті файли</span></div></div>`],
  family:['👨‍👩‍👧‍👦 Сім’я',`<div class="hub-grid"><div class="hub-card" onclick="showBaby('birthdays')"><div class="hub-icon">🎂</div><b>Дні народження</b><span>Найближчі дати та вік</span></div><div class="hub-card"><div class="hub-icon">👥</div><b>Учасники</b><span>Сімейний доступ</span></div></div>`],
  children:['👶 Діти',`<div class="hub-grid"><div class="hub-card" onclick="showBaby('children')"><div class="hub-icon">👶</div><b>Обрати дитину</b><span>Профілі дітей</span></div><div class="hub-card" onclick="showBaby('today')"><div class="hub-icon">❤️</div><b>Відкрити дитячий профіль</b><span>Сон, їжа, розвиток, книжки, школа, спогади</span></div></div>`],
- pets:['🐾 Тварини',`<div class="hub-grid"><div class="hub-card" onclick="openCompanions102()"><div class="hub-icon">🐕</div><b>Домашні улюбленці</b><span>Собаки, коти, рибки, птахи та інші</span></div><div class="hub-card" onclick="openFarmAnimals102()"><div class="hub-icon">🌾</div><b>Сільськогосподарські</b><span>Худоба, птиця, бджоли, продуктивність</span></div><div class="hub-card" onclick="openPetHealth()"><div class="hub-icon">🩺</div><b>Здоров’я</b><span>Ветеринар, щеплення, ліки</span></div><div class="hub-card" onclick="showBaby('petAchievements')"><div class="hub-icon">🏆</div><b>Досягнення</b><span>Команди та рівні</span></div></div>`],
- cars:['🚗 Авто',`<div class="hub-grid"><div class="hub-card" onclick="openCars102()"><div class="hub-icon">🚘</div><b>Мої авто</b><span>Марка, модель, двигун, паливо</span></div><div class="hub-card" onclick="openFuel102()"><div class="hub-icon">⛽</div><b>Заправки</b><span>Літри, ціна, пробіг, витрата</span></div><div class="hub-card" onclick="openCarCosts101()"><div class="hub-icon">🔧</div><b>Сервіс і витрати</b><span>ТО, ремонт, шини, страховка</span></div></div>`],
- properties:['🏠 Нерухомість',`<div class="hub-card" onclick="showBaby('properties')"><div class="hub-icon">🏠</div><b>Мої об’єкти</b><span>Адреси, оренда та платежі</span></div>`],
- expenses:['💳 Витрати',`<div class="hub-card" onclick="openExpenses()"><div class="hub-icon">💳</div><b>Сімейні витрати</b><span>Хто витратив, категорії, статистика</span></div>`],
+ pets:['🐾 Тварини',`<div class="hub-grid"><div class="hub-card" onclick="openCompanions102()"><div class="hub-icon">🐕</div><b>Домашні улюбленці</b><span>Собаки, коти, рибки, птахи та інші</span></div><div class="hub-card" onclick="openFarmAnimals102()"><div class="hub-icon">🌾</div><b>Сільськогосподарські</b><span>Худоба, птиця, бджоли, продуктивність</span></div><div class="hub-card" onclick="openPetCards11()"><div class="hub-icon">🧾</div><b>Картки тварин</b><span>Здоров’я, витрати, документи, історія</span></div><div class="hub-card" onclick="openPetHealth()"><div class="hub-icon">🩺</div><b>Здоров’я</b><span>Ветеринар, щеплення, ліки</span></div><div class="hub-card" onclick="showBaby('petAchievements')"><div class="hub-icon">🏆</div><b>Досягнення</b><span>Команди та рівні</span></div></div>`],
+ cars:['🚗 Авто',`<div class="hub-grid"><div class="hub-card" onclick="openCars102()"><div class="hub-icon">🚘</div><b>Мої авто</b><span>Марка, модель, двигун, паливо</span></div><div class="hub-card" onclick="openVehicleCards11()"><div class="hub-icon">🧾</div><b>Картки авто</b><span>Історія, витрати, документи, нагадування</span></div><div class="hub-card" onclick="openFuel102()"><div class="hub-icon">⛽</div><b>Заправки</b><span>Літри, ціна, пробіг, витрата</span></div><div class="hub-card" onclick="openCarCosts101()"><div class="hub-icon">🔧</div><b>Сервіс і витрати</b><span>ТО, ремонт, шини, страховка</span></div></div>`],
+ properties:['🏠 Нерухомість',`<div class="hub-grid"><div class="hub-card" onclick="showBaby('properties')"><div class="hub-icon">🏠</div><b>Мої об’єкти</b><span>Адреси, оренда та платежі</span></div><div class="hub-card" onclick="openPropertyCards11()"><div class="hub-icon">🧾</div><b>Картки об’єктів</b><span>Документи, платежі, історія</span></div></div>`],
+ expenses:['💳 Витрати',`<div class="hub-grid"><div class="hub-card" onclick="openExpenses()"><div class="hub-icon">💳</div><b>Сімейні витрати</b><span>Хто витратив, категорії, статистика</span></div><div class="hub-card" onclick="openExpenseAnalytics11()"><div class="hub-icon">📊</div><b>Аналітика</b><span>Категорії, об’єкти, місяці</span></div></div>`],
  calendar:['📅 Календар',`<div class="hub-card" onclick="openCalendar()"><div class="hub-icon">📅</div><b>Сімейний календар</b><span>Події, лікарі, ТО, оренда</span></div>`],
  reminders:['⏰ Нагадування',`<div class="hub-card" onclick="showBaby('familyReminders')"><div class="hub-icon">⏰</div><b>Усі нагадування</b><span>Ліки, платежі, справи</span></div>`],
- documents:['📁 Документи',`<div class="hub-card" onclick="openDocuments('all')"><div class="hub-icon">📁</div><b>Сховище документів</b><span>Сім’я, авто, нерухомість</span></div>`],
+ documents:['📁 Документи',`<div class="hub-grid"><div class="hub-card" onclick="openDocuments('all')"><div class="hub-icon">📁</div><b>Сховище документів</b><span>Сім’я, авто, нерухомість</span></div><div class="hub-card" onclick="openDocumentDeadlines11()"><div class="hub-icon">⏳</div><b>Терміни дії</b><span>Що скоро закінчується</span></div></div>`],
  work:['💼 Робота',`<div class="hub-grid"><div class="hub-card" onclick="openWork101()"><div class="hub-icon">🏢</div><b>Місце роботи</b><span>Компанія, посада, графік, дохід</span></div><div class="hub-card" onclick="openWorkTasks101()"><div class="hub-icon">✅</div><b>Завдання</b><span>Дедлайни та приватність</span></div></div>`],
 location:['📍 Геолокація',`<div class="hub-card"><div class="hub-icon">📍</div><b>Сімейна карта</b><span>Додамо окремо з дозволом кожного учасника</span></div>`]
  };
