@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f7f3">
-<title>Сімейник Baby v5</title>
+<title>Сімейник Baby v6</title>
 <style>
 :root{--bg:#f5f7f3;--card:#fff;--ink:#202820;--muted:#6f786f;--brand:#6e9079;--brand2:#e5eee7;--line:#e4e9e5;--danger:#a84f4f}
 *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
@@ -42,11 +42,16 @@
 .level{font-size:24px;font-weight:900}.progress{height:9px;border-radius:20px;background:#eee;overflow:hidden;margin-top:7px}.progress i{display:block;height:100%;background:#6e9079}
 .rec-card{border:1px solid var(--line);border-radius:16px;padding:12px;margin-top:8px;background:#fbfcfb}
 
+
+.memory-card{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;margin-top:10px;color:var(--ink)}
+.memory-media{width:100%;max-height:360px;object-fit:cover;background:#111;display:block}
+.memory-body{padding:12px}.memory-badge{display:inline-block;padding:5px 9px;border-radius:999px;background:#edf3ee;font-size:11px;font-weight:800}
+
 </style>
 </head>
 <body>
 <div class="app">
-<header><div><div class="logo">Сімейник</div><div class="sub">Baby v5 · профіль, аналітика, досягнення</div></div><div>👶</div></header>
+<header><div><div class="logo">Сімейник</div><div class="sub">Baby v6 · спогади, медіа, сімейна стрічка</div></div><div>👶</div></header>
 <main>
 <section id="authBox" class="card hero">
 <h2>Вхід</h2>
@@ -70,6 +75,7 @@
 <div class="tile" onclick="showBaby('health')">🌡️<b>Здоров’я</b><span class="muted">Температура і симптоми</span></div>
 <div class="tile" onclick="showBaby('reminders')">⏰<b>Нагадування</b><span class="muted">Ліки, лікар, вакцинація</span></div>
 <div class="tile" onclick="showBaby('children')">👶<b>Діти</b><span class="muted">Додати або обрати</span></div>
+<div class="tile" onclick="showBaby('memories')">📸<b>Спогади</b><span class="muted">Фото, відео, відзнаки</span></div>
 </div>
 </section>
 
@@ -97,6 +103,7 @@
 <button class="btn secondary" onclick="panel('feeding')">Годування</button>
 <button class="btn secondary" onclick="panel('food')">Прикорм</button>
 <button class="btn secondary" onclick="panel('achievements')">🏆 Досягнення</button>
+<button class="btn secondary" onclick="panel('memories')">📸 Спогади</button>
 <button class="btn secondary" onclick="panel('meds')">Ліки</button>
 <button class="btn secondary" onclick="panel('health')">Здоров’я</button>
 <button class="btn secondary" onclick="panel('growth')">Ріст</button>
@@ -171,6 +178,19 @@
 <button class="btn primary wide" onclick="addHealth()">Додати запис</button><div id="healthList"></div></div>
 
 
+
+<div class="panel" id="p-memories"><h2>📸 Стрічка життя</h2>
+<div class="muted">Досягнення, перші моменти, фото та короткі відео для вашої сім’ї.</div>
+<div class="field"><label>Подія</label><input id="memoryTitle" placeholder="Наприклад: Перші кроки"></div>
+<div class="field"><label>Категорія</label><select id="memoryCategory"><option>Досягнення</option><option>Перше</option><option>Книжки</option><option>Гуртки</option><option>Спорт</option><option>Подорож</option><option>Садочок</option><option>Школа</option><option>Інше</option></select></div>
+<div class="field"><label>Дата</label><input id="memoryDate" type="date"></div>
+<div class="field"><label>Опис</label><textarea id="memoryNote" rows="3"></textarea></div>
+<div class="field"><label>Фото або коротке відео</label><input id="memoryMedia" type="file" accept="image/*,video/*"></div>
+<button class="btn primary wide" onclick="addMemory()">Додати у стрічку</button>
+<div id="memoryMsg" class="msg"></div>
+<div id="memoryList"></div>
+</div>
+
 <div class="panel" id="p-achievements"><h2>🏆 Досягнення</h2>
 <div class="grid">
 <div class="ach-card"><div class="muted">Мовлення</div><div class="level" id="lvlSpeech">Рівень 0</div><div class="progress"><i id="barSpeech" style="width:0%"></i></div></div>
@@ -214,6 +234,7 @@
 <button class="btn secondary" onclick="closeQuick();panel('health')">🌡️<br>Температура</button>
 <button class="btn secondary" onclick="closeQuick();panel('growth')">📏<br>Ріст</button>
 <button class="btn secondary" onclick="closeQuick();panel('achievements')">🏆<br>Досягнення</button>
+<button class="btn secondary" onclick="closeQuick();panel('memories')">📸<br>Спогад</button>
 </div>
 </div>
 
@@ -276,7 +297,7 @@ function panel(which){
 }
 async function loadCurrent(){
  if(!childId())return;
- await Promise.all([loadTimeline(),loadSleep(),loadFeedings(),loadFoods(),loadDiapers(),loadGrowth(),loadMeds(),loadHealth(),loadReminders(),loadAchievements(),loadFoodRecommendations(),updateHero(),updateLiveStatus()]);
+ await Promise.all([loadTimeline(),loadSleep(),loadFeedings(),loadFoods(),loadDiapers(),loadGrowth(),loadMeds(),loadHealth(),loadReminders(),loadAchievements(),loadMemories(),loadFoodRecommendations(),updateHero(),updateLiveStatus()]);
  renderSleepTimer();
 }
 function sleepKey(){return 'simeinyk_v4_sleep_'+user.id+'_'+childId()}
@@ -364,6 +385,54 @@ async function loadTimeline(){
  (m.data||[]).forEach(x=>arr.push({t:x.created_at,i:'💊',a:x.name,b:x.taken_at?'Прийнято':(x.dose_note||'')}));
  arr.sort((a,b)=>new Date(b.t)-new Date(a.t));
  $('timeline').innerHTML=arr.length?arr.map(x=>`<div class="row"><div>${x.i}</div><div class="grow"><b>${esc(x.a)}</b><div class="muted">${new Date(x.t).toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'})} · ${esc(x.b||'')}</div></div></div>`).join(''):'<div class="muted">Сьогодні ще немає записів</div>';
+}
+
+
+async function addMemory(){
+  const title=$('memoryTitle').value.trim(); if(!title)return msg('memoryMsg','Напиши назву події',false);
+  let media_path=null,media_type=null;
+  const file=$('memoryMedia').files[0];
+  if(file){
+    const max=25*1024*1024;
+    if(file.size>max)return msg('memoryMsg','Файл завеликий. Максимум 25 МБ.',false);
+    media_type=file.type.startsWith('video/')?'video':'image';
+    const ext=(file.name.split('.').pop()||'bin').replace(/[^a-z0-9]/gi,'');
+    media_path=`${familyId()}/${childId()}/${crypto.randomUUID()}.${ext}`;
+    msg('memoryMsg','Завантажую медіа…');
+    const {error:upErr}=await sb.storage.from('family-memories').upload(media_path,file,{contentType:file.type,upsert:false});
+    if(upErr)return msg('memoryMsg',upErr.message,false);
+  }
+  const achieved=$('memoryDate').value?new Date($('memoryDate').value+'T12:00:00').toISOString():new Date().toISOString();
+  const {error}=await sb.from('child_memories').insert({
+    family_id:familyId(),child_id:childId(),created_by:user.id,title,
+    category:$('memoryCategory').value,note:$('memoryNote').value.trim()||null,
+    media_path,media_type,occurred_at:achieved
+  });
+  if(error){
+    if(media_path) await sb.storage.from('family-memories').remove([media_path]);
+    return msg('memoryMsg',error.message,false);
+  }
+  $('memoryTitle').value='';$('memoryNote').value='';$('memoryDate').value='';$('memoryMedia').value='';
+  msg('memoryMsg','Додано ✓'); await loadMemories();await loadTimeline();
+}
+async function signedMedia(path){
+  if(!path)return null;
+  const {data,error}=await sb.storage.from('family-memories').createSignedUrl(path,3600);
+  return error?null:data.signedUrl;
+}
+async function loadMemories(){
+  if(!childId()||!$('memoryList'))return;
+  const {data,error}=await sb.from('child_memories').select('*').eq('child_id',childId()).order('occurred_at',{ascending:false}).limit(50);
+  if(error){$('memoryList').innerHTML='<div class="err">'+esc(error.message)+'</div>';return}
+  let out='';
+  for(const x of (data||[])){
+    const url=await signedMedia(x.media_path);
+    let media='';
+    if(url&&x.media_type==='image') media=`<img class="memory-media" src="${url}" alt="">`;
+    if(url&&x.media_type==='video') media=`<video class="memory-media" src="${url}" controls playsinline preload="metadata"></video>`;
+    out+=`<div class="memory-card">${media}<div class="memory-body"><span class="memory-badge">${esc(x.category)}</span><h3>${esc(x.title)}</h3><div class="muted">${new Date(x.occurred_at).toLocaleDateString('uk-UA')}</div>${x.note?`<p>${esc(x.note)}</p>`:''}</div></div>`;
+  }
+  $('memoryList').innerHTML=out||'<div class="muted" style="margin-top:12px">Поки немає спогадів</div>';
 }
 
 function openQuick(){ $('quickOverlay').classList.remove('hidden');$('quickSheet').classList.remove('hidden') }
