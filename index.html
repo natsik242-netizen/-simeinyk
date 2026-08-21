@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f7f3">
-<title>Сімейник Family v10.1</title>
+<title>Сімейник Family v10.2</title>
 <style>
 :root{--bg:#f5f7f3;--card:#fff;--ink:#202820;--muted:#6f786f;--brand:#6e9079;--brand2:#e5eee7;--line:#e4e9e5;--danger:#a84f4f}
 *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
@@ -70,11 +70,15 @@
 .bottom-custom button{border:0;background:transparent;border-radius:14px;padding:7px 2px;font-size:10px}.bottom-custom .ico{display:block;font-size:20px}
 .choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.choice{border:1px solid var(--line);border-radius:16px;padding:12px;background:#fff}
 .badge-soft{display:inline-block;background:#eef4ef;border-radius:999px;padding:4px 8px;font-size:11px;margin:2px}
+
+.search-hit{border:1px solid var(--line);border-radius:14px;padding:10px;margin-top:7px;background:#fff}
+.select-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.history-card{border:1px solid var(--line);border-radius:15px;padding:10px;margin-top:7px;background:#fff}
 </style>
 </head>
 <body>
 <div class="app">
-<header><div><div class="logo">Сімейник</div><div class="sub">Family v10.1 · авто, тварини, господарство, робота</div></div><div>👶</div></header>
+<header><div><div class="logo">Сімейник</div><div class="sub">Family v10.2 · пошук, авто, тварини, витрати</div></div><div>👶</div></header>
 <main>
 <section id="authBox" class="card hero">
 <h2>Вхід</h2>
@@ -87,6 +91,11 @@
 <div id="appBox" class="hidden">
 <section class="page active" id="homePage">
 <div class="card hero"><h2>Сімейник</h2><div class="muted">Усе сімейне — по своїх розділах</div></div>
+<div class="card">
+  <div class="field"><label>🔎 Пошук по Сімейнику</label><input id="globalSearch" placeholder="Наприклад: страховка, Рекс, оренда" oninput="runGlobalSearch()"></div>
+  <div id="globalSearchResults"></div>
+</div>
+
 <div class="today-card">
   <div style="display:flex;justify-content:space-between;align-items:center">
     <div><h3 style="margin:0">Сьогодні</h3><div class="muted">Найважливіше для сім’ї</div></div>
@@ -950,6 +959,131 @@ function openWorkTasks101(){showAdult('✅ Робочі завдання',`<div 
 async function saveWorkTask101(){if(!$('wtTitle').value.trim())return;const {error}=await sb.from('work_tasks').insert({family_id:familyId(),user_id:user.id,title:$('wtTitle').value.trim(),due_at:$('wtDue').value?new Date($('wtDue').value).toISOString():null,visibility:$('wtVis').value});if(error)return alert(error.message);openWorkTasks101()}
 async function loadWorkTasks101(){const {data}=await sb.from('work_tasks').select('*').eq('user_id',user.id).order('due_at',{ascending:true});$('tasks101').innerHTML=(data||[]).map(x=>`<div class="row"><div>⬜</div><div class="grow"><b>${esc(x.title)}</b><div class="muted">${x.due_at?new Date(x.due_at).toLocaleString('uk-UA'):'Без дедлайну'} · ${x.visibility==='private'?'Приватно':'Сім’ї'}</div></div></div>`).join('')}
 
+
+const CAR_MAKES_102=["Abarth", "Alfa Romeo", "Audi", "BMW", "BYD", "Chevrolet", "Citroën", "Cupra", "Dacia", "Daewoo", "Fiat", "Ford", "Geely", "Honda", "Hyundai", "Infiniti", "Jaguar", "Jeep", "Kia", "Land Rover", "Lexus", "Mazda", "Mercedes-Benz", "Mini", "Mitsubishi", "Nissan", "Opel", "Peugeot", "Porsche", "Renault", "Seat", "Skoda", "Subaru", "Suzuki", "Tesla", "Toyota", "Volkswagen", "Volvo", "Інша"];
+const CAR_MODELS_102={
+ "Toyota":["Corolla","Camry","RAV4","Yaris","Land Cruiser","C-HR","Prius"],
+ "Volkswagen":["Golf","Passat","Tiguan","Touareg","Polo","T-Roc"],
+ "BMW":["1 Series","3 Series","5 Series","X1","X3","X5","X6"],
+ "Mercedes-Benz":["A-Class","C-Class","E-Class","GLA","GLC","GLE"],
+ "Audi":["A3","A4","A6","Q3","Q5","Q7"],
+ "Skoda":["Fabia","Octavia","Superb","Kamiq","Karoq","Kodiaq"],
+ "Renault":["Clio","Megane","Captur","Kadjar","Austral"],
+ "Peugeot":["208","308","2008","3008","5008"],
+ "Hyundai":["i20","i30","Tucson","Santa Fe","Kona","Ioniq"],
+ "Kia":["Ceed","Sportage","Sorento","Niro","EV6"],
+ "Ford":["Focus","Mondeo","Kuga","Puma","Mustang"],
+ "Nissan":["Micra","Qashqai","Juke","X-Trail","Leaf"],
+ "Honda":["Civic","Accord","CR-V","HR-V"],
+ "Mazda":["Mazda 3","Mazda 6","CX-3","CX-5","CX-60"],
+ "Volvo":["V40","V60","S60","XC40","XC60","XC90"],
+ "Tesla":["Model 3","Model Y","Model S","Model X"]
+};
+
+function fillModels102(){
+ const make=$('carMake102').value, sel=$('carModel102');
+ const arr=CAR_MODELS_102[make]||[];
+ sel.innerHTML='<option value="">Вибери модель</option>'+arr.map(x=>`<option>${x}</option>`).join('')+'<option>Інша</option>';
+ $('carModelManual102').classList.toggle('hidden',arr.length>0);
+}
+function openCars102(){
+ showAdult('🚗 Мої авто',`
+ <div class="field"><label>Назва авто</label><input id="carName102" placeholder="Наприклад: Сімейна"></div>
+ <div class="field"><label>Марка</label><select id="carMake102" onchange="fillModels102()"><option>Abarth</option><option>Alfa Romeo</option><option>Audi</option><option>BMW</option><option>BYD</option><option>Chevrolet</option><option>Citroën</option><option>Cupra</option><option>Dacia</option><option>Daewoo</option><option>Fiat</option><option>Ford</option><option>Geely</option><option>Honda</option><option>Hyundai</option><option>Infiniti</option><option>Jaguar</option><option>Jeep</option><option>Kia</option><option>Land Rover</option><option>Lexus</option><option>Mazda</option><option>Mercedes-Benz</option><option>Mini</option><option>Mitsubishi</option><option>Nissan</option><option>Opel</option><option>Peugeot</option><option>Porsche</option><option>Renault</option><option>Seat</option><option>Skoda</option><option>Subaru</option><option>Suzuki</option><option>Tesla</option><option>Toyota</option><option>Volkswagen</option><option>Volvo</option><option>Інша</option></select></div>
+ <div class="field"><label>Модель</label><select id="carModel102"></select></div>
+ <div class="field hidden" id="carModelManual102"><label>Модель вручну</label><input id="carModelText102"></div>
+ <div class="select-row"><div class="field"><label>Рік</label><input id="carYear102" type="number"></div><div class="field"><label>Пробіг</label><input id="carMileage102" type="number"></div></div>
+ <div class="field"><label>Кузов</label><select id="carBody102"><option>Седан</option><option>Хетчбек</option><option>Універсал</option><option>Кросовер</option><option>Позашляховик</option><option>Мінівен</option><option>Купе</option><option>Пікап</option><option>Інше</option></select></div>
+ <div class="field"><label>Двигун</label><select id="carEngine102"><option>Бензиновий</option><option>Дизельний</option><option>Гібридний</option><option>Електричний</option><option>Інше</option></select></div>
+ <div class="select-row"><div class="field"><label>Об’єм, л</label><input id="carSize102" type="number" step="0.1"></div><div class="field"><label>Потужність, к.с.</label><input id="carPower102" type="number"></div></div>
+ <div class="field"><label>Паливо</label><select id="carFuel102"><option>Бензин</option><option>Дизель</option><option>Газ/LPG</option><option>Бензин + газ</option><option>Гібрид</option><option>Plug-in hybrid</option><option>Електро</option></select></div>
+ <div class="select-row"><div class="field"><label>Коробка</label><select id="carGear102"><option>Автомат</option><option>Механіка</option><option>Робот</option><option>Варіатор</option></select></div><div class="field"><label>Привід</label><select id="carDrive102"><option>Передній</option><option>Задній</option><option>Повний</option></select></div></div>
+ <div class="field"><label>Номер</label><input id="carPlate102"></div><div class="field"><label>VIN</label><input id="carVin102"></div>
+ <button class="btn primary wide" onclick="saveCar102()">Зберегти авто</button><div id="cars102"></div>`);
+ fillModels102();loadCars102();
+}
+async function saveCar102(){
+ const name=$('carName102').value.trim();if(!name)return alert('Вкажи назву авто');
+ const make=$('carMake102').value;
+ let model=$('carModel102').value;
+ if(model==='Інша'||!model)model=$('carModelText102').value.trim()||model;
+ const {error}=await sb.from('vehicles').insert({
+  family_id:familyId(),created_by:user.id,name,make,model:model||null,year:Number($('carYear102').value)||null,
+  body_type:$('carBody102').value,engine_type:$('carEngine102').value,engine_size:Number($('carSize102').value)||null,
+  power_hp:Number($('carPower102').value)||null,fuel_type:$('carFuel102').value,transmission:$('carGear102').value,
+  drive_type:$('carDrive102').value,plate_number:$('carPlate102').value.trim()||null,vin:$('carVin102').value.trim()||null,
+  mileage:Number($('carMileage102').value)||0
+ });
+ if(error)return alert(error.message);
+ await addEntityHistory102('vehicle',null,'Створено авто: '+name,'Авто');
+ openCars102();
+}
+async function loadCars102(){
+ const {data}=await sb.from('vehicles').select('*').in('family_id',families.map(f=>f.id)).order('created_at',{ascending:false});
+ $('cars102').innerHTML=(data||[]).map(x=>`<div class="row"><div>🚗</div><div class="grow"><b>${esc(x.name)}</b><div class="muted">${esc([x.make,x.model,x.year].filter(Boolean).join(' '))}</div><span class="badge-soft">${esc(x.fuel_type||'')}</span><span class="badge-soft">${esc(x.engine_type||'')}</span>${x.mileage?`<span class="badge-soft">${x.mileage} км</span>`:''}</div></div>`).join('');
+}
+
+function openFuel102(){
+ showAdult('⛽ Заправки',`<div class="field"><label>Авто</label><select id="fuelCar102"></select></div><div class="select-row"><div class="field"><label>Літри</label><input id="fuelLiters102" type="number" step="0.01"></div><div class="field"><label>Ціна/л</label><input id="fuelPrice102" type="number" step="0.01"></div></div><div class="field"><label>Сума</label><input id="fuelTotal102" type="number" step="0.01"></div><div class="field"><label>Пробіг</label><input id="fuelMileage102" type="number"></div><div class="field"><label>Дата</label><input id="fuelDate102" type="date"></div><button class="btn primary wide" onclick="saveFuel102()">Додати заправку</button><div id="fuelStats102"></div><div id="fuelList102"></div>`);
+ loadFuel102();
+}
+async function loadFuel102(){
+ const {data:cars}=await sb.from('vehicles').select('*').in('family_id',families.map(f=>f.id));
+ $('fuelCar102').innerHTML=(cars||[]).map(x=>`<option value="${x.id}">${esc(x.name)}${x.make?' · '+esc(x.make):''}</option>`).join('');
+ const {data}=await sb.from('vehicle_fuel_logs').select('*').in('family_id',families.map(f=>f.id)).order('fuel_date',{ascending:false});
+ const rows=data||[];
+ const liters=rows.reduce((a,x)=>a+Number(x.liters||0),0),cost=rows.reduce((a,x)=>a+Number(x.total_cost||0),0);
+ $('fuelStats102').innerHTML=`<div class="today-grid"><div class="today-mini"><span class="muted">Літрів</span><b>${liters.toFixed(1)}</b></div><div class="today-mini"><span class="muted">Витрати</span><b>${cost.toFixed(0)} ₴</b></div></div>`;
+ $('fuelList102').innerHTML=rows.map(x=>`<div class="row"><div>⛽</div><div class="grow"><b>${x.liters||0} л</b><div class="muted">${x.fuel_date}${x.mileage?' · '+x.mileage+' км':''}</div></div><b>${Number(x.total_cost||0).toFixed(2)} ₴</b></div>`).join('');
+}
+async function saveFuel102(){
+ const vehicle_id=$('fuelCar102').value;if(!vehicle_id)return;
+ const liters=Number($('fuelLiters102').value)||0,price=Number($('fuelPrice102').value)||0;
+ const total=Number($('fuelTotal102').value)||liters*price,date=$('fuelDate102').value||new Date().toISOString().slice(0,10);
+ const {data:row,error}=await sb.from('vehicle_fuel_logs').insert({family_id:familyId(),vehicle_id,created_by:user.id,liters,price_per_liter:price||null,total_cost:total||null,mileage:Number($('fuelMileage102').value)||null,fuel_date:date}).select().single();
+ if(error)return alert(error.message);
+ if(total)await sb.from('expenses').insert({family_id:familyId(),created_by:user.id,spent_by:user.id,amount:total,category:'Авто',title:'Заправка',expense_date:date,vehicle_id,source_type:'fuel',source_id:row.id});
+ openFuel102();loadDashboard();
+}
+
+function openCompanions102(){
+ showAdult('🐕 Домашні улюбленці',`<div class="field"><label>Тип</label><select id="compType102"><option>Собака</option><option>Кіт</option><option>Папуга</option><option>Рибки</option><option>Черепаха</option><option>Кролик</option><option>Гризун</option><option>Рептилія</option><option>Інше</option></select></div><div class="field"><label>Облік</label><select id="compMode102"><option value="individual">Окремо</option><option value="group">Групою</option></select></div><div class="field"><label>Ім’я / назва</label><input id="compName102"></div><div class="field"><label>Кількість</label><input id="compCount102" type="number" min="1" value="1"></div><div class="field"><label>Порода / вид</label><input id="compBreed102"></div><div class="field"><label>Стать</label><select id="compSex102"><option value="">—</option><option>Самець</option><option>Самка</option><option>Змішана група</option></select></div><div class="field"><label>Дата народження</label><input id="compBirth102" type="date"></div><div class="field"><label>Вага, кг</label><input id="compWeight102" type="number" step="0.1"></div><button class="btn primary wide" onclick="saveCompanion102()">Додати</button><div id="compList102"></div>`);
+ loadCompanions102();
+}
+async function saveCompanion102(){
+ const name=$('compName102').value.trim();if(!name)return;
+ const {error}=await sb.from('pets').insert({family_id:familyId(),created_by:user.id,name,species:$('compType102').value,breed:$('compBreed102').value.trim()||null,birth_date:$('compBirth102').value||null,weight_kg:Number($('compWeight102').value)||null,profile_mode:$('compMode102').value,animal_count:Number($('compCount102').value)||1,sex:$('compSex102').value||null,animal_category:'companion'});
+ if(error)return alert(error.message);openCompanions102();
+}
+async function loadCompanions102(){
+ const {data}=await sb.from('pets').select('*').in('family_id',families.map(f=>f.id)).eq('animal_category','companion').order('name');
+ $('compList102').innerHTML=(data||[]).map(x=>`<div class="row"><div>🐾</div><div class="grow"><b>${esc(x.name)}</b><div class="muted">${esc(x.species||'')}${x.profile_mode==='group'?' · '+x.animal_count+' шт.':''}${x.breed?' · '+esc(x.breed):''}</div></div></div>`).join('');
+}
+
+function openFarmAnimals102(){
+ showAdult('🌾 Сільськогосподарські',`<div class="hub-grid"><div class="hub-card" onclick="openFarm101()"><div class="hub-icon">🐄</div><b>Худоба і птиця</b><span>Корови, свині, кози, кури, качки...</span></div><div class="hub-card" onclick="openBees101()"><div class="hub-icon">🐝</div><b>Бджільництво</b><span>Пасіки, вулики, мед</span></div></div>`);
+}
+
+async function addEntityHistory102(entity_type,entity_id,title,category){
+ if(!families.length)return;
+ await sb.from('entity_history').insert({family_id:familyId(),created_by:user.id,entity_type,entity_id,title,category});
+}
+async function runGlobalSearch(){
+ const q=$('globalSearch').value.trim().toLowerCase(),out=$('globalSearchResults');if(q.length<2){out.innerHTML='';return}
+ const [cars,pets,props,rems,docs,work]=await Promise.all([
+  sb.from('vehicles').select('id,name,make,model').in('family_id',families.map(f=>f.id)),
+  sb.from('pets').select('id,name,species,breed').in('family_id',families.map(f=>f.id)),
+  sb.from('family_properties').select('id,name,address,status').in('family_id',families.map(f=>f.id)),
+  sb.from('family_reminders').select('id,title,reminder_type').in('family_id',families.map(f=>f.id)),
+  sb.from('family_documents').select('id,title,category').in('family_id',families.map(f=>f.id)),
+  sb.from('work_profiles').select('id,company,role').eq('user_id',user.id)
+ ]);
+ let hits=[];
+ const add=(arr,icon,type,fields)=>{(arr.data||[]).forEach(x=>{const txt=fields.map(f=>x[f]||'').join(' ').toLowerCase();if(txt.includes(q))hits.push({icon,type,title:x[fields[0]]||type,sub:fields.slice(1).map(f=>x[f]).filter(Boolean).join(' · ')})})};
+ add(cars,'🚗','Авто',['name','make','model']);add(pets,'🐾','Тварина',['name','species','breed']);add(props,'🏠','Нерухомість',['name','address','status']);add(rems,'⏰','Нагадування',['title','reminder_type']);add(docs,'📄','Документ',['title','category']);add(work,'💼','Робота',['company','role']);
+ out.innerHTML=hits.slice(0,20).map(h=>`<div class="search-hit"><b>${h.icon} ${esc(h.title)}</b><div class="muted">${esc(h.type)}${h.sub?' · '+esc(h.sub):''}</div></div>`).join('')||'<div class="muted">Нічого не знайдено</div>';
+}
+
 function openHub(kind){
  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
  $('hubPage').classList.add('active');$('quickFab')?.classList.add('hidden');
@@ -957,8 +1091,8 @@ function openHub(kind){
  profile:['👤 Мій профіль',`<div class="hub-grid"><div class="hub-card" onclick="showBaby('meds')"><div class="hub-icon">💊</div><b>Ліки</b><span>Прийоми та курси</span></div><div class="hub-card" onclick="openAdultProfile()"><div class="hub-icon">👤</div><b>Мої дані</b><span>Дата народження, контакти</span></div><div class="hub-card" onclick="openDocuments('personal')"><div class="hub-icon">📁</div><b>Документи</b><span>Особисті файли</span></div></div>`],
  family:['👨‍👩‍👧‍👦 Сім’я',`<div class="hub-grid"><div class="hub-card" onclick="showBaby('birthdays')"><div class="hub-icon">🎂</div><b>Дні народження</b><span>Найближчі дати та вік</span></div><div class="hub-card"><div class="hub-icon">👥</div><b>Учасники</b><span>Сімейний доступ</span></div></div>`],
  children:['👶 Діти',`<div class="hub-grid"><div class="hub-card" onclick="showBaby('children')"><div class="hub-icon">👶</div><b>Обрати дитину</b><span>Профілі дітей</span></div><div class="hub-card" onclick="showBaby('today')"><div class="hub-icon">❤️</div><b>Відкрити дитячий профіль</b><span>Сон, їжа, розвиток, книжки, школа, спогади</span></div></div>`],
- pets:['🐾 Тварини',`<div class="hub-grid"><div class="hub-card" onclick="openPets101()"><div class="hub-icon">🐕</div><b>Тварини</b><span>Окремі та групові профілі</span></div><div class="hub-card" onclick="openFarm101()"><div class="hub-icon">🐄</div><b>Господарство</b><span>Худоба, птиця, продуктивність</span></div><div class="hub-card" onclick="openBees101()"><div class="hub-icon">🐝</div><b>Бджільництво</b><span>Пасіки, вулики, мед</span></div><div class="hub-card" onclick="openPetHealth()"><div class="hub-icon">🩺</div><b>Здоров’я</b><span>Ветеринар, щеплення, ліки</span></div><div class="hub-card" onclick="showBaby('petAchievements')"><div class="hub-icon">🏆</div><b>Досягнення</b><span>Команди та рівні</span></div></div>`],
- cars:['🚗 Авто',`<div class="hub-grid"><div class="hub-card" onclick="openCars101()"><div class="hub-icon">🚘</div><b>Мої авто</b><span>Назва, марка, двигун, паливо</span></div><div class="hub-card" onclick="openCarCosts101()"><div class="hub-icon">🔧</div><b>Витрати та сервіс</b><span>Пальне, ТО, ремонт, страховка</span></div></div>`],
+ pets:['🐾 Тварини',`<div class="hub-grid"><div class="hub-card" onclick="openCompanions102()"><div class="hub-icon">🐕</div><b>Домашні улюбленці</b><span>Собаки, коти, рибки, птахи та інші</span></div><div class="hub-card" onclick="openFarmAnimals102()"><div class="hub-icon">🌾</div><b>Сільськогосподарські</b><span>Худоба, птиця, бджоли, продуктивність</span></div><div class="hub-card" onclick="openPetHealth()"><div class="hub-icon">🩺</div><b>Здоров’я</b><span>Ветеринар, щеплення, ліки</span></div><div class="hub-card" onclick="showBaby('petAchievements')"><div class="hub-icon">🏆</div><b>Досягнення</b><span>Команди та рівні</span></div></div>`],
+ cars:['🚗 Авто',`<div class="hub-grid"><div class="hub-card" onclick="openCars102()"><div class="hub-icon">🚘</div><b>Мої авто</b><span>Марка, модель, двигун, паливо</span></div><div class="hub-card" onclick="openFuel102()"><div class="hub-icon">⛽</div><b>Заправки</b><span>Літри, ціна, пробіг, витрата</span></div><div class="hub-card" onclick="openCarCosts101()"><div class="hub-icon">🔧</div><b>Сервіс і витрати</b><span>ТО, ремонт, шини, страховка</span></div></div>`],
  properties:['🏠 Нерухомість',`<div class="hub-card" onclick="showBaby('properties')"><div class="hub-icon">🏠</div><b>Мої об’єкти</b><span>Адреси, оренда та платежі</span></div>`],
  expenses:['💳 Витрати',`<div class="hub-card" onclick="openExpenses()"><div class="hub-icon">💳</div><b>Сімейні витрати</b><span>Хто витратив, категорії, статистика</span></div>`],
  calendar:['📅 Календар',`<div class="hub-card" onclick="openCalendar()"><div class="hub-icon">📅</div><b>Сімейний календар</b><span>Події, лікарі, ТО, оренда</span></div>`],
