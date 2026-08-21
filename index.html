@@ -22,7 +22,7 @@ h2,h3{margin:0 0 8px}.muted{color:var(--muted);font-size:13px}.row{display:flex;
 </head>
 <body>
 <div class="app">
-<header><div><div class="logo">Сімейник</div><div class="sub">Уся сім’я — в одному місці · Baby v3</div></div><div>👤</div></header>
+<header><div><div class="logo">Сімейник</div><div class="sub">Уся сім’я — в одному місці · Baby v3.1</div></div><div>👤</div></header>
 <main>
 
 <section id="auth" class="card hero">
@@ -37,7 +37,7 @@ h2,h3{margin:0 0 8px}.muted{color:var(--muted);font-size:13px}.row{display:flex;
 <section class="page active" id="home">
 <div class="card hero"><h2 id="hello">Мій Сімейник</h2><div class="muted">Сьогодні в одному місці</div></div>
 <div class="grid">
-<div class="tile" onclick="go('baby')">👶<b>Дитина</b><span class="muted">Сон, годування, прикорм, здоров’я</span></div>
+<div class="tile" onclick="openBaby()">👶<b>Дитина</b><span class="muted">Сон, годування, прикорм, здоров’я</span></div>
 <div class="tile" onclick="go('expenses')">💳<b>Витрати</b><span class="muted">Хто і скільки витратив</span></div>
 <div class="tile" onclick="go('calendar')">📅<b>Календар</b><span class="muted">Особистий і сімейний</span></div>
 <div class="tile" onclick="go('family')">👨‍👩‍👧‍👦<b>Сім’я</b><span class="muted">Учасники й дні народження</span></div>
@@ -110,8 +110,11 @@ h2,h3{margin:0 0 8px}.muted{color:var(--muted);font-size:13px}.row{display:flex;
 
 <section class="page" id="baby">
 <div class="card hero">
-  <h2>Дитячий модуль</h2>
-  <div class="field"><label>Дитина</label><select id="babyChild"></select></div>
+  <div style="margin-bottom:10px">
+<button class="btn secondary" onclick="go('home')">← Головна</button>
+</div>
+<h2>Дитячий модуль v3.1</h2>
+  <div class="field"><label>Дитина</label><select id="babyChild" onchange="loadBabyAll()"></select></div>
   <div class="grid">
     <div class="tile" onclick="babyTab('babyToday')">🗓️<b>Сьогодні</b><span class="muted">Вся стрічка дня</span></div>
     <div class="tile" onclick="babyTab('babySleep')">😴<b>Сон</b><span class="muted">Таймер, вікна, аналітика</span></div>
@@ -279,6 +282,16 @@ async function loadLocations(){if(!families.length)return;const {data}=await sb.
 async function loadAll(){await Promise.all([loadExpenses(),loadEvents(),loadChildren(),loadPets(),loadCars(),loadLocations()]);renderTimer()}
 function refresh(id){if(id==='baby')loadBabyChildren();if(id==='expenses')loadExpenses();if(id==='calendar')loadEvents();if(id==='family')loadMembers();if(id==='sleep')loadChildren();if(id==='pets')loadPets();if(id==='cars')loadCars();if(id==='location')loadLocations();if(id==='profile')loadProfile()}
 document.documentElement.dataset.js='ready'; 
+
+function openBaby(){
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  const page=document.getElementById('baby');
+  if(page) page.classList.add('active');
+  document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));
+  window.scrollTo(0,0);
+  babyTab('babyToday');
+  loadBabyChildren();
+}
 function babyChildId(){return $('babyChild')?.value || $('sleepChild')?.value || null}
 function babyFamilyId(){
   const s=$('babyChild');
@@ -287,8 +300,15 @@ function babyFamilyId(){
   return o?.dataset.family || families[0]?.id || null;
 }
 function babyTab(id){
+  const page=document.getElementById('baby');
+  if(page){
+    document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+    page.classList.add('active');
+  }
   document.querySelectorAll('.babyPanel').forEach(x=>x.classList.add('hidden'));
-  $(id)?.classList.remove('hidden');
+  const panel=document.getElementById(id);
+  if(panel) panel.classList.remove('hidden');
+  window.scrollTo(0,0);
   loadBabyAll();
 }
 async function loadBabyChildren(){
