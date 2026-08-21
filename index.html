@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f7f3">
-<title>Сімейник Baby v7</title>
+<title>Сімейник Family v8</title>
 <style>
 :root{--bg:#f5f7f3;--card:#fff;--ink:#202820;--muted:#6f786f;--brand:#6e9079;--brand2:#e5eee7;--line:#e4e9e5;--danger:#a84f4f}
 *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
@@ -56,7 +56,7 @@
 </head>
 <body>
 <div class="app">
-<header><div><div class="logo">Сімейник</div><div class="sub">Baby v7 · книжки, гуртки, садочок, школа</div></div><div>👶</div></header>
+<header><div><div class="logo">Сімейник</div><div class="sub">Family v8 · діти, тварини, нерухомість, нагадування</div></div><div>👶</div></header>
 <main>
 <section id="authBox" class="card hero">
 <h2>Вхід</h2>
@@ -84,6 +84,11 @@
 <div class="tile" onclick="showBaby('books')">📚<b>Книжки</b><span class="muted">Читаємо, прочитано, улюблені</span></div>
 <div class="tile" onclick="showBaby('activities')">⚽<b>Гуртки</b><span class="muted">Секції, розклад, оплата</span></div>
 <div class="tile" onclick="showBaby('education')">🎒<b>Садочок / школа</b><span class="muted">Події, група, клас</span></div>
+<div class="tile" onclick="showBaby('familyReminders')">⏰<b>Сімейні нагадування</b><span class="muted">Оренда, ліки, дні народження</span></div>
+<div class="tile" onclick="showBaby('properties')">🏠<b>Нерухомість</b><span class="muted">Адреси, оренда, платежі</span></div>
+<div class="tile" onclick="showBaby('petAchievements')">🐕<b>Досягнення тварин</b><span class="muted">Команди й рівні</span></div>
+<div class="tile" onclick="showBaby('birthdays')">🎂<b>Дні народження</b><span class="muted">Найближчі в сім’ї</span></div>
+
 
 </div>
 </section>
@@ -116,6 +121,11 @@
 <button class="btn secondary" onclick="panel('books')">📚 Книжки</button>
 <button class="btn secondary" onclick="panel('activities')">⚽ Гуртки</button>
 <button class="btn secondary" onclick="panel('education')">🎒 Освіта</button>
+<button class="btn secondary" onclick="panel('familyReminders')">⏰ Нагадування</button>
+<button class="btn secondary" onclick="panel('properties')">🏠 Нерухомість</button>
+<button class="btn secondary" onclick="panel('petAchievements')">🐕 Тварини</button>
+<button class="btn secondary" onclick="panel('birthdays')">🎂 Дні народження</button>
+
 
 <button class="btn secondary" onclick="panel('meds')">Ліки</button>
 <button class="btn secondary" onclick="panel('health')">Здоров’я</button>
@@ -198,7 +208,7 @@
 <div class="field"><label>Категорія</label><select id="memoryCategory"><option>Досягнення</option><option>Перше</option><option>Книжки</option><option>Гуртки</option><option>Спорт</option><option>Подорож</option><option>Садочок</option><option>Школа</option><option>Інше</option></select></div>
 <div class="field"><label>Дата</label><input id="memoryDate" type="date"></div>
 <div class="field"><label>Опис</label><textarea id="memoryNote" rows="3"></textarea></div>
-<div class="field"><label>Фото або коротке відео</label><input id="memoryMedia" type="file" accept="image/*,video/*"></div>
+<div class="field"><label>Фото або відео</label><input id="memoryMedia" type="file" accept="image/*,video/*"></div><div class="muted">До 100 МБ. Відео за можливості стискається перед завантаженням.</div>
 <button class="btn primary wide" onclick="addMemory()">Додати у стрічку</button>
 <div id="memoryMsg" class="msg"></div>
 <div id="memoryList"></div>
@@ -242,6 +252,44 @@
 
 <div id="educationCard"></div>
 <div id="educationEvents"></div>
+</div>
+
+
+<div class="panel" id="p-familyReminders"><h2>⏰ Сімейні нагадування</h2>
+<div class="field"><label>Назва</label><input id="famRemTitle" placeholder="Оплатити оренду"></div>
+<div class="field"><label>Тип</label><select id="famRemType"><option>Платіж</option><option>Ліки</option><option>Тварина</option><option>Авто</option><option>День народження</option><option>Інше</option></select></div>
+<div class="field"><label>Коли</label><input id="famRemDue" type="datetime-local"></div>
+<div class="field"><label>Повторення</label><select id="famRemRepeat"><option value="none">Не повторювати</option><option value="daily">Щодня</option><option value="weekly">Щотижня</option><option value="monthly">Щомісяця</option><option value="yearly">Щороку</option></select></div>
+<div class="field"><label>Кому видно</label><select id="famRemVisibility"><option value="family">Усій сім’ї</option><option value="private">Тільки мені</option></select></div>
+<button class="btn primary wide" onclick="addFamilyReminder()">Додати нагадування</button>
+<div id="famRemList"></div>
+</div>
+
+<div class="panel" id="p-properties"><h2>🏠 Нерухомість та оренда</h2>
+<div class="field"><label>Назва об’єкта</label><input id="propName" placeholder="Квартира на Лісовій"></div>
+<div class="field"><label>Тип</label><select id="propType"><option>Квартира</option><option>Будинок</option><option>Гараж</option><option>Земля</option><option>Інше</option></select></div>
+<div class="field"><label>Адреса</label><input id="propAddress"></div>
+<div class="field"><label>Статус</label><select id="propStatus"><option>Власність</option><option>Орендуємо</option><option>Здаємо в оренду</option></select></div>
+<div class="field"><label>Оренда на місяць</label><input id="propRent" type="number" step="0.01"></div>
+<div class="field"><label>День оплати (1–31)</label><input id="propDueDay" type="number" min="1" max="31"></div>
+<div class="field"><label>Нотатка</label><input id="propNote"></div>
+<button class="btn primary wide" onclick="addProperty()">Додати об’єкт</button>
+<div id="propertyList"></div>
+</div>
+
+<div class="panel" id="p-petAchievements"><h2>🐕 Досягнення тварин</h2>
+<div class="field"><label>Тварина</label><select id="petAchPet"></select></div>
+<div class="field"><label>Категорія</label><select id="petAchCategory"><option value="commands">Команди</option><option value="behavior">Поведінка</option><option value="social">Соціалізація</option><option value="activity">Активність</option><option value="care">Догляд</option></select></div>
+<div class="field"><label>Досягнення</label><input id="petAchTitle" placeholder="Навчився команді «Сидіти»"></div>
+<div class="field"><label>Бали</label><input id="petAchPoints" type="number" min="1" max="20" value="1"></div>
+<button class="btn primary wide" onclick="addPetAchievement()">Додати</button>
+<div id="petAchSummary"></div>
+<div id="petAchList"></div>
+</div>
+
+<div class="panel" id="p-birthdays"><h2>🎂 Дні народження сім’ї</h2>
+<div class="muted">Вік рахується автоматично з дати народження у профілі.</div>
+<div id="birthdayList"></div>
 </div>
 
 <div class="panel" id="p-achievements"><h2>🏆 Досягнення</h2>
@@ -355,7 +403,7 @@ function panel(which){
 }
 async function loadCurrent(){
  if(!childId())return;
- await Promise.all([loadTimeline(),loadSleep(),loadFeedings(),loadFoods(),loadDiapers(),loadGrowth(),loadMeds(),loadHealth(),loadReminders(),loadAchievements(),loadMemories(),loadBooks(),loadActivities(),loadEducation(),loadEducationEvents(),loadFoodRecommendations(),updateHero(),updateLiveStatus()]);
+ await Promise.all([loadTimeline(),loadSleep(),loadFeedings(),loadFoods(),loadDiapers(),loadGrowth(),loadMeds(),loadHealth(),loadReminders(),loadAchievements(),loadMemories(),loadBooks(),loadActivities(),loadEducation(),loadEducationEvents(),loadFamilyReminders(),loadProperties(),loadPetAchievements(),loadBirthdays(),loadFoodRecommendations(),updateHero(),updateLiveStatus()]);
  renderSleepTimer();
 }
 function sleepKey(){return 'simeinyk_v4_sleep_'+user.id+'_'+childId()}
@@ -447,6 +495,87 @@ async function loadTimeline(){
 
 
 
+
+async function addFamilyReminder(){
+  const title=$('famRemTitle').value.trim(),due=$('famRemDue').value;if(!title||!due||!families.length)return;
+  const {error}=await sb.from('family_reminders').insert({
+    family_id:familyId(),created_by:user.id,title,reminder_type:$('famRemType').value,
+    due_at:new Date(due).toISOString(),repeat_rule:$('famRemRepeat').value,visibility:$('famRemVisibility').value
+  });
+  if(error)return alert(error.message);
+  $('famRemTitle').value='';$('famRemDue').value='';await loadFamilyReminders();
+}
+async function toggleFamilyReminder(id,done){
+  await sb.from('family_reminders').update({completed:!done}).eq('id',id);loadFamilyReminders();
+}
+async function loadFamilyReminders(){
+  if(!families.length||!$('famRemList'))return;
+  const {data}=await sb.from('family_reminders').select('*').in('family_id',families.map(f=>f.id)).order('due_at',{ascending:true}).limit(100);
+  $('famRemList').innerHTML=(data||[]).map(x=>`<div class="row"><div>⏰</div><div class="grow"><b>${esc(x.title)}</b><div class="muted">${esc(x.reminder_type)} · ${new Date(x.due_at).toLocaleString('uk-UA')} · ${esc(x.repeat_rule)}</div></div><button class="btn secondary" onclick="toggleFamilyReminder('${x.id}',${x.completed})">${x.completed?'↩️':'✓'}</button></div>`).join('');
+}
+async function addProperty(){
+  const name=$('propName').value.trim();if(!name||!families.length)return;
+  const {data,error}=await sb.from('family_properties').insert({
+    family_id:familyId(),created_by:user.id,name,property_type:$('propType').value,address:$('propAddress').value.trim()||null,
+    status:$('propStatus').value,monthly_rent:Number($('propRent').value)||null,due_day:Number($('propDueDay').value)||null,
+    note:$('propNote').value.trim()||null
+  }).select().single();
+  if(error)return alert(error.message);
+  if(data?.monthly_rent && data?.due_day){
+    const now=new Date(); let due=new Date(now.getFullYear(),now.getMonth(),Math.min(data.due_day,28),9,0,0);
+    if(due<now) due=new Date(now.getFullYear(),now.getMonth()+1,Math.min(data.due_day,28),9,0,0);
+    await sb.from('family_reminders').insert({
+      family_id:data.family_id,created_by:user.id,title:'Оплатити: '+data.name,reminder_type:'Платіж',
+      due_at:due.toISOString(),repeat_rule:'monthly',visibility:'family'
+    });
+  }
+  ['propName','propAddress','propRent','propDueDay','propNote'].forEach(id=>$(id).value='');
+  await loadProperties();await loadFamilyReminders();
+}
+async function loadProperties(){
+  if(!families.length||!$('propertyList'))return;
+  const {data}=await sb.from('family_properties').select('*').in('family_id',families.map(f=>f.id)).order('created_at',{ascending:false});
+  $('propertyList').innerHTML=(data||[]).map(x=>`<div class="row"><div>🏠</div><div class="grow"><b>${esc(x.name)}</b><div class="muted">${esc(x.property_type)} · ${esc(x.status)}${x.address?' · '+esc(x.address):''}${x.monthly_rent?' · '+x.monthly_rent+' грн/міс':''}${x.due_day?' · оплата '+x.due_day+' числа':''}</div></div></div>`).join('');
+}
+async function loadPetAchievementPets(){
+  if(!families.length||!$('petAchPet'))return;
+  const {data}=await sb.from('pets').select('*').in('family_id',families.map(f=>f.id)).order('name');
+  $('petAchPet').innerHTML=(data||[]).map(p=>`<option value="${p.id}" data-family="${p.family_id}">${esc(p.name)}</option>`).join('');
+}
+async function addPetAchievement(){
+  const pet=$('petAchPet').value,title=$('petAchTitle').value.trim();if(!pet||!title)return;
+  const option=$('petAchPet').options[$('petAchPet').selectedIndex];
+  const {error}=await sb.from('pet_achievements').insert({
+    family_id:option.dataset.family,pet_id:pet,created_by:user.id,category:$('petAchCategory').value,
+    title,points:Number($('petAchPoints').value)||1
+  });
+  if(error)return alert(error.message);
+  $('petAchTitle').value='';$('petAchPoints').value='1';loadPetAchievements();
+}
+async function loadPetAchievements(){
+  if(!$('petAchPet'))return;
+  await loadPetAchievementPets();
+  const pet=$('petAchPet').value;if(!pet)return;
+  const {data}=await sb.from('pet_achievements').select('*').eq('pet_id',pet).order('achieved_at',{ascending:false});
+  const rows=data||[],sum=rows.reduce((a,x)=>a+Number(x.points||1),0),level=Math.floor(sum/5);
+  $('petAchSummary').innerHTML=`<div class="ach-card"><div class="muted">Загальний прогрес</div><div class="level">Рівень ${level}</div><div class="progress"><i style="width:${(sum%5)/5*100}%"></i></div></div>`;
+  $('petAchList').innerHTML=rows.map(x=>`<div class="row"><div>🐾</div><div class="grow"><b>${esc(x.title)}</b><div class="muted">${esc(x.category)} · +${x.points}</div></div></div>`).join('');
+}
+function nextBirthdayInfo(dateStr){
+  const b=new Date(dateStr+'T12:00:00'),n=new Date();
+  let next=new Date(n.getFullYear(),b.getMonth(),b.getDate(),12,0,0);
+  if(next<n)next=new Date(n.getFullYear()+1,b.getMonth(),b.getDate(),12,0,0);
+  const days=Math.ceil((next-n)/86400000);
+  let age=next.getFullYear()-b.getFullYear();
+  return {next,days,age};
+}
+async function loadBirthdays(){
+  if(!families.length||!$('birthdayList'))return;
+  const {data}=await sb.from('family_member_profiles').select('*').in('family_id',families.map(f=>f.id));
+  const rows=(data||[]).filter(x=>x.birth_date).map(x=>({...x,...nextBirthdayInfo(x.birth_date)})).sort((a,b)=>a.days-b.days);
+  $('birthdayList').innerHTML=rows.map(x=>`<div class="row"><div>🎂</div><div class="grow"><b>${esc(x.display_name||x.email||'Учасник')}</b><div class="muted">${x.next.toLocaleDateString('uk-UA')} · виповниться ${x.age} · через ${x.days} дн.</div></div></div>`).join('');
+}
+
 async function addBook(){
   const title=$('bookTitle').value.trim(); if(!title)return;
   const {error}=await sb.from('child_books').insert({
@@ -534,17 +663,62 @@ async function shareAchievement(title,category,points){
   try{await navigator.clipboard.writeText(text);alert('Текст досягнення скопійовано')}catch(e){alert(text)}
 }
 
+
+async function compressVideoIfPossible(file){
+  const maxBytes=100*1024*1024;
+  if(!file.type.startsWith('video/')) return file;
+  if(file.size<=25*1024*1024) return file;
+
+  // Browser-side transcoding support is inconsistent on iPhone/Safari.
+  // We attempt MediaRecorder-based recompression only when supported.
+  if(!window.MediaRecorder || !document.createElement('video').captureStream){
+    if(file.size>maxBytes) throw new Error('Відео більше 100 МБ. Цей браузер не підтримує стискання такого файлу.');
+    return file;
+  }
+
+  try{
+    const url=URL.createObjectURL(file);
+    const video=document.createElement('video');
+    video.src=url; video.muted=true; video.playsInline=true;
+    await new Promise((res,rej)=>{video.onloadedmetadata=res;video.onerror=rej});
+    const stream=video.captureStream();
+    let mime='video/webm;codecs=vp8';
+    if(!MediaRecorder.isTypeSupported(mime)) mime='video/webm';
+    const rec=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:1800000});
+    const chunks=[];
+    rec.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
+    const done=new Promise((res,rej)=>{rec.onstop=res;rec.onerror=rej});
+    rec.start(1000);
+    await video.play();
+    await new Promise(res=>{video.onended=res});
+    rec.stop();
+    await done;
+    URL.revokeObjectURL(url);
+    const blob=new Blob(chunks,{type:rec.mimeType||'video/webm'});
+    if(blob.size===0 || blob.size>=file.size) return file;
+    const name=file.name.replace(/\.[^.]+$/,'')+'.webm';
+    return new File([blob],name,{type:blob.type,lastModified:Date.now()});
+  }catch(e){
+    if(file.size>maxBytes) throw new Error('Не вдалося стиснути відео, а файл більший за 100 МБ.');
+    return file;
+  }
+}
+
 async function addMemory(){
   const title=$('memoryTitle').value.trim(); if(!title)return msg('memoryMsg','Напиши назву події',false);
   let media_path=null,media_type=null;
-  const file=$('memoryMedia').files[0];
+  let file=$('memoryMedia').files[0];
   if(file){
-    const max=25*1024*1024;
-    if(file.size>max)return msg('memoryMsg','Файл завеликий. Максимум 25 МБ.',false);
+    const max=100*1024*1024;
+    if(file.type.startsWith('video/')){
+      msg('memoryMsg','Підготовка відео…');
+      try{file=await compressVideoIfPossible(file)}catch(e){return msg('memoryMsg',e.message,false)}
+    }
+    if(file.size>max)return msg('memoryMsg','Файл завеликий. Максимум 100 МБ.',false);
     media_type=file.type.startsWith('video/')?'video':'image';
     const ext=(file.name.split('.').pop()||'bin').replace(/[^a-z0-9]/gi,'');
     media_path=`${familyId()}/${childId()}/${crypto.randomUUID()}.${ext}`;
-    msg('memoryMsg','Завантажую медіа…');
+    msg('memoryMsg',file.type.startsWith('video/')?'Завантажую відео…':'Завантажую фото…');
     const {error:upErr}=await sb.storage.from('family-memories').upload(media_path,file,{contentType:file.type,upsert:false});
     if(upErr)return msg('memoryMsg',upErr.message,false);
   }
