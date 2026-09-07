@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f7f3">
-<title>Сімейник Family v15.2</title>
+<title>Сімейник Family v15.3</title>
 <style>
 :root{--bg:#f5f7f3;--card:#fff;--ink:#202820;--muted:#6f786f;--brand:#6e9079;--brand2:#e5eee7;--line:#e4e9e5;--danger:#a84f4f}
 *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
@@ -122,7 +122,7 @@
 </head>
 <body>
 <div class="app">
-<header><div><div class="logo">Сімейник</div><div class="sub">Family v15.2 · єдиний стиль і зручні віджети</div></div><div>👶</div></header>
+<header><div><div class="logo">Сімейник</div><div class="sub">Family v15.3 · профілі-кружечки</div></div><div>👶</div></header>
 <main>
 <section id="authBox" class="card hero">
 <h2>Вхід</h2>
@@ -154,7 +154,7 @@
   <div id="dashList"></div>
 </div>
 
-<div class="draghint15">Затисни картку й перетягни її, щоб змінити порядок.</div><div class="hub-grid sortable15" id="homeHub15">
+<div class="hub-grid sortable15" id="homeHub15">
 <div class="hub-card" data-key="profile" onclick="openHub('profile')"><div class="hub-icon">👤</div><b>Мій профіль</b><span>Особисті дані, ліки, документи</span></div>
 <div class="hub-card" data-key="family" onclick="openHub('family')"><div class="hub-icon">👨‍👩‍👧‍👦</div><b>Сім’я</b><span>Учасники, дні народження, доступ</span></div>
 <div class="hub-card" data-key="children" onclick="openHub('children')"><div class="hub-icon">👶</div><b>Діти</b><span>Увесь дитячий модуль всередині</span></div>
@@ -183,9 +183,9 @@
 
 <section class="page" id="babyPage">
 <div class="baby-shell">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+<div id="babyProfileSwitch15" class="profile-switch15 baby-switch15"></div><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
 <button class="btn secondary" onclick="goHome()">←</button>
-<select id="childSelect" onchange="loadCurrent()" style="max-width:210px;padding:10px;border-radius:12px;border:1px solid #46534a;background:#1f2a23;color:#fff"></select>
+<select id="childSelect" style="display:none" onchange="loadCurrent()" style="max-width:210px;padding:10px;border-radius:12px;border:1px solid #46534a;background:#1f2a23;color:#fff"></select>
 <button class="btn secondary" onclick="panel('children')">⚙️</button>
 </div>
 
@@ -499,6 +499,8 @@ async function loadCurrent(){
  if(!childId())return;
  await Promise.all([loadTimeline(),loadSleep(),loadFeedings(),loadFoods(),loadDiapers(),loadGrowth(),loadMeds(),loadHealth(),loadReminders(),loadAchievements(),loadMemories(),loadBooks(),loadActivities(),loadEducation(),loadEducationEvents(),loadFamilyReminders(),loadProperties(),loadPetAchievements(),loadBirthdays(),loadFoodRecommendations(),updateHero(),updateLiveStatus()]);
  renderSleepTimer();
+
+ await renderBabySwitch15();
 }
 function sleepKey(){return 'simeinyk_v4_sleep_'+user.id+'_'+childId()}
 function fmt(ms){const s=Math.max(0,Math.floor(ms/1000)),h=Math.floor(s/3600),m=Math.floor((s%3600)/60),ss=s%60;return[h,m,ss].map(v=>String(v).padStart(2,'0')).join(':')}
@@ -1408,6 +1410,53 @@ async function uploadProfilePhoto15(table,id,file,fid){
  if(error){alert(error.message);return null}
  return path;
 }
+
+function age15(d){
+ if(!d)return 'Вік не вказано';
+ const b=new Date(d),n=new Date(); if(isNaN(b))return 'Вік не вказано';
+ let m=(n.getFullYear()-b.getFullYear())*12+n.getMonth()-b.getMonth();
+ if(n.getDate()<b.getDate())m--; if(m<0)return '';
+ const y=Math.floor(m/12),mm=m%12;
+ return y?`${y} р.${mm?' '+mm+' міс.':''}`:`${mm} міс.`;
+}
+async function childNext15(c){
+ try{
+  const {data}=await sb.from('family_reminders').select('title,due_at').eq('family_id',c.family_id).eq('child_id',c.id).eq('completed',false).gte('due_at',new Date().toISOString()).order('due_at').limit(1);
+  if(data?.[0])return `${new Date(data[0].due_at).toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'})} · ${data[0].title}`;
+ }catch(e){}
+ return 'Немає нагадувань';
+}
+async function renderBabySwitch15(){
+ const host=document.getElementById('babyProfileSwitch15'); if(!host||!children?.length)return;
+ const cur=$('childSelect')?.value||children[0].id;
+ let out='';
+ for(const c of children){
+  const u=await signedPhoto15(c.photo_path);
+  out+=`<div class="ps15 ${c.id===cur?'active':''}" onclick="selectBaby15('${c.id}')"><div class="pic">${u?`<img src="${u}" alt="">`:'+'}</div><div class="nm">${esc(c.name)}</div></div>`;
+ }
+ out+=`<div class="ps15 add" onclick="openAddChild15()"><div class="pic">+</div><div class="nm">Додати</div></div>`;
+ host.innerHTML=out;
+ const c=children.find(x=>x.id===cur)||children[0];
+ const age=age15(c.birth_date),next=await childNext15(c);
+ const left=document.getElementById('babyLeftSmart15'),right=document.getElementById('babyRightSmart15');
+ if(left)left.innerHTML=`<b>${esc(age)}</b>Вік`;
+ if(right)right.innerHTML=`<b>⏰</b>${esc(next)}`;
+}
+async function selectBaby15(id){
+ if($('childSelect'))$('childSelect').value=id;
+ await loadCurrent();
+ await renderBabySwitch15();
+ top15();
+}
+function openAddChild15(){
+ showAdult('👶 Додати дитину',`<div class="field"><label>Ім’я</label><input id="addChildName15"></div><div class="field"><label>Дата народження</label><input id="addChildBirth15" type="date"></div><button class="btn primary wide" onclick="addChildQuick15()">Додати</button>`);
+}
+async function addChildQuick15(){
+ const name=$('addChildName15').value.trim();if(!name)return;
+ const {error}=await sb.from('child_profiles').insert({family_id:familyId(),created_by:user.id,name,birth_date:$('addChildBirth15').value||null});
+ if(error)return alert(error.message);await loadChildren();showBaby('today');
+}
+
 async function avatarHtml15(path,fallback='👤',big=false,table=null,id=null,fid=null){
  const u=await signedPhoto15(path);
  const act=(table&&id&&fid)?`onclick="changePhoto15('${table}','${id}','${fid}')" role="button" aria-label="Додати або змінити фото"`:'';
@@ -1617,7 +1666,7 @@ async function updateLiveStatus(){
   const raw=localStorage.getItem(sleepKey());
   if(raw){
     const r=JSON.parse(raw);
-    $('liveStatus').innerHTML='<b>😴 Спить</b><div class="muted">'+fmt(Date.now()-new Date(r.started_at))+'</div>';
+    $('liveStatus').innerHTML='<b>😴 Спить</b><div class="baby-smart15"><div id="babyLeftSmart15" class="side"><b>—</b>Вік</div><div></div><div id="babyRightSmart15" class="side"><b>⏰</b>Нагадування</div></div><div class="muted">'+fmt(Date.now()-new Date(r.started_at))+'</div>';
     return;
   }
   const {data}=await sb.from('sleep_sessions').select('*').eq('child_id',childId()).not('ended_at','is',null).order('ended_at',{ascending:false}).limit(1);
@@ -1688,3 +1737,17 @@ setTimeout(()=>renderNav101(),300);
 </script>
 </body>
 </html>
+<style>
+.profile-switch15{display:flex;gap:12px;align-items:flex-start;overflow-x:auto;padding:6px 2px 12px;scrollbar-width:none}
+.profile-switch15::-webkit-scrollbar{display:none}
+.ps15{min-width:72px;text-align:center}
+.ps15 .pic{width:68px;height:68px;border-radius:50%;overflow:hidden;background:#e9efea;border:3px solid transparent;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800;margin:auto}
+.ps15.active .pic{border-color:#315a42}
+.ps15 .pic img{width:100%;height:100%;object-fit:cover}
+.ps15 .nm{font-size:12px;margin-top:5px;white-space:nowrap;max-width:78px;overflow:hidden;text-overflow:ellipsis}
+.ps15.add .pic{border:2px dashed #aeb8b1;background:#fff;font-size:32px}
+.baby-switch15{padding:4px 10px 8px}
+.baby-smart15{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;text-align:center;margin:4px 0 12px}
+.baby-smart15 .side{font-size:13px;color:#aebbb2}
+.baby-smart15 .side b{display:block;color:#fff;font-size:18px;margin-bottom:3px}
+</style>
