@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f7f3">
-<title>Сімейник Family v15.3</title>
+<title>Сімейник Family v15.4</title>
 <style>
 :root{--bg:#f5f7f3;--card:#fff;--ink:#202820;--muted:#6f786f;--brand:#6e9079;--brand2:#e5eee7;--line:#e4e9e5;--danger:#a84f4f}
 *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
@@ -118,11 +118,26 @@
 .draghint15{font-size:12px;color:var(--muted);margin:3px 0 10px}
 .home-tools15{display:flex;justify-content:flex-end;margin:0 0 8px}
 .home-tools15 button{border:1px solid var(--line);background:#fff;border-radius:12px;padding:7px 10px}
+
+.baby-top154{grid-template-columns:minmax(72px,1fr) minmax(150px,2fr) minmax(72px,1fr);align-items:center}
+.baby-center154{min-width:0}
+.baby-top154 .profile-switch15{justify-content:center;padding:0;gap:10px;max-width:230px;margin:auto}
+.baby-top154 .ps15{min-width:58px}
+.baby-top154 .ps15 .pic{width:62px;height:62px;border-radius:50%;background:#284235;border-color:#4f6d5c;color:#fff}
+.baby-top154 .ps15.active .pic{border-color:#9fc8ad;box-shadow:0 0 0 3px #9fc8ad33}
+.baby-top154 .ps15 .nm{color:#fff;font-size:12px;max-width:68px}
+.baby-top154 .ps15.add .pic{background:transparent;border:2px dashed #6f8778}
+#babyReminderText154{max-width:110px;margin:auto;line-height:1.2}
+@media(max-width:390px){
+ .baby-top154{grid-template-columns:70px 1fr 78px;gap:5px}
+ .baby-top154 .ps15 .pic{width:56px;height:56px}
+ .baby-top154 .profile-switch15{gap:7px}
+}
 </style>
 </head>
 <body>
 <div class="app">
-<header><div><div class="logo">Сімейник</div><div class="sub">Family v15.3 · профілі-кружечки</div></div><div>👶</div></header>
+<header><div><div class="logo">Сімейник</div><div class="sub">Family v15.4 · прямі профілі</div></div><div>👶</div></header>
 <main>
 <section id="authBox" class="card hero">
 <h2>Вхід</h2>
@@ -157,7 +172,7 @@
 <div class="hub-grid sortable15" id="homeHub15">
 <div class="hub-card" data-key="profile" onclick="openHub('profile')"><div class="hub-icon">👤</div><b>Мій профіль</b><span>Особисті дані, ліки, документи</span></div>
 <div class="hub-card" data-key="family" onclick="openHub('family')"><div class="hub-icon">👨‍👩‍👧‍👦</div><b>Сім’я</b><span>Учасники, дні народження, доступ</span></div>
-<div class="hub-card" data-key="children" onclick="openHub('children')"><div class="hub-icon">👶</div><b>Діти</b><span>Увесь дитячий модуль всередині</span></div>
+<div class="hub-card" data-key="children" onclick="showBaby('today')"><div class="hub-icon">👶</div><b>Діти</b><span>Профілі дітей</span></div>
 <div class="hub-card" data-key="pets" onclick="openHub('pets')"><div class="hub-icon">🐾</div><b>Тварини</b><span>Профілі, здоров’я, досягнення</span></div>
 <div class="hub-card" data-key="cars" onclick="openHub('cars')"><div class="hub-icon">🚗</div><b>Авто</b><span>Машини, ТО, страховка, витрати</span></div>
 <div class="hub-card" data-key="properties" onclick="openHub('properties')"><div class="hub-icon">🏠</div><b>Нерухомість</b><span>Адреси, оренда, платежі</span></div>
@@ -183,16 +198,21 @@
 
 <section class="page" id="babyPage">
 <div class="baby-shell">
-<div id="babyProfileSwitch15" class="profile-switch15 baby-switch15"></div><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
 <button class="btn secondary" onclick="goHome()">←</button>
 <select id="childSelect" style="display:none" onchange="loadCurrent()" style="max-width:210px;padding:10px;border-radius:12px;border:1px solid #46534a;background:#1f2a23;color:#fff"></select>
 <button class="btn secondary" onclick="panel('children')">⚙️</button>
 </div>
 
-<div class="baby-top">
-<div><div class="baby-stat-big" id="heroHeight">—</div><div class="baby-stat-label">Зріст</div></div>
-<div><div class="avatar" id="childAvatar">👶</div><div class="child-name" id="heroName">Дитина</div><div class="child-age" id="heroAge">—</div></div>
-<div><div class="baby-stat-big" id="heroWeight">—</div><div class="baby-stat-label">Вага</div></div>
+<div class="baby-top baby-top154">
+<div><div class="baby-stat-big" id="babyAge154">—</div><div class="baby-stat-label">Вік</div></div>
+<div class="baby-center154">
+  <div id="babyProfileSwitch15" class="profile-switch15 baby-switch15"></div>
+  <div id="heroName" class="child-name hidden">Дитина</div>
+  <div id="heroAge" class="child-age hidden">—</div>
+  <div id="childAvatar" class="hidden">👶</div>
+</div>
+<div><div class="baby-stat-big" id="babyReminder154">⏰</div><div class="baby-stat-label" id="babyReminderText154">Немає нагадувань</div></div>
 </div>
 
 <div class="status-live" id="liveStatus">
@@ -460,7 +480,7 @@ function msg(id,t,ok=true){$(id).className='msg '+(ok?'ok':'err');$(id).textCont
 async function register(){await ensureSB();const e=$('email').value.trim(),p=$('password').value;if(!e||p.length<6)return msg('authMsg','Введи email і пароль від 6 символів',false);const {data,error}=await sb.auth.signUp({email:e,password:p});if(error)return msg('authMsg',error.message,false);msg('authMsg','Акаунт створено');if(data.session){user=data.user;await afterLogin()}}
 async function login(){await ensureSB();const {data,error}=await sb.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error)return msg('authMsg',error.message,false);user=data.user;await afterLogin()}
 async function init(){await ensureSB();const {data:{session}}=await sb.auth.getSession();if(session){user=session.user;await afterLogin()}}
-async function afterLogin(){$('authBox').classList.add('hidden');$('appBox').classList.remove('hidden');$('nav').classList.remove('hidden');$('globalQuick15')?.classList.remove('hidden');await loadFamilies();await loadChildren();await loadDashboard();await generateAutoReminders11();renderNav101();initHomeSort15();top15();}
+async function afterLogin(){document.querySelector('header').style.display='none';$('authBox').classList.add('hidden');$('appBox').classList.remove('hidden');$('nav').classList.remove('hidden');$('globalQuick15')?.classList.remove('hidden');await loadFamilies();await loadChildren();await loadDashboard();await generateAutoReminders11();renderNav101();initHomeSort15();top15();}
 async function loadFamilies(){const {data}=await sb.from('my_families').select('*');families=data||[];}
 function familyId(){const c=children.find(x=>x.id===$('childSelect')?.value);return c?.family_id||families[0]?.id||null}
 function childId(){return $('childSelect')?.value||children[0]?.id||null}
@@ -483,14 +503,14 @@ async function addChild(){
  if(file)await uploadProfilePhoto15('child_profiles',row.id,file,row.family_id);
  $('newChildName').value='';$('newChildBirth').value='';if($('newChildPhoto15'))$('newChildPhoto15').value='';await loadChildren();
 }
-function goHome(btn){$('quickFab')?.classList.add('hidden');
+function goHome(btn){if(user)document.querySelector('header').style.display='none';$('quickFab')?.classList.add('hidden');
  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$('homePage').classList.add('active');
  document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active')); if(btn)btn.classList.add('active'); window.scrollTo(0,0);if($('homePage')?.classList.contains('active'))loadDashboard();initHomeSort15();top15();
 }
 function showBaby(which,btn){$('quickFab')?.classList.remove('hidden');
  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$('babyPage').classList.add('active');
  document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active');
- panel(which);window.scrollTo(0,0);
+ panel(which);renderBabySwitch15();top15();
 }
 function panel(which){
  currentPanel=which;document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));$('p-'+which).classList.add('active');loadCurrent();
@@ -983,7 +1003,8 @@ async function loadDashboard(){
 
 const NAV101={home:['🏠','Головна'],profile:['👤','Я'],family:['👨‍👩‍👧‍👦','Сім’я'],children:['👶','Діти'],pets:['🐾','Тварини'],cars:['🚗','Авто'],properties:['🏠','Дім'],expenses:['💳','Витрати'],calendar:['📅','Календар'],reminders:['⏰','Нагадування'],documents:['📁','Документи'],work:['💼','Робота']};
 function nav101(){try{return JSON.parse(localStorage.getItem('nav101'))||['home','children','cars','expenses','family']}catch(e){return ['home','children','cars','expenses','family']}}
-function renderNav101(){let el=$('bottom101');if(!el){el=document.createElement('div');el.id='bottom101';el.className='bottom-custom';document.body.appendChild(el)}el.innerHTML=nav101().map((k,i)=>`<button onclick="${k==='home'?'goHome()':`openHub('${k}')`}" oncontextmenu="event.preventDefault();editNav101(${i})"><span class="ico">${NAV101[k][0]}</span>${NAV101[k][1]}</button>`).join('')}
+function navAction101(k){if(k==='home')return "goHome()";if(k==='children')return "showBaby('today')";return `openHub('${k}')`}
+function renderNav101(){let el=$('bottom101');if(!el){el=document.createElement('div');el.id='bottom101';el.className='bottom-custom';document.body.appendChild(el)}el.innerHTML=nav101().map((k,i)=>`<button onclick="${navAction101(k)}" oncontextmenu="event.preventDefault();editNav101(${i})"><span class="ico">${NAV101[k][0]}</span>${NAV101[k][1]}</button>`).join('')}
 function editNav101(i){showAdult('⚙️ Нижнє меню',`<div class="muted">Вибери розділ для цього місця. На телефоні — довге натискання на іконку.</div><div class="choice-grid" style="margin-top:10px">${Object.entries(NAV101).map(([k,v])=>`<div class="choice" onclick="setNav101(${i},'${k}')">${v[0]} ${v[1]}</div>`).join('')}</div>`)}
 function setNav101(i,k){const a=nav101();a[i]=k;localStorage.setItem('nav101',JSON.stringify(a));renderNav101();goHome()}
 let hold101;document.addEventListener('touchstart',e=>{const b=e.target.closest('#bottom101 button');if(!b)return;const i=[...b.parentNode.children].indexOf(b);hold101=setTimeout(()=>editNav101(i),650)},{passive:true});document.addEventListener('touchend',()=>clearTimeout(hold101),{passive:true});
@@ -1432,15 +1453,18 @@ async function renderBabySwitch15(){
  let out='';
  for(const c of children){
   const u=await signedPhoto15(c.photo_path);
-  out+=`<div class="ps15 ${c.id===cur?'active':''}" onclick="selectBaby15('${c.id}')"><div class="pic">${u?`<img src="${u}" alt="">`:'+'}</div><div class="nm">${esc(c.name)}</div></div>`;
+  const action=u
+    ? `selectBaby15('${c.id}')`
+    : `selectBaby15('${c.id}');setTimeout(()=>changePhoto15('child_profiles','${c.id}','${c.family_id}'),60)`;
+  out+=`<div class="ps15 ${c.id===cur?'active':''}" onclick="${action}"><div class="pic">${u?`<img src="${u}" alt="">`:'+'}</div><div class="nm">${esc(c.name)}</div></div>`;
  }
  out+=`<div class="ps15 add" onclick="openAddChild15()"><div class="pic">+</div><div class="nm">Додати</div></div>`;
  host.innerHTML=out;
  const c=children.find(x=>x.id===cur)||children[0];
- const age=age15(c.birth_date),next=await childNext15(c);
- const left=document.getElementById('babyLeftSmart15'),right=document.getElementById('babyRightSmart15');
- if(left)left.innerHTML=`<b>${esc(age)}</b>Вік`;
- if(right)right.innerHTML=`<b>⏰</b>${esc(next)}`;
+ if(document.getElementById('babyAge154'))$('babyAge154').textContent=age15(c.birth_date);
+ const next=await childNext15(c);
+ if(document.getElementById('babyReminder154'))$('babyReminder154').textContent=next==='Немає нагадувань'?'✓':'⏰';
+ if(document.getElementById('babyReminderText154'))$('babyReminderText154').textContent=next;
 }
 async function selectBaby15(id){
  if($('childSelect'))$('childSelect').value=id;
@@ -1618,13 +1642,13 @@ function sortable15(container,key){
 }
 function initHomeSort15(){sortable15($('homeHub15'),'simeinyk_home_order15')}
 
-async function openHub(kind){
+async function openHub(kind){if(kind==='children'){showBaby('today');return;}
  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
  $('hubPage').classList.add('active');$('quickFab')?.classList.add('hidden');
  const M={
  profile:['👤 Мій профіль',`<div class="hub-card" onclick="openDataManager13()"><div class="hub-icon">🗂️</div><b>Керування даними</b><span>Пошук, редагування, видалення</span></div><div class="hub-grid"><div class="hub-card" onclick="showBaby('meds')"><div class="hub-icon">💊</div><b>Ліки</b><span>Прийоми та курси</span></div><div class="hub-card" onclick="openAdultProfile()"><div class="hub-icon">👤</div><b>Мої дані</b><span>Дата народження, контакти</span></div><div class="hub-card" onclick="openDocuments('personal')"><div class="hub-icon">📁</div><b>Документи</b><span>Особисті файли</span></div></div>`],
  family:['👨‍👩‍👧‍👦 Сім’я',`<div class="hub-grid"><div class="hub-card" onclick="openAccess12()"><div class="hub-icon">🔐</div><b>Доступи</b><span>Ролі та приватність</span></div><div class="hub-card" onclick="openLinkCenter13()"><div class="hub-icon">🔗</div><b>Зв’язки</b><span>Люди, авто, тварини, документи й витрати</span></div><div class="hub-card" onclick="openReports12()"><div class="hub-icon">📈</div><b>Звіти</b><span>Місячний сімейний підсумок</span></div><div class="hub-card" onclick="openExport12()"><div class="hub-icon">📦</div><b>Експорт</b><span>Резервна копія даних</span></div><div class="hub-card" onclick="showBaby('birthdays')"><div class="hub-icon">🎂</div><b>Дні народження</b><span>Найближчі дати та вік</span></div><div class="hub-card"><div class="hub-icon">👥</div><b>Учасники</b><span>Сімейний доступ</span></div></div>`],
- children:['👶 Діти',`<div class="hub-grid"><div class="hub-card" onclick="showBaby('children')"><div class="hub-icon">👶</div><b>Обрати дитину</b><span>Профілі дітей</span></div><div class="hub-card" onclick="showBaby('today')"><div class="hub-icon">❤️</div><b>Відкрити дитячий профіль</b><span>Сон, їжа, розвиток, книжки, школа, спогади</span></div></div>`],
+ children:['👶 Діти',''],
  pets:['🐾 Тварини',`<div class="hub-grid"><div class="hub-card" onclick="openCompanions102()"><div class="hub-icon">🐕</div><b>Домашні улюбленці</b><span>Собаки, коти, рибки, птахи та інші</span></div><div class="hub-card" onclick="openFarmAnimals102()"><div class="hub-icon">🌾</div><b>Сільськогосподарські</b><span>Худоба, птиця, бджоли, продуктивність</span></div><div class="hub-card" onclick="openPetCards11()"><div class="hub-icon">🧾</div><b>Картки тварин</b><span>Здоров’я, витрати, документи, історія</span></div><div class="hub-card" onclick="openPetHealth()"><div class="hub-icon">🩺</div><b>Здоров’я</b><span>Ветеринар, щеплення, ліки</span></div><div class="hub-card" onclick="showBaby('petAchievements')"><div class="hub-icon">🏆</div><b>Досягнення</b><span>Команди та рівні</span></div></div>`],
  cars:['🚗 Авто',`<div class="hub-grid"><div class="hub-card" onclick="openCars102()"><div class="hub-icon">🚘</div><b>Мої авто</b><span>Марка, модель, двигун, паливо</span></div><div class="hub-card" onclick="openVehicleCards11()"><div class="hub-icon">🧾</div><b>Картки авто</b><span>Історія, витрати, документи, нагадування</span></div><div class="hub-card" onclick="openFuel102()"><div class="hub-icon">⛽</div><b>Заправки</b><span>Літри, ціна, пробіг, витрата</span></div><div class="hub-card" onclick="openCarCosts101()"><div class="hub-icon">🔧</div><b>Сервіс і витрати</b><span>ТО, ремонт, шини, страховка</span></div></div>`],
  properties:['🏠 Нерухомість',`<div class="hub-grid"><div class="hub-card" onclick="showBaby('properties')"><div class="hub-icon">🏠</div><b>Мої об’єкти</b><span>Адреси, оренда та платежі</span></div><div class="hub-card" onclick="openPropertyCards11()"><div class="hub-icon">🧾</div><b>Картки об’єктів</b><span>Документи, платежі, історія</span></div></div>`],
@@ -1657,10 +1681,7 @@ async function updateHero(){
   if(!c)return;
   $('heroName').textContent=c.name||'Дитина';
   $('heroAge').textContent=childAgeText(c.birth_date);
-  const {data}=await sb.from('baby_growth').select('*').eq('child_id',childId()).order('measured_at',{ascending:false}).limit(1);
-  const g=(data||[])[0];
-  $('heroHeight').textContent=g?.height_cm?g.height_cm+' см':'—';
-  $('heroWeight').textContent=g?.weight_kg?g.weight_kg+' кг':'—';
+  if(document.getElementById('babyAge154'))$('babyAge154').textContent=age15(c.birth_date);
 }
 async function updateLiveStatus(){
   const raw=localStorage.getItem(sleepKey());
