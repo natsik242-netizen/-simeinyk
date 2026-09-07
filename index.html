@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f7f3">
-<title>Сімейник Family v12</title>
+<title>Сімейник Family v13</title>
 <style>
 :root{--bg:#f5f7f3;--card:#fff;--ink:#202820;--muted:#6f786f;--brand:#6e9079;--brand2:#e5eee7;--line:#e4e9e5;--danger:#a84f4f}
 *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
@@ -90,11 +90,17 @@
 .manage-actions button{padding:7px 10px;border-radius:12px;border:1px solid var(--line);background:#fff}
 .report-box{border:1px solid var(--line);border-radius:18px;padding:13px;margin-top:8px;background:#fff}
 .role-chip{display:inline-block;padding:5px 9px;border-radius:999px;background:#eef4ef;font-size:11px;margin:2px}
+
+.v13-item{border:1px solid var(--line);border-radius:17px;padding:12px;background:#fff;margin:8px 0}
+.v13-filter{display:flex;gap:6px;overflow:auto;padding:4px 0 8px}
+.v13-filter button,.v13-actions button{border:1px solid var(--line);background:#fff;border-radius:11px;padding:7px 10px}
+.v13-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.v13-link{font-size:12px;padding:4px 8px;border-radius:999px;background:#eef4ef;display:inline-block;margin-top:5px}
 </style>
 </head>
 <body>
 <div class="app">
-<header><div><div class="logo">Сімейник</div><div class="sub">Family v12 · доступи, звіти, експорт</div></div><div>👶</div></header>
+<header><div><div class="logo">Сімейник</div><div class="sub">Family v13 · керування, зв’язки, пошук</div></div><div>👶</div></header>
 <main>
 <section id="authBox" class="card hero">
 <h2>Вхід</h2>
@@ -1301,12 +1307,51 @@ async function requestBrowserNotifications12(){
  else alert('Дозвіл на сповіщення не надано.');
 }
 
+
+const V13_TYPES={
+ expenses:{table:'expenses',icon:'💳',label:'Витрати',title:x=>(x.category||'Витрата')+' · '+Number(x.amount||0).toFixed(2)+' ₴',date:x=>x.expense_date},
+ family_reminders:{table:'family_reminders',icon:'⏰',label:'Нагадування',title:x=>x.title||'Нагадування',date:x=>x.due_at},
+ vehicles:{table:'vehicles',icon:'🚗',label:'Авто',title:x=>x.name||[x.make,x.model].filter(Boolean).join(' ')||'Авто',date:x=>x.created_at},
+ pets:{table:'pets',icon:'🐾',label:'Тварини',title:x=>x.name||x.species||'Тварина',date:x=>x.created_at},
+ family_properties:{table:'family_properties',icon:'🏠',label:'Нерухомість',title:x=>x.name||x.address||'Об’єкт',date:x=>x.created_at},
+ family_documents:{table:'family_documents',icon:'📄',label:'Документи',title:x=>x.title||'Документ',date:x=>x.expiry_date||x.created_at},
+ work_tasks:{table:'work_tasks',icon:'💼',label:'Робота',title:x=>x.title||'Завдання',date:x=>x.due_at}
+};
+let v13cache=[],v13filter='all';
+async function openDataManager13(){
+ showAdult('🗂️ Керування даними',`<div class="field"><input id="v13q" placeholder="Пошук по всіх записах…" oninput="renderManager13()"></div><div class="v13-filter"><button onclick="v13filter='all';renderManager13()">Усі</button>${Object.entries(V13_TYPES).map(([k,v])=>`<button onclick="v13filter='${k}';renderManager13()">${v.icon} ${v.label}</button>`).join('')}</div><div id="v13list"><div class="muted">Завантажую…</div></div>`);
+ await loadManager13();
+}
+async function loadManager13(){
+ v13cache=[];const ids=families.map(f=>f.id);
+ for(const [key,c] of Object.entries(V13_TYPES)){
+  let q=sb.from(c.table).select('*');
+  if(key==='work_tasks')q=q.eq('user_id',user.id); else q=q.in('family_id',ids);
+  const {data}=await q.limit(200);(data||[]).forEach(row=>v13cache.push({key,row}));
+ } renderManager13();
+}
+function linkedText13(x){const r=x.row,a=[];if(r.vehicle_id)a.push('🚗 авто');if(r.pet_id)a.push('🐾 тварина');if(r.property_id)a.push('🏠 нерухомість');if(r.child_id)a.push('👶 дитина');if(r.person_id)a.push('👤 людина');return a.join(' · ')}
+function renderManager13(){
+ const q=($('v13q')?.value||'').toLowerCase().trim();let rows=v13cache.filter(x=>v13filter==='all'||x.key===v13filter);
+ if(q)rows=rows.filter(x=>JSON.stringify(x.row).toLowerCase().includes(q));
+ rows.sort((a,b)=>new Date(V13_TYPES[b.key].date(b.row)||0)-new Date(V13_TYPES[a.key].date(a.row)||0));
+ $('v13list').innerHTML=rows.length?rows.map(x=>{const c=V13_TYPES[x.key],r=x.row,ln=linkedText13(x);return `<div class="v13-item"><div class="entity-head"><div class="entity-icon">${c.icon}</div><div class="grow"><b>${esc(c.title(r))}</b><div class="muted">${esc(c.label)}${c.date(r)?' · '+new Date(c.date(r)).toLocaleDateString('uk-UA'):''}</div>${ln?`<span class="v13-link">${ln}</span>`:''}</div></div><div class="v13-actions"><button onclick="editGeneric13('${x.key}','${r.id}')">✏️ Редагувати</button><button onclick="deleteGeneric13('${x.key}','${r.id}')">🗑 Видалити</button></div></div>`}).join(''):'<div class="muted">Нічого не знайдено.</div>';
+}
+async function deleteGeneric13(key,id){const c=V13_TYPES[key];if(!c||!confirm('Видалити цей запис?'))return;const {error}=await sb.from(c.table).delete().eq('id',id);if(error)return alert(error.message);await loadManager13()}
+async function editGeneric13(key,id){
+ const item=v13cache.find(x=>x.key===key&&x.row.id===id);if(!item)return;const r=item.row,c=V13_TYPES[key];
+ const editable=Object.entries(r).filter(([k,v])=>!['id','family_id','user_id','created_by','created_at','updated_at'].includes(k)&&['string','number'].includes(typeof v));
+ showAdult('✏️ '+c.label,`<div id="edit13">${editable.map(([k,v])=>`<div class="field"><label>${esc(k)}</label><input data-k="${esc(k)}" value="${esc(String(v??''))}"></div>`).join('')}<button class="btn primary wide" onclick="saveGeneric13('${key}','${id}')">Зберегти</button></div>`);
+}
+async function saveGeneric13(key,id){const c=V13_TYPES[key],patch={};document.querySelectorAll('#edit13 input[data-k]').forEach(el=>patch[el.dataset.k]=el.value===''?null:el.value);const {error}=await sb.from(c.table).update(patch).eq('id',id);if(error)return alert(error.message);alert('Збережено');openDataManager13()}
+async function openLinkCenter13(){showAdult('🔗 Зв’язки записів',`<div class="muted">Витрати, документи та нагадування можна прив’язувати до конкретного авто, тварини, нерухомості, дитини або члена сім’ї.</div><button class="btn primary wide" style="margin-top:10px" onclick="openDataManager13()">Відкрити керування</button>`)}
+
 function openHub(kind){
  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
  $('hubPage').classList.add('active');$('quickFab')?.classList.add('hidden');
  const M={
- profile:['👤 Мій профіль',`<div class="hub-grid"><div class="hub-card" onclick="showBaby('meds')"><div class="hub-icon">💊</div><b>Ліки</b><span>Прийоми та курси</span></div><div class="hub-card" onclick="openAdultProfile()"><div class="hub-icon">👤</div><b>Мої дані</b><span>Дата народження, контакти</span></div><div class="hub-card" onclick="openDocuments('personal')"><div class="hub-icon">📁</div><b>Документи</b><span>Особисті файли</span></div></div>`],
- family:['👨‍👩‍👧‍👦 Сім’я',`<div class="hub-grid"><div class="hub-card" onclick="openAccess12()"><div class="hub-icon">🔐</div><b>Доступи</b><span>Ролі та приватність</span></div><div class="hub-card" onclick="openReports12()"><div class="hub-icon">📈</div><b>Звіти</b><span>Місячний сімейний підсумок</span></div><div class="hub-card" onclick="openExport12()"><div class="hub-icon">📦</div><b>Експорт</b><span>Резервна копія даних</span></div><div class="hub-card" onclick="showBaby('birthdays')"><div class="hub-icon">🎂</div><b>Дні народження</b><span>Найближчі дати та вік</span></div><div class="hub-card"><div class="hub-icon">👥</div><b>Учасники</b><span>Сімейний доступ</span></div></div>`],
+ profile:['👤 Мій профіль',`<div class="hub-card" onclick="openDataManager13()"><div class="hub-icon">🗂️</div><b>Керування даними</b><span>Пошук, редагування, видалення</span></div><div class="hub-grid"><div class="hub-card" onclick="showBaby('meds')"><div class="hub-icon">💊</div><b>Ліки</b><span>Прийоми та курси</span></div><div class="hub-card" onclick="openAdultProfile()"><div class="hub-icon">👤</div><b>Мої дані</b><span>Дата народження, контакти</span></div><div class="hub-card" onclick="openDocuments('personal')"><div class="hub-icon">📁</div><b>Документи</b><span>Особисті файли</span></div></div>`],
+ family:['👨‍👩‍👧‍👦 Сім’я',`<div class="hub-grid"><div class="hub-card" onclick="openAccess12()"><div class="hub-icon">🔐</div><b>Доступи</b><span>Ролі та приватність</span></div><div class="hub-card" onclick="openLinkCenter13()"><div class="hub-icon">🔗</div><b>Зв’язки</b><span>Люди, авто, тварини, документи й витрати</span></div><div class="hub-card" onclick="openReports12()"><div class="hub-icon">📈</div><b>Звіти</b><span>Місячний сімейний підсумок</span></div><div class="hub-card" onclick="openExport12()"><div class="hub-icon">📦</div><b>Експорт</b><span>Резервна копія даних</span></div><div class="hub-card" onclick="showBaby('birthdays')"><div class="hub-icon">🎂</div><b>Дні народження</b><span>Найближчі дати та вік</span></div><div class="hub-card"><div class="hub-icon">👥</div><b>Учасники</b><span>Сімейний доступ</span></div></div>`],
  children:['👶 Діти',`<div class="hub-grid"><div class="hub-card" onclick="showBaby('children')"><div class="hub-icon">👶</div><b>Обрати дитину</b><span>Профілі дітей</span></div><div class="hub-card" onclick="showBaby('today')"><div class="hub-icon">❤️</div><b>Відкрити дитячий профіль</b><span>Сон, їжа, розвиток, книжки, школа, спогади</span></div></div>`],
  pets:['🐾 Тварини',`<div class="hub-grid"><div class="hub-card" onclick="openCompanions102()"><div class="hub-icon">🐕</div><b>Домашні улюбленці</b><span>Собаки, коти, рибки, птахи та інші</span></div><div class="hub-card" onclick="openFarmAnimals102()"><div class="hub-icon">🌾</div><b>Сільськогосподарські</b><span>Худоба, птиця, бджоли, продуктивність</span></div><div class="hub-card" onclick="openPetCards11()"><div class="hub-icon">🧾</div><b>Картки тварин</b><span>Здоров’я, витрати, документи, історія</span></div><div class="hub-card" onclick="openPetHealth()"><div class="hub-icon">🩺</div><b>Здоров’я</b><span>Ветеринар, щеплення, ліки</span></div><div class="hub-card" onclick="showBaby('petAchievements')"><div class="hub-icon">🏆</div><b>Досягнення</b><span>Команди та рівні</span></div></div>`],
  cars:['🚗 Авто',`<div class="hub-grid"><div class="hub-card" onclick="openCars102()"><div class="hub-icon">🚘</div><b>Мої авто</b><span>Марка, модель, двигун, паливо</span></div><div class="hub-card" onclick="openVehicleCards11()"><div class="hub-icon">🧾</div><b>Картки авто</b><span>Історія, витрати, документи, нагадування</span></div><div class="hub-card" onclick="openFuel102()"><div class="hub-icon">⛽</div><b>Заправки</b><span>Літри, ціна, пробіг, витрата</span></div><div class="hub-card" onclick="openCarCosts101()"><div class="hub-icon">🔧</div><b>Сервіс і витрати</b><span>ТО, ремонт, шини, страховка</span></div></div>`],
