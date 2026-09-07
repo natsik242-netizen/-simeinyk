@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f7f3">
-<title>Сімейник Family v15.4</title>
+<title>Сімейник Family v16</title>
 <style>
 :root{--bg:#f5f7f3;--card:#fff;--ink:#202820;--muted:#6f786f;--brand:#6e9079;--brand2:#e5eee7;--line:#e4e9e5;--danger:#a84f4f}
 *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
@@ -133,11 +133,131 @@
  .baby-top154 .ps15 .pic{width:56px;height:56px}
  .baby-top154 .profile-switch15{gap:7px}
 }
+
+/* ===== Family v16 — unified dark design ===== */
+:root{
+ --bg:#071116;--card:#0d1b22;--card2:#11232c;--ink:#f4f7f8;--muted:#8ea1aa;
+ --brand:#29d86f;--brand2:#123225;--line:#1c3039;--danger:#ff6b6b;
+ --blue:#2d9cff;--pink:#f04491;--purple:#ad55ff;
+}
+html{background:#071116}
+body{background:linear-gradient(180deg,#071116 0%,#09151b 100%);color:var(--ink)}
+.app{max-width:560px;background:transparent;padding-bottom:96px}
+main{padding:12px 14px 28px}
+header{background:#071116;color:#fff}
+h1,h2,h3,b{color:var(--ink)}
+.muted,.sub{color:var(--muted)}
+.card,.today-card,.today-mini,.hub-card,.section-overview15,.section-overview15 .stat,
+.smart-card,.entity-card,.report-box,.profile15,.v13-item,.history-card,.search-hit,
+.memory-card,.school-card,.rec-card,.row,.tile,.choice{
+ background:var(--card);border-color:var(--line);color:var(--ink);box-shadow:none
+}
+.card{border-radius:20px}
+.hero{background:linear-gradient(145deg,#10242b,#0c1b21)}
+.field input,.field select,.field textarea{
+ background:#09161c;border-color:#203640;color:#f4f7f8;outline:none
+}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:#3f6775}
+.field input::placeholder,.field textarea::placeholder{color:#637984}
+.secondary,.manage-actions button,.v13-actions button,.v13-filter button,.profile15-actions button{
+ background:#13242c;border-color:#203640;color:#eaf0f2
+}
+.primary{background:var(--brand);color:#04120a}
+.danger{background:#2a1518;border-color:#54242a;color:#ff9090}
+.v16-homehead{padding:4px 2px 14px}
+.v16-homehead h1{font-size:27px;margin:0 0 8px;font-weight:900;letter-spacing:-.5px}
+.v16-homehead b{font-size:16px}
+.v16-homehead .muted{margin-top:3px}
+.v16-refresh,.v16-iconbtn,.v16-back{
+ border:0;background:#12242c;color:#eaf1f3;border-radius:50%;width:38px;height:38px;
+ font-size:21px;font-weight:800;display:flex;align-items:center;justify-content:center
+}
+.v16-back{font-size:31px;line-height:1}
+.v16-iconbtn{font-size:18px;letter-spacing:1px}
+.v16-section{padding:2px 0 14px}
+.section-head{margin:2px 0 14px}.section-head h2{font-size:27px;font-weight:900}
+.today-card{padding:15px;border-radius:21px;background:linear-gradient(145deg,#0e2028,#0b1920)}
+.today-grid{gap:9px}
+.today-mini{padding:12px;background:#11242c}
+.today-mini b{font-size:20px}
+.hub-grid{gap:10px}
+.hub-card{min-height:108px;padding:15px;border-radius:19px;background:#0d1c23}
+.hub-card:active{transform:scale(.98)}
+.hub-card .hub-icon{font-size:28px}
+.hub-card b{font-size:16px}
+.hub-card span{color:#8da0aa}
+.section-overview15{background:linear-gradient(145deg,#10242c,#0d1c23);padding:15px}
+.section-overview15 .bigico{background:#152c35}
+.section-overview15 .stat{background:#0a181e}
+.section-overview15 .muted{color:#8da0aa}
+.draghint15{display:none!important}
+.bottom-custom{
+ position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(560px,100%);
+ margin:0;border-radius:0;background:rgba(7,17,22,.96);border:0;border-top:1px solid #1a3039;
+ padding:7px 5px calc(8px + env(safe-area-inset-bottom));box-shadow:0 -10px 30px #0005
+}
+.bottom-custom button{color:#81959e;padding:6px 2px}
+.bottom-custom button .ico{font-size:21px}
+.bottom-custom button:active,.bottom-custom button:focus,.bottom-custom button.active16{color:var(--brand)}
+.nav{display:none!important}
+.quick15{background:#159cff;color:#fff;bottom:88px}
+.quick-fab{background:#159cff;border-color:#0b1b22;bottom:90px}
+.sheet{background:#0b1920;color:#fff}
+.overlay{background:#0009}
+
+/* Child profile uses exactly the same v16 visual language */
+.baby-shell{
+ background:transparent;color:#f7fafb;border-radius:0;padding:0;margin:0;min-height:70vh
+}
+.baby-top154{
+ background:linear-gradient(145deg,#10232b,#0d1b22);border:1px solid var(--line);
+ border-radius:22px;padding:16px 8px;margin:8px 0 12px
+}
+.baby-stat-big{font-size:18px}
+.baby-stat-label{color:#8da0aa}
+.baby-top154 .ps15 .pic{
+ background:#132a32;border:2px solid #29434d;color:#e9f0f2
+}
+.baby-top154 .ps15.active .pic{
+ border-color:var(--brand);box-shadow:0 0 0 3px rgba(41,216,111,.14)
+}
+.baby-top154 .ps15.add .pic{border-color:#35505b}
+.baby-top154 .ps15 .nm{color:#eef3f5}
+.status-live{
+ background:linear-gradient(145deg,#10242c,#0d1c23);border-color:#203640;border-radius:19px
+}
+.tabs{gap:8px;margin:10px 0 13px}
+.tabs .btn{border-radius:999px;padding:9px 14px}
+.tabs .btn:focus{background:var(--brand);color:#06140b;border-color:var(--brand)}
+.panel h2{font-size:23px}
+.timeline-row{background:#0e1e25;border-color:#1c333c}
+.timeline-icon{background:#243c47}
+.ach-card{background:#102129;border-color:#213943}
+.progress{background:#1a3038}.progress i{background:var(--brand)}
+.game-badge{background:#18291f;border-color:#31533b;color:#ccebd5}
+.memory-badge,.badge-soft,.pill,.role-chip,.v13-link{background:#142a31;color:#b9c8ce}
+.avatar15{background:#13272f;border-color:#28404a}
+.profile15-actions button{color:#e9eff1}
+
+/* Search and auth */
+#authBox{margin-top:15vh;background:linear-gradient(145deg,#10242c,#0b1920)}
+#authBox h2{font-size:28px}
+#globalSearchResults:empty{display:none}
+#homePage>.card:nth-of-type(1){background:#0b1920}
+
+/* Small screens */
+@media(max-width:390px){
+ main{padding-left:11px;padding-right:11px}
+ .hub-grid{gap:8px}
+ .hub-card{padding:13px}
+ .baby-top154{grid-template-columns:66px 1fr 74px}
+}
+
 </style>
 </head>
 <body>
 <div class="app">
-<header><div><div class="logo">Сімейник</div><div class="sub">Family v15.4 · прямі профілі</div></div><div>👶</div></header>
+<header><div><div class="logo">Сімейник</div><div class="sub">Family v16 · темний єдиний дизайн</div></div><div>👶</div></header>
 <main>
 <section id="authBox" class="card hero">
 <h2>Вхід</h2>
@@ -149,7 +269,7 @@
 
 <div id="appBox" class="hidden">
 <section class="page active" id="homePage">
-<div class="card hero"><h2>Сімейник</h2><div class="muted">Усе сімейне — по своїх розділах</div></div>
+<div class="v16-homehead"><h1>Сімейник</h1><b>Добрий день 👋</b><div class="muted">Усе важливе для сім’ї — в одному місці</div></div>
 <div class="card">
   <div class="field"><label>🔎 Пошук по Сімейнику</label><input id="globalSearch" placeholder="Наприклад: страховка, Рекс, оренда" oninput="runGlobalSearch()"></div>
   <div id="globalSearchResults"></div>
@@ -158,7 +278,7 @@
 <div class="today-card">
   <div style="display:flex;justify-content:space-between;align-items:center">
     <div><h3 style="margin:0">Сьогодні</h3><div class="muted">Автоматично з усіх розділів</div></div>
-    <div style="display:flex;gap:6px"><button class="btn secondary" onclick="openSmartToday11()">Розгорнути</button><button class="btn secondary" onclick="loadDashboard()">↻</button></div>
+    <button class="v16-refresh" onclick="loadDashboard()">↻</button>
   </div>
   <div class="today-grid">
     <div class="today-mini"><span class="muted">Нагадування</span><b id="dashReminders">0</b></div>
@@ -185,23 +305,23 @@
 </section>
 
 <section class="page" id="hubPage">
-<div class="card">
-<div class="section-head"><button class="btn secondary" onclick="goHome()">←</button><h2 id="hubTitle">Розділ</h2></div>
-<div id="hubOverview15"></div><div class="draghint15">Затисни і перетягни картки нижче, щоб розташувати їх як зручно.</div><div id="hubContent"></div>
+<div class="v16-section">
+<div class="section-head"><button class="v16-back" onclick="goHome()">‹</button><h2 id="hubTitle">Розділ</h2></div>
+<div id="hubOverview15"></div><div id="hubContent"></div>
 </div>
 </section>
 
 
 <section class="page" id="adultPage">
-<div class="card"><div class="section-head"><button class="btn secondary" onclick="goHome()">←</button><h2 id="adultTitle">Розділ</h2></div><div id="adultContent"></div></div>
+<div class="v16-section"><div class="section-head"><button class="v16-back" onclick="goHome()">‹</button><h2 id="adultTitle">Розділ</h2></div><div id="adultContent"></div></div>
 </section>
 
 <section class="page" id="babyPage">
 <div class="baby-shell">
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-<button class="btn secondary" onclick="goHome()">←</button>
+<button class="v16-back" onclick="goHome()">‹</button>
 <select id="childSelect" style="display:none" onchange="loadCurrent()" style="max-width:210px;padding:10px;border-radius:12px;border:1px solid #46534a;background:#1f2a23;color:#fff"></select>
-<button class="btn secondary" onclick="panel('children')">⚙️</button>
+<button class="v16-iconbtn" onclick="panel('children')">•••</button>
 </div>
 
 <div class="baby-top baby-top154">
@@ -222,9 +342,9 @@
 <div class="tabs">
 <button class="btn secondary" onclick="panel('today')">Сьогодні</button>
 <button class="btn secondary" onclick="panel('sleep')">Сон</button>
-<button class="btn secondary" onclick="panel('feeding')">Годування</button>
+<button class="btn secondary" onclick="panel('feeding')">Їжа</button>
 <button class="btn secondary" onclick="panel('food')">Прикорм</button>
-<button class="btn secondary" onclick="panel('achievements')">🏆 Досягнення</button>
+<button class="btn secondary" onclick="panel('achievements')">Розвиток</button>
 <button class="btn secondary" onclick="panel('memories')">📸 Спогади</button>
 <button class="btn secondary" onclick="panel('books')">📚 Книжки</button>
 <button class="btn secondary" onclick="panel('activities')">⚽ Гуртки</button>
@@ -503,11 +623,11 @@ async function addChild(){
  if(file)await uploadProfilePhoto15('child_profiles',row.id,file,row.family_id);
  $('newChildName').value='';$('newChildBirth').value='';if($('newChildPhoto15'))$('newChildPhoto15').value='';await loadChildren();
 }
-function goHome(btn){if(user)document.querySelector('header').style.display='none';$('quickFab')?.classList.add('hidden');
+function goHome(btn){activeNav16='home';renderNav101();if(user)document.querySelector('header').style.display='none';$('quickFab')?.classList.add('hidden');
  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$('homePage').classList.add('active');
  document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active')); if(btn)btn.classList.add('active'); window.scrollTo(0,0);if($('homePage')?.classList.contains('active'))loadDashboard();initHomeSort15();top15();
 }
-function showBaby(which,btn){$('quickFab')?.classList.remove('hidden');
+function showBaby(which,btn){activeNav16='children';renderNav101();$('quickFab')?.classList.remove('hidden');
  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$('babyPage').classList.add('active');
  document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active');
  panel(which);renderBabySwitch15();top15();
@@ -1003,7 +1123,9 @@ async function loadDashboard(){
 
 const NAV101={home:['🏠','Головна'],profile:['👤','Я'],family:['👨‍👩‍👧‍👦','Сім’я'],children:['👶','Діти'],pets:['🐾','Тварини'],cars:['🚗','Авто'],properties:['🏠','Дім'],expenses:['💳','Витрати'],calendar:['📅','Календар'],reminders:['⏰','Нагадування'],documents:['📁','Документи'],work:['💼','Робота']};
 function nav101(){try{return JSON.parse(localStorage.getItem('nav101'))||['home','children','cars','expenses','family']}catch(e){return ['home','children','cars','expenses','family']}}
-function navAction101(k){if(k==='home')return "goHome()";if(k==='children')return "showBaby('today')";return `openHub('${k}')`}
+let activeNav16='home';
+function markNav16(k){activeNav16=k;setTimeout(()=>{document.querySelectorAll('#bottom101 button').forEach((b,i)=>{const key=nav101()[i];b.classList.toggle('active16',key===activeNav16)})},0)}
+function navAction101(k){if(k==='home')return "markNav16('home');goHome()";if(k==='children')return "markNav16('children');showBaby('today')";return `markNav16('${k}');openHub('${k}')`}
 function renderNav101(){let el=$('bottom101');if(!el){el=document.createElement('div');el.id='bottom101';el.className='bottom-custom';document.body.appendChild(el)}el.innerHTML=nav101().map((k,i)=>`<button onclick="${navAction101(k)}" oncontextmenu="event.preventDefault();editNav101(${i})"><span class="ico">${NAV101[k][0]}</span>${NAV101[k][1]}</button>`).join('')}
 function editNav101(i){showAdult('⚙️ Нижнє меню',`<div class="muted">Вибери розділ для цього місця. На телефоні — довге натискання на іконку.</div><div class="choice-grid" style="margin-top:10px">${Object.entries(NAV101).map(([k,v])=>`<div class="choice" onclick="setNav101(${i},'${k}')">${v[0]} ${v[1]}</div>`).join('')}</div>`)}
 function setNav101(i,k){const a=nav101();a[i]=k;localStorage.setItem('nav101',JSON.stringify(a));renderNav101();goHome()}
