@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f7f3">
-<title>Сімейник Family v18.5</title>
+<title>Сімейник Family v19.0</title>
 <style>
 :root{--bg:#f5f7f3;--card:#fff;--ink:#202820;--muted:#6f786f;--brand:#6e9079;--brand2:#e5eee7;--line:#e4e9e5;--danger:#a84f4f}
 *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
@@ -412,11 +412,28 @@ body.v18-open #quickFab,#babyPage.active ~ #quickFab{display:none!important}
 .v185-q{border:1px solid #1d343e;background:#0b1b22;color:#dce6ea;border-radius:16px;padding:11px 4px;font-weight:800;font-size:11px}
 .v185-q span{display:block;font-size:22px;margin-bottom:5px}
 
+
+/* ===== FAMILY v19.0 — ALL MODULES ===== */
+.v190-all{margin:18px 0 8px}
+.v190-head{display:flex;align-items:end;justify-content:space-between;margin-bottom:11px}
+.v190-head h2{margin:0;font-size:21px}.v190-head small{color:#738993}
+.v190-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.v190-card{border:1px solid #19313a;background:#0b1b22;border-radius:20px;padding:15px;text-align:left;color:#f6f8f9;min-height:106px}
+.v190-card span{font-size:29px;display:block;margin-bottom:9px}
+.v190-card b{display:block;font-size:15px;margin-bottom:4px}
+.v190-card small{display:block;color:#7f949d;line-height:1.25}
+.v190-card.wide{grid-column:1/-1;min-height:84px;display:grid;grid-template-columns:46px 1fr auto;align-items:center;gap:10px}
+.v190-card.wide span{margin:0}.v190-card.wide i{font-style:normal;color:#4c6873;font-size:24px}
+.v190-section{font-size:12px;color:#68808a;font-weight:900;text-transform:uppercase;letter-spacing:.08em;margin:18px 2px 8px}
+.v190-status{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:11px 0}
+.v190-stat{background:#08181e;border:1px solid #19313a;border-radius:16px;padding:10px;text-align:center}
+.v190-stat b{display:block;font-size:18px}.v190-stat small{color:#728893;font-size:10px}
+
 </style>
 </head>
 <body>
 <div class="app">
-<header><div><div class="logo">Сімейник</div><div class="sub">Family v18.5</div></div><div>👶</div></header>
+<header><div><div class="logo">Сімейник</div><div class="sub">Family v19.0</div></div><div>👶</div></header>
 <main>
 <section id="authBox" class="card hero">
 <h2>Вхід</h2>
@@ -759,7 +776,7 @@ function msg(id,t,ok=true){$(id).className='msg '+(ok?'ok':'err');$(id).textCont
 async function register(){await ensureSB();const e=$('email').value.trim(),p=$('password').value;if(!e||p.length<6)return msg('authMsg','Введи email і пароль від 6 символів',false);const {data,error}=await sb.auth.signUp({email:e,password:p});if(error)return msg('authMsg',error.message,false);msg('authMsg','Акаунт створено');if(data.session){user=data.user;await afterLogin()}}
 async function login(){await ensureSB();const {data,error}=await sb.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error)return msg('authMsg',error.message,false);user=data.user;await afterLogin()}
 async function init(){await ensureSB();const {data:{session}}=await sb.auth.getSession();if(session){user=session.user;await afterLogin()}}
-async function afterLogin(){document.querySelector('header').style.display='none';$('authBox').classList.add('hidden');$('appBox').classList.remove('hidden');$('nav').classList.remove('hidden');$('globalQuick15')?.classList.remove('hidden');await loadFamilies();await loadChildren();await loadDashboard();await renderSmartHome185();await generateAutoReminders11();renderNav101();initHomeSort15();top15();}
+async function afterLogin(){document.querySelector('header').style.display='none';$('authBox').classList.add('hidden');$('appBox').classList.remove('hidden');$('nav').classList.remove('hidden');$('globalQuick15')?.classList.remove('hidden');await loadFamilies();await loadChildren();await loadDashboard();await renderSmartHome185();await renderV190All();await generateAutoReminders11();renderNav101();initHomeSort15();top15();}
 async function loadFamilies(){const {data}=await sb.from('my_families').select('*');families=data||[];}
 function familyId(){const c=children.find(x=>x.id===$('childSelect')?.value);return c?.family_id||families[0]?.id||null}
 function childId(){return $('childSelect')?.value||children[0]?.id||null}
@@ -2267,11 +2284,19 @@ function renderV18Body(){
 }
 function v18Open(k){
  document.body.classList.remove('v18-open');
- if(k==='expenses'){openHub('expenses');return}
+ if(k==='expenses'){openExpenses();return}
  if(k==='docs'){openDocuments();return}
  if(k==='carcost'){openCarCosts101();return}
  if(k==='reminders'){openHub('reminders');return}
- if(k==='health'){openHub('health');return}
+ if(k==='health'){
+   if(v18Kind==='pets' && typeof openPetProfile15==='function' && v18Id){openPetProfile15(v18Id);return}
+   openHub('health');return
+ }
+ if(k==='pet'){
+   if(typeof openPetProfile15==='function' && v18Id){openPetProfile15(v18Id);return}
+   openPets101();return
+ }
+ if(k==='property'){v190PropertyAdd();return}
 }
 
 let v183FamilyId=null, v183MemberId=null;
@@ -2387,23 +2412,9 @@ function v18FamilyOpen(k){
 }
 function v18Add(){
  document.body.classList.remove('v18-open');
- if(v18Kind==='pets'){
-   if(typeof openPets101==='function'){openPets101();return}
-   alert('Форма додавання тварини ще не підключена.');
-   return;
- }
- if(v18Kind==='cars'){
-   if(typeof openCars101==='function'){openCars101();return}
-   alert('Форма додавання авто ще не підключена.');
-   return;
- }
- if(v18Kind==='properties'){
-   // Open the legacy property management page directly, bypassing V18 redirect.
-   const oldKind=v18Kind; v18Kind=null;
-   if(typeof openProperties101==='function'){openProperties101();return}
-   alert('Форма додавання нерухомості ще не підключена.');
-   v18Kind=oldKind;
- }
+ if(v18Kind==='pets'){openPets101();return}
+ if(v18Kind==='cars'){openCars101();return}
+ if(v18Kind==='properties'){v190PropertyAdd();return}
 }
 function v18More(){ alert('Редагування та додаткові дії будуть тут.'); }
 
@@ -2608,6 +2619,104 @@ if(_goHome185){
   goHome = function(...args){
     const r=_goHome185.apply(this,args);
     Promise.resolve(r).then(()=>renderSmartHome185());
+    return r;
+  };
+}
+
+
+
+/* ================= FAMILY v19.0 ================= */
+async function v190Counts(){
+  const ids=(families||[]).map(f=>f.id);
+  const count=async table=>{
+    if(!ids.length)return 0;
+    try{
+      const {count}=await sb.from(table).select('*',{count:'exact',head:true}).in('family_id',ids);
+      return count||0;
+    }catch(e){return 0}
+  };
+  const [children,pets,cars]=await Promise.all([
+    count('child_profiles'),count('pets'),count('vehicles')
+  ]);
+  return {children,pets,cars};
+}
+async function renderV190All(){
+  const host=$('dashboard')||$('homePage')||$('appBox');
+  if(!host)return;
+  let box=$('allModules190');
+  if(!box){
+    box=document.createElement('div');
+    box.id='allModules190';
+    box.className='v190-all';
+    const today=$('smartToday185');
+    if(today && today.parentNode) today.insertAdjacentElement('afterend',box);
+    else host.prepend(box);
+  }
+  const c=await v190Counts();
+  box.innerHTML=`
+    <div class="v190-head"><h2>Сімейник</h2><small>усе в одному місці</small></div>
+    <div class="v190-status">
+      <div class="v190-stat"><b>${c.children}</b><small>дітей</small></div>
+      <div class="v190-stat"><b>${c.pets}</b><small>тварин</small></div>
+      <div class="v190-stat"><b>${c.cars}</b><small>авто</small></div>
+    </div>
+
+    <div class="v190-section">Сім’я та профілі</div>
+    <div class="v190-grid">
+      <button class="v190-card" onclick="openV18('profile')"><span>👤</span><b>Мій профіль</b><small>Дані, здоров’я, документи, витрати</small></button>
+      <button class="v190-card" onclick="openV18('family')"><span>👨‍👩‍👧‍👦</span><b>Сім’я</b><small>Учасники, сім’ї, доступи</small></button>
+      <button class="v190-card" onclick="showBaby('today')"><span>👶</span><b>Діти</b><small>Сон, їжа, ріст, ліки, розвиток</small></button>
+      <button class="v190-card" onclick="openV18('pets')"><span>🐾</span><b>Тварини</b><small>Здоров’я, годування, досягнення</small></button>
+    </div>
+
+    <div class="v190-section">Майно</div>
+    <div class="v190-grid">
+      <button class="v190-card" onclick="openV18('cars')"><span>🚗</span><b>Авто</b><small>ТО, заправки, страхування, витрати</small></button>
+      <button class="v190-card" onclick="openV18('properties')"><span>🏠</span><b>Нерухомість</b><small>Платежі, документи, ремонти</small></button>
+    </div>
+
+    <div class="v190-section">Організація життя</div>
+    <div class="v190-grid">
+      <button class="v190-card" onclick="openExpenses()"><span>💳</span><b>Витрати</b><small>Особисті та сімейні витрати</small></button>
+      <button class="v190-card" onclick="openCalendar()"><span>📅</span><b>Календар</b><small>Події, лікарі, свята, справи</small></button>
+      <button class="v190-card" onclick="openHub('reminders')"><span>⏰</span><b>Нагадування</b><small>Особисті та сімейні</small></button>
+      <button class="v190-card" onclick="openDocuments()"><span>📁</span><b>Документи</b><small>Особисті, авто, житло, сім’я</small></button>
+      <button class="v190-card" onclick="openHub('health')"><span>❤️</span><b>Здоров’я</b><small>Медичні записи та ліки</small></button>
+      <button class="v190-card" onclick="openHub('work')"><span>💼</span><b>Робота</b><small>Завдання, графік, документи</small></button>
+    </div>
+
+    <div class="v190-section">Додатково</div>
+    <div class="v190-grid">
+      <button class="v190-card wide" onclick="openAccess184()"><span>🔐</span><div><b>Права доступу</b><small>Хто може бачити та редагувати конкретні дані</small></div><i>›</i></button>
+      <button class="v190-card wide" onclick="openHub('family')"><span>📦</span><div><b>Звіти та резервна копія</b><small>Керування сімейними даними</small></div><i>›</i></button>
+    </div>`;
+}
+
+function v190PropertyAdd(){
+  if(typeof openProperties==='function'){openProperties();return}
+  if(typeof openProperty==='function'){openProperty();return}
+  showAdult('🏠 Додати нерухомість',`
+    <div class="field"><label>Назва</label><input id="p190name" placeholder="Квартира, будинок..."></div>
+    <div class="field"><label>Адреса</label><input id="p190address"></div>
+    <div class="field"><label>Тип</label><select id="p190type"><option>Квартира</option><option>Будинок</option><option>Дача</option><option>Гараж</option><option>Земля</option><option>Інше</option></select></div>
+    <button class="btn primary wide" onclick="saveProperty190()">Додати</button>`);
+}
+async function saveProperty190(){
+  const name=$('p190name').value.trim(); if(!name)return;
+  const payload={family_id:familyId(),name,address:$('p190address').value.trim()||null,property_type:$('p190type').value};
+  if(user?.id)payload.created_by=user.id;
+  const {data,error}=await sb.from('family_properties').insert(payload).select().single();
+  if(error)return alert(error.message);
+  await openV18('properties',data?.id||null);
+}
+
+
+
+const _goHome190 = typeof goHome==='function' ? goHome : null;
+if(_goHome190){
+  goHome=function(...args){
+    const r=_goHome190.apply(this,args);
+    Promise.resolve(r).then(async()=>{await renderSmartHome185();await renderV190All();});
     return r;
   };
 }
