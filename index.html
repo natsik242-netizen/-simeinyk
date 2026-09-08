@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f7f3">
-<title>Сімейник Family v20.7</title>
+<title>Сімейник Family v20.9</title>
 <style>
 :root{--bg:#f5f7f3;--card:#fff;--ink:#202820;--muted:#6f786f;--brand:#6e9079;--brand2:#e5eee7;--line:#e4e9e5;--danger:#a84f4f}
 *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
@@ -603,6 +603,46 @@ html,body{min-height:100%;}
   -webkit-tap-highlight-color:rgba(255,255,255,.08);
 }
 
+
+/* ===== v20.8 GLOBAL TAP / BACK FIX ===== */
+.page.active,
+#adultPage.active,
+#hubPage.active,
+#babyPage.active,
+#v18Page.active,
+#access184Page.active{
+  pointer-events:auto!important;
+}
+.page.active button,
+.page.active [onclick],
+nav button,
+#globalQuick15{
+  pointer-events:auto!important;
+  touch-action:manipulation!important;
+  -webkit-user-select:none;
+  user-select:none;
+}
+.v16-back,.v18-back{
+  position:relative!important;
+  z-index:999!important;
+  pointer-events:auto!important;
+  touch-action:manipulation!important;
+}
+#quickAddOverlay205.hidden{
+  display:none!important;
+  pointer-events:none!important;
+}
+
+
+/* v20.9 final iPhone interaction hardening */
+body{overscroll-behavior-y:none}
+.page:not(.active){pointer-events:none!important}
+.page.active{pointer-events:auto!important}
+.page.active *{pointer-events:auto}
+#quickAddOverlay205.hidden,
+#quickAddOverlay205.hidden{display:none!important;pointer-events:none!important}
+.v16-back,.v18-back,[data-app-back="1"]{min-width:52px!important;min-height:52px!important;z-index:1000!important}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -616,7 +656,7 @@ html,body{min-height:100%;}
 </head>
 <body>
 <div class="app">
-<header><div><div class="logo">Сімейник</div><div class="sub">Family v20.7</div></div><div>👶</div></header>
+<header><div><div class="logo">Сімейник</div><div class="sub">Family v20.9</div></div><div>👶</div></header>
 <main>
 <section id="authBox" class="card hero">
 <h2>Вхід</h2>
@@ -665,20 +705,20 @@ html,body{min-height:100%;}
 
 <section class="page" id="hubPage">
 <div class="v16-section">
-<div class="section-head"><button class="v16-back" onclick="goHome()">‹</button><h2 id="hubTitle">Розділ</h2></div>
+<div class="section-head"><button class="v16-back" onclick="appBack208()" data-app-back="1">‹</button><h2 id="hubTitle">Розділ</h2></div>
 <div id="hubOverview15"></div><div id="hubContent"></div>
 </div>
 </section>
 
 
 <section class="page" id="adultPage">
-<div class="v16-section"><div class="section-head"><button class="v16-back" onclick="goHome()">‹</button><h2 id="adultTitle">Розділ</h2></div><div id="adultContent"></div></div>
+<div class="v16-section"><div class="section-head"><button class="v16-back" onclick="appBack208()" data-app-back="1">‹</button><h2 id="adultTitle">Розділ</h2></div><div id="adultContent"></div></div>
 </section>
 
 <section class="page" id="babyPage">
 <div class="baby-shell">
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-<button class="v16-back" onclick="goHome()">‹</button>
+<button class="v16-back" onclick="appBack208()" data-app-back="1">‹</button>
 <select id="childSelect" style="display:none" onchange="loadCurrent()" style="max-width:210px;padding:10px;border-radius:12px;border:1px solid #46534a;background:#1f2a23;color:#fff"></select>
 <button class="v16-iconbtn" onclick="panel('children')">•••</button>
 </div>
@@ -950,7 +990,7 @@ html,body{min-height:100%;}
 
 <button id="globalQuick15" class="quick15 hidden" onclick="contextQuick15()">+</button>
 <nav id="nav" class="nav hidden">
-<button class="active" onclick="goHome(this)"><b>⌂</b>Головна</button>
+<button class="active" onclick="appBack208()" data-app-back="1"><b>⌂</b>Головна</button>
 <button onclick="showBaby('today',this)"><b>👶</b>Дитина</button>
 <button onclick="showBaby('sleep',this)"><b>😴</b>Сон</button>
 <button onclick="showBaby('reminders',this)"><b>⏰</b>Нагадування</button>
@@ -1155,7 +1195,72 @@ async function addChild(){
  if(file)await uploadProfilePhoto15('child_profiles',row.id,file,row.family_id);
  $('newChildName').value='';$('newChildBirth').value='';if($('newChildPhoto15'))$('newChildPhoto15').value='';await loadChildren();
 }
-function goHome(btn){document.body.style.overflow='';$('v18Page')?.classList.remove('active');activeNav16='home';renderNav101();if(user)document.querySelector('header').style.display='none';$('quickFab')?.classList.add('hidden');if($('globalQuick15')){$('globalQuick15').classList.remove('hidden');}
+
+let backLock208=false;
+
+function normalizeUi209(){
+  closeQuickAdd205?.();
+  document.body.classList.remove('v18-open');
+  document.body.style.overflow='';
+  document.querySelectorAll('.hidden').forEach(el=>{
+    if(el.id==='quickAddOverlay205') el.style.pointerEvents='none';
+  });
+}
+
+function appBack208(){
+  if(backLock208)return;
+  backLock208=true;
+  setTimeout(()=>backLock208=false,250);
+
+  closeQuickAdd205?.();
+  document.body.classList.remove('v18-open');
+  document.body.style.overflow='';
+
+  const adult=$('adultPage');
+  const access=$('access184Page');
+  const hub=$('hubPage');
+  const baby=$('babyPage');
+  const v18=$('v18Page');
+
+  // From family sub-pages return to Family.
+  if((adult&&adult.classList.contains('active')) ||
+     (access&&access.classList.contains('active')) ||
+     (hub&&hub.classList.contains('active'))){
+    document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+    if(typeof openV18==='function'){
+      openV18('family');
+      return;
+    }
+  }
+
+  // From child/entity pages return home.
+  if((baby&&baby.classList.contains('active')) ||
+     (v18&&v18.classList.contains('active'))){
+    goHome();
+    return;
+  }
+
+  goHome();
+}
+
+// iPhone/PWA fallback: back buttons must work even when a layer interferes
+document.addEventListener('pointerup',e=>{
+  const b=e.target.closest('.v16-back,.v18-back,[data-app-back="1"]');
+  if(!b)return;
+  e.preventDefault();
+  e.stopPropagation();
+  appBack208();
+},true);
+
+document.addEventListener('touchend',e=>{
+  const b=e.target.closest('.v16-back,.v18-back,[data-app-back="1"]');
+  if(!b)return;
+  e.preventDefault();
+  e.stopPropagation();
+  appBack208();
+},{capture:true,passive:false});
+
+function goHome(btn){normalizeUi209();document.body.style.overflow='';$('v18Page')?.classList.remove('active');activeNav16='home';renderNav101();if(user)document.querySelector('header').style.display='none';$('quickFab')?.classList.add('hidden');if($('globalQuick15')){$('globalQuick15').classList.remove('hidden');}
  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$('homePage').classList.add('active');
  document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active')); if(btn)btn.classList.add('active'); window.scrollTo(0,0);if($('homePage')?.classList.contains('active'))loadDashboard();initHomeSort15();top15();
 }
@@ -2575,7 +2680,7 @@ async function v18ChangeActivePhoto(table,id,fid){
 }
 
 function v18Table(kind){return kind==='pets'?'pets':kind==='cars'?'vehicles':kind==='properties'?'family_properties':'profiles'}
-function v18ShowPage(){
+function v18ShowPage(){normalizeUi209();
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   const page=$('v18Page');
   const shell=page?.querySelector('.v18-shell');
@@ -2860,8 +2965,8 @@ function v183FamilyAction(k){
   if(!k)return;
   document.body.classList.remove('v18-open');
 
-  if(k==='invite'){openFamilyInvite101();return}
-  if(k==='docs'){openDocuments('all');return}
+  if(k==='invite'){$('v18Page')?.classList.remove('active');openFamilyInvite101();return}
+  if(k==='docs'){$('v18Page')?.classList.remove('active');openDocuments('all');return}
   if(k==='calendar'){
     $('v18Page')?.classList.remove('active');
     openHub('calendar');return
@@ -3293,7 +3398,7 @@ async function v200Diagnostics(){
 <section class="page" id="v18Page">
   <div class="v18-shell">
     <div class="v18-head">
-      <button class="v18-back" onclick="goHome()">‹</button>
+      <button class="v18-back" onclick="appBack208()" data-app-back="1">‹</button>
       <div>
         <h1 id="v18Title">Профіль</h1>
         <small id="v18Subtitle"></small>
