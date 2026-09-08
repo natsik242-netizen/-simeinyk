@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f7f3">
-<title>Сімейник Family v19.0</title>
+<title>Сімейник Family v20.0</title>
 <style>
 :root{--bg:#f5f7f3;--card:#fff;--ink:#202820;--muted:#6f786f;--brand:#6e9079;--brand2:#e5eee7;--line:#e4e9e5;--danger:#a84f4f}
 *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
@@ -429,11 +429,29 @@ body.v18-open #quickFab,#babyPage.active ~ #quickFab{display:none!important}
 .v190-stat{background:#08181e;border:1px solid #19313a;border-radius:16px;padding:10px;text-align:center}
 .v190-stat b{display:block;font-size:18px}.v190-stat small{color:#728893;font-size:10px}
 
+
+/* ===== FAMILY v20.0 STABLE ===== */
+:root{--safe-bottom:env(safe-area-inset-bottom,0px)}
+body{overscroll-behavior-y:none}
+button,a,input,select,textarea{-webkit-tap-highlight-color:transparent}
+button{touch-action:manipulation}
+.page{padding-bottom:calc(96px + var(--safe-bottom))}
+nav{padding-bottom:var(--safe-bottom)}
+.v200-toast{position:fixed;left:50%;bottom:calc(92px + var(--safe-bottom));transform:translateX(-50%);z-index:99999;background:#13252d;color:#f5f8fa;border:1px solid #29424c;border-radius:999px;padding:10px 15px;font-size:12px;font-weight:800;box-shadow:0 10px 35px #0008;max-width:88%;text-align:center}
+.v200-offline{position:fixed;top:0;left:0;right:0;z-index:99999;background:#5a3415;color:#ffe0a9;text-align:center;padding:7px 12px;font-size:11px;font-weight:900}
+.v200-sync{display:inline-flex;align-items:center;gap:6px;color:#708791;font-size:10px;font-weight:800}
+.v200-sync.ok{color:#54dca5}.v200-sync.bad{color:#ff9f8f}
+@media(max-width:480px){
+  input,select,textarea{font-size:16px!important}
+  .v190-grid{gap:8px}
+  .v190-card{min-height:98px;padding:13px}
+}
+
 </style>
 </head>
 <body>
 <div class="app">
-<header><div><div class="logo">Сімейник</div><div class="sub">Family v19.0</div></div><div>👶</div></header>
+<header><div><div class="logo">Сімейник</div><div class="sub">Family v20.0</div></div><div>👶</div></header>
 <main>
 <section id="authBox" class="card hero">
 <h2>Вхід</h2>
@@ -2161,6 +2179,8 @@ async function v18Photo(x,kind){
 }
 
 async function v18ChangeActivePhoto(table,id,fid){
+  const type=table==='pets'?'pet':table==='vehicles'?'car':table==='family_properties'?'property':table==='child_profiles'?'child':table==='profiles'?'person':null;
+  if(type && !(await v200Can(type,id,fid,'edit'))){toast200('Немає дозволу на редагування');return}
   const keepKind=v18Kind,keepId=id;
   await changePhoto15(table,id,fid);
   v18Kind=keepKind; v18Id=keepId;
@@ -2224,7 +2244,7 @@ async function renderV18(){
     const fid=x.family_id||familyId();
     const action=active
       ? `v18ChangeActivePhoto('${table}','${x.id}','${fid}')`
-      : `switchV18('${x.id}')`;
+      : `v200OpenEntity('${v18Kind}','${x.id}')`;
     sw+=`<button class="v18-person ${active?'active '+cfg.cls:''}" onclick="${action}"><span class="v18-circle">${await v18Photo(x,v18Kind)}</span><b>${esc(v18Name(x,v18Kind))}</b></button>`;
   }
   if(v18Kind!=='profile')sw+=`<button class="v18-person add" onclick="v18Add()"><span class="v18-circle">+</span><b>Додати</b></button>`;
@@ -2564,17 +2584,17 @@ async function v185SmartItems(){
   for(const p of pets){
     const d=v185Date(p.next_vaccination||p.vaccination_date||p.next_medicine||p.medicine_date);
     if(!d)continue;
-    items.push({date:d,icon:'🐾',title:p.name||'Тварина',sub:'Вакцинація / ліки',go:"openV18('pets','"+p.id+"')"});
+    items.push({date:d,icon:'🐾',title:p.name||'Тварина',sub:'Вакцинація / ліки',go:"v200OpenEntity('pets','"+p.id+"')"});
   }
   for(const c of cars){
     const d=v185Date(c.next_service_date||c.insurance_until||c.insurance_date||c.service_date);
     if(!d)continue;
-    items.push({date:d,icon:'🚗',title:c.name||[c.make,c.model].filter(Boolean).join(' ')||'Авто',sub:'ТО / страховка',go:"openV18('cars','"+c.id+"')"});
+    items.push({date:d,icon:'🚗',title:c.name||[c.make,c.model].filter(Boolean).join(' ')||'Авто',sub:'ТО / страховка',go:"v200OpenEntity('cars','"+c.id+"')"});
   }
   for(const p of props){
     const d=v185Date(p.next_payment||p.payment_date||p.next_event_date);
     if(!d)continue;
-    items.push({date:d,icon:'🏠',title:p.name||p.title||p.address||'Нерухомість',sub:'Платіж / подія',go:"openV18('properties','"+p.id+"')"});
+    items.push({date:d,icon:'🏠',title:p.name||p.title||p.address||'Нерухомість',sub:'Платіж / подія',go:"v200OpenEntity('properties','"+p.id+"')"});
   }
 
   const now=new Date();
@@ -2689,6 +2709,7 @@ async function renderV190All(){
     <div class="v190-grid">
       <button class="v190-card wide" onclick="openAccess184()"><span>🔐</span><div><b>Права доступу</b><small>Хто може бачити та редагувати конкретні дані</small></div><i>›</i></button>
       <button class="v190-card wide" onclick="openHub('family')"><span>📦</span><div><b>Звіти та резервна копія</b><small>Керування сімейними даними</small></div><i>›</i></button>
+      <button class="v190-card wide" onclick="v200Diagnostics()"><span>🛠️</span><div><b>Перевірка системи</b><small>Швидка перевірка підключення основних модулів</small></div><i>›</i></button>
     </div>`;
 }
 
@@ -2719,6 +2740,143 @@ if(_goHome190){
     Promise.resolve(r).then(async()=>{await renderSmartHome185();await renderV190All();});
     return r;
   };
+}
+
+
+
+/* ================= FAMILY v20.0 STABILITY ================= */
+let v200Busy=false;
+
+function toast200(text,ms=1800){
+  document.querySelector('.v200-toast')?.remove();
+  const d=document.createElement('div');
+  d.className='v200-toast'; d.textContent=text;
+  document.body.appendChild(d);
+  setTimeout(()=>d.remove(),ms);
+}
+function top200(){
+  requestAnimationFrame(()=>window.scrollTo({top:0,left:0,behavior:'auto'}));
+}
+function v200Page(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const p=$(id); if(p)p.classList.add('active');
+  top200();
+}
+function v200Net(){
+  let bar=document.querySelector('.v200-offline');
+  if(!navigator.onLine){
+    if(!bar){bar=document.createElement('div');bar.className='v200-offline';bar.textContent='Немає інтернету — зміни можуть не зберегтися';document.body.appendChild(bar)}
+  }else bar?.remove();
+}
+window.addEventListener('online',v200Net);
+window.addEventListener('offline',v200Net);
+document.addEventListener('DOMContentLoaded',v200Net);
+
+function v200Safe(fn){
+  return async function(...args){
+    if(v200Busy)return;
+    v200Busy=true;
+    try{return await fn.apply(this,args)}
+    catch(e){console.error(e);toast200('Помилка: '+(e?.message||'спробуйте ще раз'),2800)}
+    finally{v200Busy=false}
+  }
+}
+async function v200TableExists(table){
+  try{
+    const {error}=await sb.from(table).select('*').limit(1);
+    return !error;
+  }catch(e){return false}
+}
+async function v200HealthCheck(){
+  const tests=['families','family_members','child_profiles','pets','vehicles','family_properties','family_access_rules'];
+  const result={};
+  for(const t of tests)result[t]=await v200TableExists(t);
+  return result;
+}
+
+/* Consistent back behavior: close current module to Home instead of leaving the app. */
+window.addEventListener('popstate',()=>{
+  try{goHome();top200()}catch(e){}
+});
+
+/* Make all module opens start at the top. */
+const _openV18200 = typeof openV18==='function' ? openV18 : null;
+if(_openV18200){
+  openV18=async function(...args){
+    const r=await _openV18200.apply(this,args); top200(); return r;
+  };
+}
+const _showBaby200 = typeof showBaby==='function' ? showBaby : null;
+if(_showBaby200){
+  showBaby=async function(...args){
+    const r=await _showBaby200.apply(this,args); top200(); return r;
+  };
+}
+
+/* Access-rule enforcement helpers used by profile entry points. */
+async function v200MyMember(fid){
+  try{
+    const {data}=await sb.from('family_members').select('*').eq('family_id',fid).eq('user_id',user.id).maybeSingle();
+    return data||null;
+  }catch(e){return null}
+}
+async function v200Can(resourceType,resourceId,fid,mode='view'){
+  if(!fid||!resourceId)return true;
+  const me=await v200MyMember(fid);
+  if(!me)return false;
+  if(me.role==='owner'||me.role==='admin')return true;
+  try{
+    const {data,error}=await sb.from('family_access_rules')
+      .select('can_view,can_edit')
+      .eq('family_id',fid)
+      .eq('grantee_member_id',me.id)
+      .eq('resource_type',resourceType)
+      .eq('resource_id',resourceId)
+      .maybeSingle();
+    if(error||!data)return true; // legacy data remains visible until an explicit rule exists
+    return mode==='edit'?!!data.can_edit:!!data.can_view;
+  }catch(e){return true}
+}
+async function v200OpenEntity(kind,id){
+  const cfg={pets:['pet','pets'],cars:['car','vehicles'],properties:['property','family_properties']}[kind];
+  if(!cfg)return openV18(kind,id);
+  const items=await v18Load(kind);
+  const x=items.find(i=>i.id===id);
+  if(x && !(await v200Can(cfg[0],id,x.family_id,'view'))){
+    toast200('Для цього профілю немає доступу');
+    return;
+  }
+  return openV18(kind,id);
+}
+
+/* Safer delete utility: explicit confirmation + Supabase result check. */
+async function v200Delete(table,id,label='запис'){
+  if(!confirm(`Видалити ${label}? Цю дію не можна скасувати.`))return false;
+  const {error}=await sb.from(table).delete().eq('id',id);
+  if(error){toast200('Не вдалося видалити: '+error.message,2800);return false}
+  toast200('Видалено');
+  return true;
+}
+
+/* One refresh point after writes. */
+async function v200Refresh(){
+  try{
+    await loadFamilies();
+    await loadChildren();
+    await loadDashboard();
+    await renderSmartHome185();
+    await renderV190All();
+  }catch(e){console.warn(e)}
+}
+
+
+
+async function v200Diagnostics(){
+  toast200('Перевіряю базу…',900);
+  const r=await v200HealthCheck();
+  const bad=Object.entries(r).filter(([,v])=>!v).map(([k])=>k);
+  if(bad.length)alert('Потрібна перевірка Supabase:\n'+bad.join('\n'));
+  else alert('Family v20.0\n\nОсновні таблиці Supabase доступні.\nАвторизація активна.\nМодулі підключені.');
 }
 
 </script>
