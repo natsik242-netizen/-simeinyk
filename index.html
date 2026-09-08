@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f7f3">
-<title>Сімейник Family v18.3</title>
+<title>Сімейник Family v18.4</title>
 <style>
 :root{--bg:#f5f7f3;--card:#fff;--ink:#202820;--muted:#6f786f;--brand:#6e9079;--brand2:#e5eee7;--line:#e4e9e5;--danger:#a84f4f}
 *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
@@ -376,11 +376,32 @@ body.v18-open #quickFab,#babyPage.active ~ #quickFab{display:none!important}
 .v183-member b{display:block;font-size:11px;margin-top:5px;max-width:76px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .v183-role{font-size:10px;color:#647b85;margin-top:2px}
 
+
+/* ===== v18.4 ACCESS CONTROL ===== */
+#access184Page{background:#061116;color:#f5f8fa;min-height:100vh;padding-bottom:110px}
+.v184-shell{max-width:760px;margin:0 auto;padding:18px 16px 32px}
+.v184-members{display:flex;gap:10px;overflow-x:auto;padding:3px 0 15px;scrollbar-width:none}
+.v184-members::-webkit-scrollbar{display:none}
+.v184-member{min-width:76px;border:0;background:none;color:#8da0a8;text-align:center}
+.v184-member .av{width:62px;height:62px;margin:auto;border-radius:50%;background:#10242d;border:2px solid #29414b;display:flex;align-items:center;justify-content:center;font-size:27px}
+.v184-member.active .av{border-color:#37d6c5;box-shadow:0 0 0 4px #37d6c520}
+.v184-member b{display:block;font-size:11px;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v184-card{background:#0b1b22;border:1px solid #19313a;border-radius:20px;padding:14px;margin-bottom:10px}
+.v184-cardhead{display:grid;grid-template-columns:42px 1fr auto;align-items:center;gap:9px}
+.v184-cardhead>span{font-size:26px}
+.v184-cardhead b{display:block}.v184-cardhead small{display:block;color:#7f949d;margin-top:3px}
+.v184-switches{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.v184-toggle{border:1px solid #263b44;background:#0a171d;color:#91a4ac;border-radius:14px;padding:10px;font-weight:800}
+.v184-toggle.on.view{background:#17382f;border-color:#2adf8a;color:#8ff5ca}
+.v184-toggle.on.edit{background:#182f43;border-color:#299fff;color:#8ccaff}
+.v184-note{background:#111d22;border:1px solid #263942;border-radius:16px;padding:12px;color:#8da0a8;font-size:12px;margin-bottom:12px}
+.v184-save{width:100%;border:0;border-radius:16px;background:#37d6c5;color:#05201c;padding:13px;font-weight:900;margin-top:7px}
+
 </style>
 </head>
 <body>
 <div class="app">
-<header><div><div class="logo">Сімейник</div><div class="sub">Family v18.3</div></div><div>👶</div></header>
+<header><div><div class="logo">Сімейник</div><div class="sub">Family v18.4</div></div><div>👶</div></header>
 <main>
 <section id="authBox" class="card hero">
 <h2>Вхід</h2>
@@ -2338,7 +2359,7 @@ function v183FamilyAction(k){
  if(k==='docs'){openDocuments();return}
  if(k==='calendar'){openHub('calendar');return}
  if(k==='reminders'){openHub('reminders');return}
- if(k==='access'){openHub('family');return}
+ if(k==='access'){openAccess184();return}
  if(k==='members'){openHub('family');return}
 }
 
@@ -2393,6 +2414,86 @@ goHome = function(btn){
  return _goHomeV18(btn);
 };
 
+
+
+/* ================= v18.4 ACCESS ================= */
+let a184FamilyId=null,a184MemberId=null,a184Rules=[],a184Resources=[];
+
+async function openAccess184(){
+  const fam=v183CurrentFamily();
+  a184FamilyId=fam?.id||null;
+  if(!a184FamilyId){alert('Спочатку виберіть сім’ю.');return}
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  $('access184Page').classList.add('active');
+  document.body.classList.add('v18-open');
+  await loadAccess184();
+  top15();
+}
+async function loadAccess184(){
+  const members=await v183LoadMembers(a184FamilyId);
+  if(!a184MemberId || !members.some(m=>m.id===a184MemberId))a184MemberId=members[0]?.id||null;
+
+  const [childrenRes,petsRes,carsRes,propRes,docsRes,rulesRes]=await Promise.all([
+    sb.from('child_profiles').select('id,name,family_id').eq('family_id',a184FamilyId),
+    sb.from('pets').select('id,name,family_id').eq('family_id',a184FamilyId),
+    sb.from('vehicles').select('id,name,make,model,family_id').eq('family_id',a184FamilyId),
+    sb.from('family_properties').select('id,name,title,address,family_id').eq('family_id',a184FamilyId),
+    sb.from('family_documents').select('id,title,name,family_id').eq('family_id',a184FamilyId),
+    sb.from('family_access_rules').select('*').eq('family_id',a184FamilyId)
+  ]);
+  a184Resources=[
+    ...(childrenRes.data||[]).map(x=>({type:'child',id:x.id,title:x.name||'Дитина',icon:'👶'})),
+    ...(petsRes.data||[]).map(x=>({type:'pet',id:x.id,title:x.name||'Тварина',icon:'🐾'})),
+    ...(carsRes.data||[]).map(x=>({type:'car',id:x.id,title:x.name||[x.make,x.model].filter(Boolean).join(' ')||'Авто',icon:'🚗'})),
+    ...(propRes.data||[]).map(x=>({type:'property',id:x.id,title:x.name||x.title||x.address||'Нерухомість',icon:'🏠'})),
+    ...(docsRes.data||[]).map(x=>({type:'document',id:x.id,title:x.title||x.name||'Документ',icon:'📄'})),
+  ];
+  a184Rules=rulesRes.data||[];
+  renderAccess184(members);
+}
+function rule184(res){
+  return a184Rules.find(r=>r.grantee_member_id===a184MemberId && r.resource_type===res.type && r.resource_id===res.id)
+    || {can_view:true,can_edit:false};
+}
+async function renderAccess184(members){
+  const root=$('access184Content');if(!root)return;
+  const selected=members.find(m=>m.id===a184MemberId);
+  const strip=`<div class="v184-members">${members.map(m=>`
+    <button class="v184-member ${m.id===a184MemberId?'active':''}" onclick="a184MemberId='${m.id}';renderAccess184(${JSON.stringify(members).replace(/"/g,'&quot;')})">
+      <div class="av">👤</div><b>${esc(v183MemberName(m))}</b>
+    </button>`).join('')}</div>`;
+  const note=`<div class="v184-note">Налаштовуємо доступ для <b>${esc(selected?v183MemberName(selected):'учасника')}</b>. «Перегляд» дозволяє бачити профіль, «Редагування» — змінювати його дані.</div>`;
+  const cards=a184Resources.map(res=>{
+    const r=rule184(res);
+    return `<div class="v184-card">
+      <div class="v184-cardhead"><span>${res.icon}</span><div><b>${esc(res.title)}</b><small>${esc(res.type)}</small></div></div>
+      <div class="v184-switches">
+        <button class="v184-toggle ${r.can_view?'on view':''}" onclick="toggle184('${res.type}','${res.id}','view')">👁 Перегляд</button>
+        <button class="v184-toggle ${r.can_edit?'on edit':''}" onclick="toggle184('${res.type}','${res.id}','edit')">✏️ Редагування</button>
+      </div>
+    </div>`;
+  }).join('');
+  root.innerHTML=strip+note+(cards||`<div class="v18-empty"><h2>Немає профілів</h2><p>Додайте дітей, тварин, авто, нерухомість або документи.</p></div>`);
+}
+async function toggle184(type,id,mode){
+  const old=a184Rules.find(r=>r.grantee_member_id===a184MemberId&&r.resource_type===type&&r.resource_id===id);
+  let can_view=old?!!old.can_view:true, can_edit=old?!!old.can_edit:false;
+  if(mode==='view'){
+    can_view=!can_view;
+    if(!can_view)can_edit=false;
+  }else{
+    can_edit=!can_edit;
+    if(can_edit)can_view=true;
+  }
+  const payload={family_id:a184FamilyId,grantee_member_id:a184MemberId,resource_type:type,resource_id:id,can_view,can_edit,updated_at:new Date().toISOString()};
+  const {data,error}=await sb.from('family_access_rules').upsert(payload,{onConflict:'family_id,grantee_member_id,resource_type,resource_id'}).select().single();
+  if(error){alert('Не вдалося зберегти доступ: '+error.message);return}
+  a184Rules=a184Rules.filter(r=>!(r.grantee_member_id===a184MemberId&&r.resource_type===type&&r.resource_id===id));
+  a184Rules.push(data);
+  const members=await v183LoadMembers(a184FamilyId);
+  renderAccess184(members);
+}
+
 </script>
 
 <section class="page" id="v18Page">
@@ -2406,6 +2507,18 @@ goHome = function(btn){
       <button class="v18-more" onclick="v18More()">•••</button>
     </div>
     <div id="v18Content"></div>
+  </div>
+</section>
+
+
+<section class="page" id="access184Page">
+  <div class="v184-shell">
+    <div class="v18-head">
+      <button class="v18-back" onclick="openV18('family')">‹</button>
+      <div><h1>Доступи</h1><small>Перегляд і редагування даних</small></div>
+      <button class="v18-more" onclick="openV18('family')">•••</button>
+    </div>
+    <div id="access184Content"></div>
   </div>
 </section>
 
