@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f7f3">
-<title>Сімейник Family v20.6</title>
+<title>Сімейник Family v20.7</title>
 <style>
 :root{--bg:#f5f7f3;--card:#fff;--ink:#202820;--muted:#6f786f;--brand:#6e9079;--brand2:#e5eee7;--line:#e4e9e5;--danger:#a84f4f}
 *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
@@ -583,6 +583,26 @@ html,body{min-height:100%;}
   margin-top:0!important;
 }
 
+
+/* v20.7 — Family section interaction fix */
+#v18Page.active #v18Content,
+#v18Page.active .v18-family-grid,
+#v18Page.active .v183-members,
+#v18Page.active button{
+  pointer-events:auto!important;
+}
+#v18Page.active .v18-family-grid,
+#v18Page.active .v183-members{
+  position:relative!important;
+  z-index:3!important;
+}
+#v18Page.active .v18-family-card,
+#v18Page.active .v183-member{
+  cursor:pointer!important;
+  touch-action:manipulation!important;
+  -webkit-tap-highlight-color:rgba(255,255,255,.08);
+}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -596,7 +616,7 @@ html,body{min-height:100%;}
 </head>
 <body>
 <div class="app">
-<header><div><div class="logo">Сімейник</div><div class="sub">Family v20.6</div></div><div>👶</div></header>
+<header><div><div class="logo">Сімейник</div><div class="sub">Family v20.7</div></div><div>👶</div></header>
 <main>
 <section id="authBox" class="card hero">
 <h2>Вхід</h2>
@@ -2786,7 +2806,7 @@ async function renderV18Family(){
      <div class="v183-role">${esc(v183RoleLabel(m.role))}</div>
    </button>
  `).join('')}
- <button class="v183-member" onclick="openFamilyInvite101()">
+ <button class="v183-member" data-family-action="invite">
    <div class="v183-member-avatar">+</div>
    <b>Запросити</b>
    <div class="v183-role">нового члена</div>
@@ -2804,18 +2824,61 @@ async function renderV18Family(){
  ];
  root.innerHTML=familySwitch+meta+`<div class="v18-section-title">Члени сім’ї</div>`+memberStrip+
  `<div class="v18-section-title">Сімейні функції</div><div class="v18-family-grid">${cards.map(c=>`
-   <button class="v18-family-card" onclick="v183FamilyAction('${c[3]}')"><span>${c[0]}</span><b>${c[1]}</b><small>${c[2]}</small></button>
+   <button class="v18-family-card" data-family-action="${c[3]}"><span>${c[0]}</span><b>${c[1]}</b><small>${c[2]}</small></button>
  `).join('')}</div>`;
+  initFamilyClicks207();
+}
+
+
+function initFamilyClicks207(){
+  const root=$('v18Content');
+  if(!root || root.dataset.familyClicks207==='1') return;
+  root.dataset.familyClicks207='1';
+
+  root.addEventListener('click',ev=>{
+    const actionBtn=ev.target.closest('[data-family-action]');
+    if(actionBtn){
+      ev.preventDefault();
+      ev.stopPropagation();
+      const k=actionBtn.dataset.familyAction;
+      if(k) v183FamilyAction(k);
+      return;
+    }
+  });
+
+  root.addEventListener('touchend',ev=>{
+    const actionBtn=ev.target.closest('[data-family-action]');
+    if(actionBtn){
+      ev.preventDefault();
+      const k=actionBtn.dataset.familyAction;
+      if(k) v183FamilyAction(k);
+    }
+  },{passive:false});
 }
 
 function v183FamilyAction(k){
- document.body.classList.remove('v18-open');
- if(k==='invite'){openFamilyInvite101();return}
- if(k==='docs'){openDocuments();return}
- if(k==='calendar'){openHub('calendar');return}
- if(k==='reminders'){openHub('reminders');return}
- if(k==='access'){openAccess184();return}
- if(k==='members'){openHub('family');return}
+  if(!k)return;
+  document.body.classList.remove('v18-open');
+
+  if(k==='invite'){openFamilyInvite101();return}
+  if(k==='docs'){openDocuments('all');return}
+  if(k==='calendar'){
+    $('v18Page')?.classList.remove('active');
+    openHub('calendar');return
+  }
+  if(k==='reminders'){
+    $('v18Page')?.classList.remove('active');
+    openHub('reminders');return
+  }
+  if(k==='access'){
+    $('v18Page')?.classList.remove('active');
+    if(typeof openAccess184==='function'){openAccess184();return}
+    openHub('family');return
+  }
+  if(k==='members'){
+    $('v18Page')?.classList.remove('active');
+    openHub('family');return
+  }
 }
 
 function v18FamilyOpen(k){
