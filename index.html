@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f7f3">
-<title>Сімейник Family v20.3</title>
+<title>Сімейник Family v20.5</title>
 <style>
 :root{--bg:#f5f7f3;--card:#fff;--ink:#202820;--muted:#6f786f;--brand:#6e9079;--brand2:#e5eee7;--line:#e4e9e5;--danger:#a84f4f}
 *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
@@ -528,6 +528,45 @@ html,body{min-height:100%;}
 #v18Page.active{position:fixed!important;inset:0!important;margin:0!important;transform:none!important;}
 #v18Page.active>.v18-shell{position:relative!important;top:0!important;margin:0 auto!important;transform:none!important;}
 
+
+/* ===== v20.5: compact Quick Add + onboarding ===== */
+#quickAddOverlay205{
+  position:fixed; inset:0; z-index:120;
+  background:rgba(0,0,0,.48);
+  display:flex; align-items:flex-end; justify-content:center;
+  padding:0;
+}
+#quickAddOverlay205.hidden{display:none!important}
+.quick205-panel{
+  width:100%; max-width:620px;
+  background:#08171d;
+  border:1px solid #1b3540;
+  border-radius:24px 24px 0 0;
+  padding:10px 14px calc(14px + env(safe-area-inset-bottom,0px));
+  box-shadow:0 -20px 60px rgba(0,0,0,.35);
+  max-height:48dvh;
+}
+.quick205-handle{width:42px;height:5px;border-radius:999px;background:#29424c;margin:1px auto 9px}
+.quick205-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.quick205-head h3{margin:0;font-size:20px}
+.quick205-close{
+  width:40px;height:40px;border:0;border-radius:50%;
+  background:#102832;color:#dbe7eb;font-size:22px
+}
+.quick205-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.quick205-item{
+  min-height:72px;border:1px solid #1d3944;border-radius:16px;
+  background:#10242c;color:#f5f8fa;font-weight:800;font-size:14px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+}
+.quick205-item span{font-size:25px}
+.onboard205{max-width:620px;margin:0 auto;padding:calc(env(safe-area-inset-top,0px) + 24px) 16px 110px}
+.onboard205-card{background:#0a1a21;border:1px solid #1b3540;border-radius:24px;padding:18px;margin-bottom:12px}
+.onboard205-card h2,.onboard205-card h3{margin:0 0 8px}
+.onboard205-card p{margin:0 0 14px;color:#8fa2aa}
+.onboard205-actions{display:grid;grid-template-columns:1fr;gap:10px}
+.invite205-box{background:#07161c;border:1px solid #1c3741;border-radius:16px;padding:12px;word-break:break-all;color:#d6e4e9}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -541,7 +580,7 @@ html,body{min-height:100%;}
 </head>
 <body>
 <div class="app">
-<header><div><div class="logo">Сімейник</div><div class="sub">Family v20.3</div></div><div>👶</div></header>
+<header><div><div class="logo">Сімейник</div><div class="sub">Family v20.5</div></div><div>👶</div></header>
 <main>
 <section id="authBox" class="card hero">
 <h2>Вхід</h2>
@@ -857,6 +896,22 @@ html,body{min-height:100%;}
 </div>
 </div>
 
+
+<div id="quickAddOverlay205" class="hidden" onclick="if(event.target===this)closeQuickAdd205()">
+  <div class="quick205-panel">
+    <div class="quick205-handle"></div>
+    <div class="quick205-head"><h3>Швидко додати</h3><button class="quick205-close" onclick="closeQuickAdd205()">×</button></div>
+    <div class="quick205-grid">
+      <button class="quick205-item" onclick="quickAction205('child')"><span>👶</span>Дитину</button>
+      <button class="quick205-item" onclick="quickAction205('pet')"><span>🐈</span>Тварину</button>
+      <button class="quick205-item" onclick="quickAction205('car')"><span>🚗</span>Авто</button>
+      <button class="quick205-item" onclick="quickAction205('expense')"><span>💳</span>Витрату</button>
+      <button class="quick205-item" onclick="quickAction205('reminder')"><span>⏰</span>Нагадування</button>
+      <button class="quick205-item" onclick="quickAction205('document')"><span>📄</span>Документ</button>
+    </div>
+  </div>
+</div>
+
 <button id="globalQuick15" class="quick15 hidden" onclick="contextQuick15()">+</button>
 <nav id="nav" class="nav hidden">
 <button class="active" onclick="goHome(this)"><b>⌂</b>Головна</button>
@@ -881,10 +936,165 @@ async function ensureSB(){
  sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY); return sb;
 }
 function msg(id,t,ok=true){$(id).className='msg '+(ok?'ok':'err');$(id).textContent=t}
-async function register(){await ensureSB();const e=$('email').value.trim(),p=$('password').value;if(!e||p.length<6)return msg('authMsg','Введи email і пароль від 6 символів',false);const {data,error}=await sb.auth.signUp({email:e,password:p});if(error)return msg('authMsg',error.message,false);msg('authMsg','Акаунт створено');if(data.session){user=data.user;await afterLogin()}}
+
+function inviteToken205(){
+  try{return new URL(location.href).searchParams.get('invite')||''}catch(e){return ''}
+}
+function cleanInviteUrl205(){
+  try{
+    const u=new URL(location.href);u.searchParams.delete('invite');
+    history.replaceState({},'',u.pathname+u.search+u.hash);
+  }catch(e){}
+}
+async function showFamilyOnboarding205(){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  $('adultPage').classList.add('active');
+  $('quickFab')?.classList.add('hidden');
+  $('globalQuick15')?.classList.add('hidden');
+  const token=inviteToken205();
+
+  $('adultTitle').textContent=token?'Запрошення в сім’ю':'Початок роботи';
+  $('adultContent').innerHTML=token ? `
+    <div class="onboard205">
+      <div class="onboard205-card">
+        <h2>👨‍👩‍👧 Вас запросили в сім’ю</h2>
+        <p>Після підтвердження ваш акаунт буде додано до сім’ї. Ви побачите тільки те, до чого вам відкриють доступ.</p>
+        <button class="btn primary wide" onclick="acceptInvite205()">Приєднатися</button>
+        <button class="btn secondary wide" style="margin-top:8px" onclick="cleanInviteUrl205();showFamilyOnboarding205()">Не зараз</button>
+      </div>
+    </div>` : `
+    <div class="onboard205">
+      <div class="onboard205-card">
+        <h2>Вітаємо у «Сімейнику» 👋</h2>
+        <p>Це новий чистий акаунт. Створіть власну сім’ю або відкрийте запрошення, яке вам надіслали.</p>
+        <div class="onboard205-actions">
+          <button class="btn primary wide" onclick="showCreateFamily205()">Створити свою сім’ю</button>
+          <button class="btn secondary wide" onclick="showJoinCode205()">Приєднатися за посиланням</button>
+        </div>
+      </div>
+    </div>`;
+}
+function showCreateFamily205(){
+  $('adultTitle').textContent='Створити сім’ю';
+  $('adultContent').innerHTML=`<div class="onboard205"><div class="onboard205-card">
+    <h3>Назва сім’ї</h3>
+    <div class="field"><input id="familyName205" placeholder="Наприклад: Сім’я Верченко"></div>
+    <button class="btn primary wide" onclick="createFamily205()">Створити</button>
+  </div></div>`;
+}
+async function createFamily205(){
+  const name=$('familyName205')?.value.trim();
+  if(!name)return alert('Введіть назву сім’ї');
+  const {data,error}=await sb.rpc('create_family_for_current_user',{p_name:name});
+  if(error)return alert('Не вдалося створити сім’ю: '+error.message);
+  await loadFamilies();
+  await afterLogin205Continue();
+}
+function showJoinCode205(){
+  $('adultTitle').textContent='Приєднатися';
+  $('adultContent').innerHTML=`<div class="onboard205"><div class="onboard205-card">
+    <h3>Вставте посилання-запрошення</h3>
+    <div class="field"><input id="inviteLink205" placeholder="https://.../?invite=..."></div>
+    <button class="btn primary wide" onclick="joinFromLink205()">Продовжити</button>
+  </div></div>`;
+}
+function joinFromLink205(){
+  const raw=$('inviteLink205')?.value.trim();
+  if(!raw)return;
+  try{
+    const u=new URL(raw);
+    const t=u.searchParams.get('invite');
+    if(!t)throw new Error();
+    const here=new URL(location.href);here.searchParams.set('invite',t);location.href=here.toString();
+  }catch(e){alert('У посиланні немає коду запрошення')}
+}
+async function acceptInvite205(){
+  const token=inviteToken205();
+  if(!token)return alert('Код запрошення не знайдено');
+  const {data,error}=await sb.rpc('accept_family_invite',{p_token:token});
+  if(error)return alert('Не вдалося приєднатися: '+error.message);
+  cleanInviteUrl205();
+  await loadFamilies();
+  await afterLogin205Continue();
+}
+async function createInvite205(role='member'){
+  const fid=(typeof v183CurrentFamily==='function'&&v183CurrentFamily()?.id)||familyId();
+  if(!fid)return alert('Спочатку виберіть сім’ю');
+  const {data,error}=await sb.rpc('create_family_invite',{p_family_id:fid,p_role:role});
+  if(error)return alert('Не вдалося створити запрошення: '+error.message);
+  const token=Array.isArray(data)?data[0]?.token:(data?.token||data);
+  if(!token)return alert('Сервер не повернув код запрошення');
+  const u=new URL(location.href);u.search='';u.hash='';u.searchParams.set('invite',token);
+  const link=u.toString();
+  $('inviteLinkBox205').textContent=link;
+  $('inviteLinkBox205').dataset.link=link;
+  $('inviteShare205').classList.remove('hidden');
+}
+async function copyInvite205(){
+  const link=$('inviteLinkBox205')?.dataset.link||'';
+  if(!link)return;
+  try{await navigator.clipboard.writeText(link);alert('Посилання скопійовано')}
+  catch(e){prompt('Скопіюйте посилання:',link)}
+}
+async function shareInvite205(){
+  const link=$('inviteLinkBox205')?.dataset.link||'';
+  if(!link)return;
+  if(navigator.share){
+    try{await navigator.share({title:'Запрошення в Сімейник',text:'Приєднуйся до моєї сім’ї у «Сімейнику»',url:link});return}catch(e){}
+  }
+  copyInvite205();
+}
+function openFamilyInvite101(){
+  showAdult('➕ Запросити в сім’ю',`
+    <div class="onboard205-card">
+      <h3>Створити посилання-запрошення</h3>
+      <p>Людина відкриє посилання, зареєструє власний акаунт і підтвердить приєднання.</p>
+      <div class="field"><label>Роль</label><select id="inviteRole205">
+        <option value="member">Учасник</option>
+        <option value="relative">Родич</option>
+        <option value="parent">Батьки</option>
+      </select></div>
+      <button class="btn primary wide" onclick="createInvite205($('inviteRole205').value)">Створити посилання</button>
+      <div id="inviteShare205" class="hidden" style="margin-top:12px">
+        <div id="inviteLinkBox205" class="invite205-box"></div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="btn secondary" style="flex:1" onclick="copyInvite205()">Копіювати</button>
+          <button class="btn primary" style="flex:1" onclick="shareInvite205()">Поділитися</button>
+        </div>
+      </div>
+    </div>`);
+}
+async function afterLogin205Continue(){
+  document.querySelector('header').style.display='none';
+  $('authBox').classList.add('hidden');
+  $('appBox').classList.remove('hidden');
+  $('nav').classList.remove('hidden');
+  $('globalQuick15')?.classList.remove('hidden');
+  await loadChildren();
+  await loadDashboard();
+  await renderSmartHome185();
+  await renderV190All();
+  await generateAutoReminders11();
+  renderNav101();initHomeSort15();goHome();top15();
+}
+
+async function register(){await ensureSB();const e=$('email').value.trim(),p=$('password').value;if(!e||p.length<6)return msg('authMsg','Введи email і пароль від 6 символів',false);const {data,error}=await sb.auth.signUp({email:e,password:p});if(error)return msg('authMsg',error.message,false);msg('authMsg',data.session?'Акаунт створено':'Акаунт створено. Якщо Supabase просить підтвердження email — відкрийте лист і потім увійдіть.');if(data.session){user=data.user;await afterLogin()}}
 async function login(){await ensureSB();const {data,error}=await sb.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error)return msg('authMsg',error.message,false);user=data.user;await afterLogin()}
 async function init(){await ensureSB();const {data:{session}}=await sb.auth.getSession();if(session){user=session.user;await afterLogin()}}
-async function afterLogin(){document.querySelector('header').style.display='none';$('authBox').classList.add('hidden');$('appBox').classList.remove('hidden');$('nav').classList.remove('hidden');$('globalQuick15')?.classList.remove('hidden');await loadFamilies();await loadChildren();await loadDashboard();await renderSmartHome185();await renderV190All();await generateAutoReminders11();renderNav101();initHomeSort15();top15();}
+async function afterLogin(){
+  document.querySelector('header').style.display='none';
+  $('authBox').classList.add('hidden');
+  $('appBox').classList.remove('hidden');
+  $('nav').classList.remove('hidden');
+  await loadFamilies();
+
+  // Invitation always wins; otherwise a brand-new account gets a clean first-run screen.
+  if(inviteToken205()){await showFamilyOnboarding205();return}
+  if(!families.length){await showFamilyOnboarding205();return}
+
+  $('globalQuick15')?.classList.remove('hidden');
+  await afterLogin205Continue();
+}
 async function loadFamilies(){const {data}=await sb.from('my_families').select('*');families=data||[];}
 function familyId(){const c=children.find(x=>x.id===$('childSelect')?.value);return c?.family_id||families[0]?.id||null}
 function childId(){return $('childSelect')?.value||children[0]?.id||null}
@@ -1279,7 +1489,7 @@ async function loadMemories(){
 
 function showAdult(title,html){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  $('adultPage').classList.remove('quick-add-201');
+  $('adultPage').classList.remove('quick-add-201');closeQuickAdd205();
   $('adultPage').classList.add('active');$('quickFab')?.classList.add('hidden');
   $('adultTitle').textContent=title;$('adultContent').innerHTML=html;window.scrollTo(0,0);
 }
@@ -2035,8 +2245,22 @@ function contextQuick15(){
 }
 
 function openGlobalQuick15(){
- showAdult('➕ Швидко додати',`<div class="quick15-sheet"><button class="btn secondary" onclick="showBaby('children')">👶<br>Дитину</button><button class="btn secondary" onclick="openCompanions102()">🐕<br>Тварину</button><button class="btn secondary" onclick="openCars102()">🚗<br>Авто</button><button class="btn secondary" onclick="openExpenses()">💳<br>Витрату</button><button class="btn secondary" onclick="openReminders()">⏰<br>Нагадування</button><button class="btn secondary" onclick="openDocuments('all')">📄<br>Документ</button></div>`);
- $('adultPage')?.classList.add('quick-add-201');
+  $('quickAddOverlay205')?.classList.remove('hidden');
+}
+function closeQuickAdd205(){
+  $('quickAddOverlay205')?.classList.add('hidden');
+}
+function quickAction205(k){
+  closeQuickAdd205();
+  if(k==='child'){
+    if(typeof panel==='function'){panel('children');return}
+    if(typeof showBaby==='function'){showBaby('children');return}
+  }
+  if(k==='pet'){if(typeof openPets101==='function'){openPets101();return}}
+  if(k==='car'){if(typeof openCars101==='function'){openCars101();return}}
+  if(k==='expense'){if(typeof openExpenses==='function'){openExpenses();return}}
+  if(k==='reminder'){if(typeof openReminders==='function'){openReminders();return}}
+  if(k==='document'){if(typeof openDocuments==='function'){openDocuments('all');return}}
 }
 
 
