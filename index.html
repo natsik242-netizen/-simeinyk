@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f7f3">
-<title>Сімейник Family v18.1</title>
+<title>Сімейник Family v18.2</title>
 <style>
 :root{--bg:#f5f7f3;--card:#fff;--ink:#202820;--muted:#6f786f;--brand:#6e9079;--brand2:#e5eee7;--line:#e4e9e5;--danger:#a84f4f}
 *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
@@ -355,11 +355,14 @@ body.v18-open #quickFab{display:none!important}
 }
 body.v18-open #quickFab,#babyPage.active ~ #quickFab{display:none!important}
 
+
+.v18-swipehint{text-align:center;color:#536b75;font-size:11px;font-weight:700;margin:-4px 0 10px}
+
 </style>
 </head>
 <body>
 <div class="app">
-<header><div><div class="logo">Сімейник</div><div class="sub">Family v18.1</div></div><div>👶</div></header>
+<header><div><div class="logo">Сімейник</div><div class="sub">Family v18.2</div></div><div>👶</div></header>
 <main>
 <section id="authBox" class="card hero">
 <h2>Вхід</h2>
@@ -2085,6 +2088,16 @@ async function v18Photo(x,kind){
   }
   return `<span>${v18Cfg(kind)?.icon||'•'}</span>`;
 }
+
+async function v18ChangeActivePhoto(table,id,fid){
+  const keepKind=v18Kind,keepId=id;
+  await changePhoto15(table,id,fid);
+  v18Kind=keepKind; v18Id=keepId;
+  v18Items=await v18Load(keepKind);
+  v18ShowPage();
+  await renderV18();
+}
+
 function v18Table(kind){return kind==='pets'?'pets':kind==='cars'?'vehicles':kind==='properties'?'family_properties':'profiles'}
 function v18ShowPage(){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -2095,8 +2108,38 @@ async function openV18(kind,id=null){
   const cfg=v18Cfg(kind); if(!cfg)return;
   v18Kind=kind; v18Tab='Огляд'; v18Items=await v18Load(kind); v18Id=id||v18Items[0]?.id||null;
   $('v18Title').textContent=cfg.title; $('v18Subtitle').textContent=cfg.subtitle;
-  v18ShowPage(); await renderV18(); top15();
+  v18ShowPage(); initV18Swipe(); await renderV18(); top15();
 }
+
+function v18Index(){
+  return Math.max(0,v18Items.findIndex(x=>x.id===v18Id));
+}
+async function v18Swipe(dir){
+  if(!v18Items?.length || v18Kind==='profile' || v18Kind==='family')return;
+  let i=v18Index()+dir;
+  if(i<0)i=v18Items.length-1;
+  if(i>=v18Items.length)i=0;
+  await switchV18(v18Items[i].id);
+}
+function initV18Swipe(){
+  const page=$('v18Page');
+  if(!page || page.dataset.swipe182==='1')return;
+  page.dataset.swipe182='1';
+  let sx=0,sy=0,started=false;
+  page.addEventListener('touchstart',e=>{
+    const t=e.touches?.[0]; if(!t)return;
+    if(e.target.closest('button,input,select,textarea,.v18-switch,.v18-tabs'))return;
+    sx=t.clientX; sy=t.clientY; started=true;
+  },{passive:true});
+  page.addEventListener('touchend',e=>{
+    if(!started)return; started=false;
+    const t=e.changedTouches?.[0]; if(!t)return;
+    const dx=t.clientX-sx,dy=t.clientY-sy;
+    if(Math.abs(dx)<55 || Math.abs(dx)<Math.abs(dy)*1.25)return;
+    v18Swipe(dx<0?1:-1);
+  },{passive:true});
+}
+
 async function switchV18(id){
   v18Id=id; v18Tab='Огляд'; await renderV18(); top15();
 }
@@ -2105,7 +2148,13 @@ async function renderV18(){
   if(v18Kind==='family'){await renderV18Family();return}
   let sw='<div class="v18-switch">';
   for(const x of v18Items){
-    sw+=`<button class="v18-person ${x.id===v18Id?'active '+cfg.cls:''}" onclick="switchV18('${x.id}')"><span class="v18-circle">${await v18Photo(x,v18Kind)}</span><b>${esc(v18Name(x,v18Kind))}</b></button>`;
+    const active=x.id===v18Id;
+    const table=v18Table(v18Kind);
+    const fid=x.family_id||familyId();
+    const action=active
+      ? `v18ChangeActivePhoto('${table}','${x.id}','${fid}')`
+      : `switchV18('${x.id}')`;
+    sw+=`<button class="v18-person ${active?'active '+cfg.cls:''}" onclick="${action}"><span class="v18-circle">${await v18Photo(x,v18Kind)}</span><b>${esc(v18Name(x,v18Kind))}</b></button>`;
   }
   if(v18Kind!=='profile')sw+=`<button class="v18-person add" onclick="v18Add()"><span class="v18-circle">+</span><b>Додати</b></button>`;
   sw+='</div>';
@@ -2121,12 +2170,13 @@ async function renderV18(){
   if(v18Kind==='profile'){s1=x.birth_date?age15(x.birth_date):'—';l1='Вік';s2='⏰';l2='Найближче нагадування'}
   const fid=x.family_id||familyId();
   const table=v18Table(v18Kind);
+  const swipeHint=v18Items.length>1?`<div class="v18-swipehint">‹ свайп для перемикання ›</div>`:'';
   const hero=`<div class="v18-hero ${cfg.cls}"><div class="v18-main">
-    <div class="v18-photo" onclick="changePhoto15('${table}','${x.id}','${fid}')">${await v18Photo(x,v18Kind)}</div>
+    <div class="v18-photo" onclick="v18ChangeActivePhoto('${table}','${x.id}','${fid}')">${await v18Photo(x,v18Kind)}</div>
     <div><h2>${esc(v18Name(x,v18Kind))}</h2><p>${esc(v18Sub(x,v18Kind))}</p><div class="v18-photo-note">Натисніть фото, щоб змінити</div></div>
   </div><div class="v18-stats"><div class="v18-stat"><strong>${s1}</strong><span>${l1}</span></div><div class="v18-stat"><strong>${s2}</strong><span>${l2}</span></div></div></div>`;
   const tabs=`<div class="v18-tabs">${cfg.tabs.map(t=>`<button class="${t===v18Tab?'active '+cfg.cls:''}" onclick="v18SelectTab(this,'${t}')">${t}</button>`).join('')}</div>`;
-  root.innerHTML=sw+hero+tabs+`<div id="v18Body"></div>`; renderV18Body();
+  root.innerHTML=sw+swipeHint+hero+tabs+`<div id="v18Body"></div>`; renderV18Body();
 }
 function v18SelectTab(btn,t){v18Tab=t;document.querySelectorAll('.v18-tabs button').forEach(b=>b.className='');btn.className='active '+v18Cfg(v18Kind).cls;renderV18Body()}
 function v18Rows(){
@@ -2186,10 +2236,23 @@ function v18FamilyOpen(k){
 }
 function v18Add(){
  document.body.classList.remove('v18-open');
- // Use existing working creation screens, never the old overview route.
- if(v18Kind==='pets'){ if(typeof openPets101==='function'){openPets101();return} }
- if(v18Kind==='cars'){ if(typeof openCars101==='function'){openCars101();return} }
- if(v18Kind==='properties'){openHub('properties');return}
+ if(v18Kind==='pets'){
+   if(typeof openPets101==='function'){openPets101();return}
+   alert('Форма додавання тварини ще не підключена.');
+   return;
+ }
+ if(v18Kind==='cars'){
+   if(typeof openCars101==='function'){openCars101();return}
+   alert('Форма додавання авто ще не підключена.');
+   return;
+ }
+ if(v18Kind==='properties'){
+   // Open the legacy property management page directly, bypassing V18 redirect.
+   const oldKind=v18Kind; v18Kind=null;
+   if(typeof openProperties101==='function'){openProperties101();return}
+   alert('Форма додавання нерухомості ще не підключена.');
+   v18Kind=oldKind;
+ }
 }
 function v18More(){ alert('Редагування та додаткові дії будуть тут.'); }
 
