@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f7f3">
-<title>Сімейник Family v18</title>
+<title>Сімейник Family v18.1</title>
 <style>
 :root{--bg:#f5f7f3;--card:#fff;--ink:#202820;--muted:#6f786f;--brand:#6e9079;--brand2:#e5eee7;--line:#e4e9e5;--danger:#a84f4f}
 *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
@@ -300,11 +300,66 @@ h1,h2,h3,b{color:var(--ink)}
 .v18-family-card span{font-size:28px}.v18-family-card b{display:block;margin-top:9px}.v18-family-card small{display:block;color:#7f949d;margin-top:4px}
 body.v18-open #quickFab{display:none!important}
 
+
+/* ===== v18.1 CHILD PROFILE ===== */
+#babyPage{background:#061116!important;color:#f5f8fa;min-height:100vh;padding-bottom:108px}
+#babyPage .baby-shell{max-width:760px;margin:0 auto;padding:18px 16px 30px}
+#babyPage .baby-top154{
+  background:linear-gradient(145deg,#24131d,#101821);
+  border:1px solid #3a2430;
+  border-radius:25px;
+  padding:16px;
+  display:grid;
+  grid-template-columns:1fr minmax(120px,1.3fr) 1fr;
+  gap:10px;
+  align-items:center;
+}
+#babyPage .baby-stat-big{font-size:18px;font-weight:900;color:#fff}
+#babyPage .baby-stat-label{font-size:11px;color:#9b8992;font-weight:700;margin-top:4px}
+#babyPage .baby-center154{min-width:0}
+#babyPage .baby-switch15{
+  display:flex;
+  gap:11px;
+  overflow-x:auto;
+  justify-content:flex-start;
+  padding:3px 2px 7px;
+  scrollbar-width:none;
+}
+#babyPage .baby-switch15::-webkit-scrollbar{display:none}
+#babyPage .ps15{min-width:66px;text-align:center;color:#9c8c94}
+#babyPage .ps15 .pic{
+  width:62px;height:62px;border-radius:50%;
+  background:#241821;border:2px solid #4e3542;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;font-size:29px;font-weight:800;
+}
+#babyPage .ps15 .pic img{width:100%;height:100%;object-fit:cover}
+#babyPage .ps15 .nm{font-size:11px;font-weight:800;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#babyPage .ps15.active .pic{border-color:#ff5f9e;box-shadow:0 0 0 4px #ff5f9e22}
+#babyPage .ps15.active .nm{color:#ff78ab}
+#babyPage .ps15.add .pic{background:transparent;border-style:dashed;color:#b89aa8}
+#babyPage .status-live{
+  background:#0b1b22;border:1px solid #19313a;border-radius:18px;margin-top:12px;padding:14px;
+}
+#babyPage .tabs{
+  display:flex;gap:8px;overflow-x:auto;padding:13px 0 12px;scrollbar-width:none
+}
+#babyPage .tabs::-webkit-scrollbar{display:none}
+#babyPage .tabs .btn{
+  flex:none!important;border-radius:999px!important;
+  background:#18252c!important;border:0!important;color:#a9b5ba!important;
+  padding:9px 14px!important;font-weight:800!important
+}
+#babyPage .panel{
+  background:#0b1b22;border:1px solid #19313a;border-radius:20px;padding:14px;
+}
+body.v18-open #quickFab,#babyPage.active ~ #quickFab{display:none!important}
+
 </style>
 </head>
 <body>
 <div class="app">
-<header><div><div class="logo">Сімейник</div><div class="sub">Family v18</div></div><div>👶</div></header>
+<header><div><div class="logo">Сімейник</div><div class="sub">Family v18.1</div></div><div>👶</div></header>
 <main>
 <section id="authBox" class="card hero">
 <h2>Вхід</h2>
@@ -677,7 +732,7 @@ function goHome(btn){activeNav16='home';renderNav101();if(user)document.querySel
 function showBaby(which,btn){activeNav16='children';renderNav101();$('quickFab')?.classList.remove('hidden');
  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$('babyPage').classList.add('active');
  document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active');
- panel(which);renderBabySwitch15();top15();
+ panel(which);renderBabySwitch15();initBabySwipe18();top15();
 }
 function panel(which){
  currentPanel=which;document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));$('p-'+which).classList.add('active');loadCurrent();
@@ -1625,15 +1680,24 @@ async function childNext15(c){
  return 'Немає нагадувань';
 }
 async function renderBabySwitch15(){
- const host=document.getElementById('babyProfileSwitch15'); if(!host||!children?.length)return;
+ const host=document.getElementById('babyProfileSwitch15'); 
+ if(!host)return;
+ if(!children?.length){
+   host.innerHTML=`<div class="ps15 add" onclick="openAddChild15()"><div class="pic">+</div><div class="nm">Додати</div></div>`;
+   return;
+ }
  const cur=$('childSelect')?.value||children[0].id;
  let out='';
  for(const c of children){
   const u=await signedPhoto15(c.photo_path);
-  const action=u
-    ? `selectBaby15('${c.id}')`
-    : `selectBaby15('${c.id}');setTimeout(()=>changePhoto15('child_profiles','${c.id}','${c.family_id}'),60)`;
-  out+=`<div class="ps15 ${c.id===cur?'active':''}" onclick="${action}"><div class="pic">${u?`<img src="${u}" alt="">`:'+'}</div><div class="nm">${esc(c.name)}</div></div>`;
+  const active=c.id===cur;
+  const action=active
+    ? `changePhoto15('child_profiles','${c.id}','${c.family_id}')`
+    : `selectBaby15('${c.id}')`;
+  out+=`<div class="ps15 ${active?'active':''}" onclick="${action}">
+    <div class="pic">${u?`<img src="${u}" alt="">`:'+'}</div>
+    <div class="nm">${esc(c.name)}</div>
+  </div>`;
  }
  out+=`<div class="ps15 add" onclick="openAddChild15()"><div class="pic">+</div><div class="nm">Додати</div></div>`;
  host.innerHTML=out;
@@ -1643,6 +1707,39 @@ async function renderBabySwitch15(){
  if(document.getElementById('babyReminder154'))$('babyReminder154').textContent=next==='Немає нагадувань'?'✓':'⏰';
  if(document.getElementById('babyReminderText154'))$('babyReminderText154').textContent=next;
 }
+
+function babyIndex18(){
+ const id=childId();
+ return Math.max(0,children.findIndex(c=>c.id===id));
+}
+async function babySwipe18(dir){
+ if(!children?.length)return;
+ let i=babyIndex18();
+ i+=dir;
+ if(i<0)i=children.length-1;
+ if(i>=children.length)i=0;
+ await selectBaby15(children[i].id);
+}
+function initBabySwipe18(){
+ const page=document.getElementById('babyPage');
+ if(!page||page.dataset.swipe181==='1')return;
+ page.dataset.swipe181='1';
+ let sx=0,sy=0,started=false;
+ page.addEventListener('touchstart',e=>{
+   const t=e.touches?.[0]; if(!t)return;
+   // Don't hijack horizontal sliders / buttons / form fields.
+   if(e.target.closest('button,input,select,textarea,.tabs,.profile-switch15'))return;
+   sx=t.clientX; sy=t.clientY; started=true;
+ },{passive:true});
+ page.addEventListener('touchend',e=>{
+   if(!started)return; started=false;
+   const t=e.changedTouches?.[0]; if(!t)return;
+   const dx=t.clientX-sx, dy=t.clientY-sy;
+   if(Math.abs(dx)<55 || Math.abs(dx)<Math.abs(dy)*1.25)return;
+   babySwipe18(dx<0?1:-1);
+ },{passive:true});
+}
+
 async function selectBaby15(id){
  if($('childSelect'))$('childSelect').value=id;
  await loadCurrent();
@@ -1667,7 +1764,7 @@ async function avatarHtml15(path,fallback='👤',big=false,table=null,id=null,fi
 }
 async function changePhoto15(table,id,fid){
  const input=document.createElement('input');input.type='file';input.accept='image/*';
- input.onchange=async()=>{const f=input.files?.[0];if(!f)return;const ok=await uploadProfilePhoto15(table,id,f,fid);if(ok){if(table==='pets')openPetProfile15(id);else if(table==='vehicles')openVehicleProfile15(id);else if(table==='child_profiles')loadChildren();else if(table==='profiles')openAdultProfile();}};
+ input.onchange=async()=>{const f=input.files?.[0];if(!f)return;const ok=await uploadProfilePhoto15(table,id,f,fid);if(ok){if(table==='pets')openPetProfile15(id);else if(table==='vehicles')openVehicleProfile15(id);else if(table==='child_profiles'){await loadChildren();if($('childSelect'))$('childSelect').value=id;showBaby(currentPanel||'today');}else if(table==='profiles')openAdultProfile();}};
  input.click();
 }
 async function openProfiles15(){
