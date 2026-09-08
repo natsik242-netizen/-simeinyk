@@ -447,6 +447,60 @@ nav{padding-bottom:var(--safe-bottom)}
   .v190-card{min-height:98px;padding:13px}
 }
 
+
+/* ===== PWA UI FIX v20.1 ===== */
+:root{--top-safe:env(safe-area-inset-top,0px)}
+#v18Page .v18-shell,#access184Page .v184-shell,
+#adultPage .v16-section,#hubPage .v16-section,#babyPage .baby-shell{
+  padding-top:calc(var(--top-safe) + 12px)!important;
+}
+#v18Page,#adultPage,#hubPage,#babyPage,#access184Page{
+  min-height:100dvh!important;
+}
+.v18-head,.section-head{
+  margin-top:0!important;
+}
+.v18-back,.v16-back{
+  width:52px!important;height:52px!important;min-width:52px!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  touch-action:manipulation;
+}
+#babyPage>.baby-shell>div:first-child{padding-top:0!important}
+
+/* Remove the accidental giant blank top area in profile modules */
+body.v18-open main{padding-top:0!important}
+#v18Page .v18-shell{margin-top:0!important}
+#v18Page.active{padding-top:0!important}
+
+/* Child header: compact and easier to switch */
+#babyPage .baby-top154{
+  grid-template-columns:58px minmax(0,1fr) 74px!important;
+  padding:12px!important;gap:10px!important;margin-top:8px!important;
+}
+#babyPage .baby-switch15{padding:2px 0 6px!important;gap:9px!important}
+#babyPage .ps15{min-width:58px!important}
+#babyPage .ps15 .pic{width:54px!important;height:54px!important}
+
+/* Quick add is a compact bottom sheet */
+#adultPage.quick-add-201{
+  position:fixed!important;inset:0!important;z-index:90!important;
+  background:rgba(0,0,0,.42)!important;padding:0!important;
+  display:flex!important;align-items:flex-end!important;
+}
+#adultPage.quick-add-201 .v16-section{
+  width:100%!important;max-width:560px!important;margin:0 auto!important;
+  background:#08171d!important;border:1px solid #1c3540!important;
+  border-radius:26px 26px 0 0!important;
+  padding:18px 16px calc(24px + env(safe-area-inset-bottom,0px))!important;
+  max-height:62dvh!important;overflow:auto!important;
+}
+#adultPage.quick-add-201 .section-head h2{font-size:23px!important}
+#adultPage.quick-add-201 .quick15-sheet{grid-template-columns:repeat(3,1fr)!important;gap:9px!important}
+#adultPage.quick-add-201 .quick15-sheet button{min-height:72px!important;padding:9px 5px!important}
+
+/* Home: remove duplicated catalog added by v19 */
+#allModules190{display:none!important}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -1198,6 +1252,7 @@ async function loadMemories(){
 
 function showAdult(title,html){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  $('adultPage').classList.remove('quick-add-201');
   $('adultPage').classList.add('active');$('quickFab')?.classList.add('hidden');
   $('adultTitle').textContent=title;$('adultContent').innerHTML=html;window.scrollTo(0,0);
 }
@@ -1927,7 +1982,8 @@ async function openVehicleProfile15(id){
  showAdult('🚗 '+esc(c.name),`<div class="profile15"><div class="profile15-head">${a}<div class="grow"><h3 style="margin:0">${esc(c.name)}</h3><div class="muted">${esc([c.make,c.model,c.year].filter(Boolean).join(' '))}</div></div></div></div><div class="today-grid"><div class="today-mini"><span class="muted">Сервіс</span><b>${(svc.data||[]).length}</b></div><div class="today-mini"><span class="muted">Заправки</span><b>${(fuel.data||[]).length}</b></div><div class="today-mini"><span class="muted">Документи</span><b>${(docs.data||[]).length}</b></div><div class="today-mini"><span class="muted">Витрати</span><b>${total.toFixed(0)} ₴</b></div><div class="today-mini"><span class="muted">Нагадування</span><b>${(rem.data||[]).length}</b></div></div>`);
 }
 function openGlobalQuick15(){
- showAdult('➕ Швидко додати',`<div class="quick15-sheet"><button class="btn secondary" onclick="showBaby('children')">👶<br>Дитину</button><button class="btn secondary" onclick="openCompanions102()">🐕<br>Тварину</button><button class="btn secondary" onclick="openCars102()">🚗<br>Авто</button><button class="btn secondary" onclick="openExpenses()">💳<br>Витрату</button><button class="btn secondary" onclick="openReminders()">⏰<br>Нагадування</button><button class="btn secondary" onclick="openDocuments('all')">📄<br>Документ</button><button class="btn secondary" onclick="openSmartToday11()">🧠<br>Сьогодні</button></div>`);
+ showAdult('➕ Швидко додати',`<div class="quick15-sheet"><button class="btn secondary" onclick="showBaby('children')">👶<br>Дитину</button><button class="btn secondary" onclick="openCompanions102()">🐕<br>Тварину</button><button class="btn secondary" onclick="openCars102()">🚗<br>Авто</button><button class="btn secondary" onclick="openExpenses()">💳<br>Витрату</button><button class="btn secondary" onclick="openReminders()">⏰<br>Нагадування</button><button class="btn secondary" onclick="openDocuments('all')">📄<br>Документ</button></div>`);
+ $('adultPage')?.classList.add('quick-add-201');
 }
 
 
@@ -2670,58 +2726,9 @@ async function v190Counts(){
   return {children,pets,cars};
 }
 async function renderV190All(){
-  const host=$('dashboard')||$('homePage')||$('appBox');
-  if(!host)return;
-  let box=$('allModules190');
-  if(!box){
-    box=document.createElement('div');
-    box.id='allModules190';
-    box.className='v190-all';
-    const today=$('smartToday185');
-    if(today && today.parentNode) today.insertAdjacentElement('afterend',box);
-    else host.prepend(box);
-  }
-  const c=await v190Counts();
-  box.innerHTML=`
-    <div class="v190-head"><h2>Сімейник</h2><small>усе в одному місці</small></div>
-    <div class="v190-status">
-      <div class="v190-stat"><b>${c.children}</b><small>дітей</small></div>
-      <div class="v190-stat"><b>${c.pets}</b><small>тварин</small></div>
-      <div class="v190-stat"><b>${c.cars}</b><small>авто</small></div>
-    </div>
-
-    <div class="v190-section">Сім’я та профілі</div>
-    <div class="v190-grid">
-      <button class="v190-card" onclick="openV18('profile')"><span>👤</span><b>Мій профіль</b><small>Дані, здоров’я, документи, витрати</small></button>
-      <button class="v190-card" onclick="openV18('family')"><span>👨‍👩‍👧‍👦</span><b>Сім’я</b><small>Учасники, сім’ї, доступи</small></button>
-      <button class="v190-card" onclick="showBaby('today')"><span>👶</span><b>Діти</b><small>Сон, їжа, ріст, ліки, розвиток</small></button>
-      <button class="v190-card" onclick="openV18('pets')"><span>🐾</span><b>Тварини</b><small>Здоров’я, годування, досягнення</small></button>
-    </div>
-
-    <div class="v190-section">Майно</div>
-    <div class="v190-grid">
-      <button class="v190-card" onclick="openV18('cars')"><span>🚗</span><b>Авто</b><small>ТО, заправки, страхування, витрати</small></button>
-      <button class="v190-card" onclick="openV18('properties')"><span>🏠</span><b>Нерухомість</b><small>Платежі, документи, ремонти</small></button>
-    </div>
-
-    <div class="v190-section">Організація життя</div>
-    <div class="v190-grid">
-      <button class="v190-card" onclick="openExpenses()"><span>💳</span><b>Витрати</b><small>Особисті та сімейні витрати</small></button>
-      <button class="v190-card" onclick="openCalendar()"><span>📅</span><b>Календар</b><small>Події, лікарі, свята, справи</small></button>
-      <button class="v190-card" onclick="openHub('reminders')"><span>⏰</span><b>Нагадування</b><small>Особисті та сімейні</small></button>
-      <button class="v190-card" onclick="openDocuments()"><span>📁</span><b>Документи</b><small>Особисті, авто, житло, сім’я</small></button>
-      <button class="v190-card" onclick="openHub('health')"><span>❤️</span><b>Здоров’я</b><small>Медичні записи та ліки</small></button>
-      <button class="v190-card" onclick="openHub('work')"><span>💼</span><b>Робота</b><small>Завдання, графік, документи</small></button>
-    </div>
-
-    <div class="v190-section">Додатково</div>
-    <div class="v190-grid">
-      <button class="v190-card wide" onclick="openAccess184()"><span>🔐</span><div><b>Права доступу</b><small>Хто може бачити та редагувати конкретні дані</small></div><i>›</i></button>
-      <button class="v190-card wide" onclick="openHub('family')"><span>📦</span><div><b>Звіти та резервна копія</b><small>Керування сімейними даними</small></div><i>›</i></button>
-      <button class="v190-card wide" onclick="v200Diagnostics()"><span>🛠️</span><div><b>Перевірка системи</b><small>Швидка перевірка підключення основних модулів</small></div><i>›</i></button>
-    </div>`;
+  const old=document.getElementById('allModules190');
+  if(old) old.remove();
 }
-
 function v190PropertyAdd(){
   if(typeof openProperties==='function'){openProperties();return}
   if(typeof openProperty==='function'){openProperty();return}
@@ -2920,7 +2927,7 @@ async function v200Diagnostics(){
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(console.warn);
+    navigator.serviceWorker.register('./sw.js').then(r=>r.update()).catch(console.warn);
   });
 }
 </script>
