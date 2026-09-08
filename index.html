@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f7f3">
-<title>Сімейник Family v20.2</title>
+<title>Сімейник Family v20.3</title>
 <style>
 :root{--bg:#f5f7f3;--card:#fff;--ink:#202820;--muted:#6f786f;--brand:#6e9079;--brand2:#e5eee7;--line:#e4e9e5;--danger:#a84f4f}
 *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
@@ -522,6 +522,12 @@ body.v18-open main{padding-top:0!important}
   padding-top:calc(env(safe-area-inset-top,0px) + 12px)!important;
 }
 
+
+/* ===== HARD VIEWPORT FIX v20.3 ===== */
+html,body{min-height:100%;}
+#v18Page.active{position:fixed!important;inset:0!important;margin:0!important;transform:none!important;}
+#v18Page.active>.v18-shell{position:relative!important;top:0!important;margin:0 auto!important;transform:none!important;}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -535,7 +541,7 @@ body.v18-open main{padding-top:0!important}
 </head>
 <body>
 <div class="app">
-<header><div><div class="logo">Сімейник</div><div class="sub">Family v20.0</div></div><div>👶</div></header>
+<header><div><div class="logo">Сімейник</div><div class="sub">Family v20.3</div></div><div>👶</div></header>
 <main>
 <section id="authBox" class="card hero">
 <h2>Вхід</h2>
@@ -901,7 +907,7 @@ async function addChild(){
  if(file)await uploadProfilePhoto15('child_profiles',row.id,file,row.family_id);
  $('newChildName').value='';$('newChildBirth').value='';if($('newChildPhoto15'))$('newChildPhoto15').value='';await loadChildren();
 }
-function goHome(btn){activeNav16='home';renderNav101();if(user)document.querySelector('header').style.display='none';$('quickFab')?.classList.add('hidden');if($('globalQuick15')){$('globalQuick15').onclick=()=>openGlobalQuick15();$('globalQuick15').classList.remove('hidden');}
+function goHome(btn){document.body.style.overflow='';$('v18Page')?.classList.remove('active');activeNav16='home';renderNav101();if(user)document.querySelector('header').style.display='none';$('quickFab')?.classList.add('hidden');if($('globalQuick15')){$('globalQuick15').onclick=()=>openGlobalQuick15();$('globalQuick15').classList.remove('hidden');}
  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$('homePage').classList.add('active');
  document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active')); if(btn)btn.classList.add('active'); window.scrollTo(0,0);if($('homePage')?.classList.contains('active'))loadDashboard();initHomeSort15();top15();
 }
@@ -2279,18 +2285,39 @@ function v18Table(kind){return kind==='pets'?'pets':kind==='cars'?'vehicles':kin
 function v18ShowPage(){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   const page=$('v18Page');
+  const shell=page?.querySelector('.v18-shell');
+  if(!page)return;
+
+  // Hard reset: make this a real viewport page, independent of old .app layout.
+  if(page.parentElement!==document.body) document.body.appendChild(page);
   page.classList.add('active');
+  page.style.setProperty('position','fixed','important');
+  page.style.setProperty('inset','0','important');
+  page.style.setProperty('top','0','important');
+  page.style.setProperty('left','0','important');
+  page.style.setProperty('right','0','important');
+  page.style.setProperty('bottom','0','important');
+  page.style.setProperty('display','block','important');
+  page.style.setProperty('overflow-y','auto','important');
+  page.style.setProperty('overflow-x','hidden','important');
+  page.style.setProperty('z-index','60','important');
+  page.style.setProperty('margin','0','important');
+  page.style.setProperty('padding','0 0 calc(96px + env(safe-area-inset-bottom,0px))','important');
+  page.style.setProperty('background','#061116','important');
+  if(shell){
+    shell.style.setProperty('margin','0 auto','important');
+    shell.style.setProperty('padding-top','calc(env(safe-area-inset-top,0px) + 10px)','important');
+    shell.style.setProperty('transform','none','important');
+  }
   document.body.classList.add('v18-open');
+  document.body.style.overflow='hidden';
   page.scrollTop=0;
   window.scrollTo(0,0);
 
-  // The floating + follows the section context.
   const q=$('globalQuick15');
   if(q){
     q.classList.remove('hidden');
-    if(v18Kind==='pets') q.onclick=()=>v18Add();
-    else if(v18Kind==='cars') q.onclick=()=>v18Add();
-    else if(v18Kind==='properties') q.onclick=()=>v18Add();
+    if(v18Kind==='pets'||v18Kind==='cars'||v18Kind==='properties') q.onclick=()=>v18Add();
     else q.onclick=()=>openGlobalQuick15();
   }
 }
