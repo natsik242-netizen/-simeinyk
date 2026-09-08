@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f7f3">
-<title>Сімейник Family v17.2</title>
+<title>Сімейник Family v18</title>
 <style>
 :root{--bg:#f5f7f3;--card:#fff;--ink:#202820;--muted:#6f786f;--brand:#6e9079;--brand2:#e5eee7;--line:#e4e9e5;--danger:#a84f4f}
 *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
@@ -254,37 +254,57 @@ h1,h2,h3,b{color:var(--ink)}
 }
 
 
-/* ===== v17.2 universal profile layout ===== */
-.up17-switch{display:flex;gap:12px;overflow-x:auto;padding:2px 2px 13px;scrollbar-width:none}
-.up17-switch::-webkit-scrollbar{display:none}
-.up17-person{border:0;background:none;color:#91a5ae;min-width:67px;padding:0;display:flex;flex-direction:column;align-items:center;gap:5px}
-.up17-person b{font-size:12px;max-width:76px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.up17-circle{width:62px;height:62px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#132832;border:2px solid #29434d;font-size:27px;overflow:hidden}
-.up17-circle img,.up17-photo img{width:100%;height:100%;object-fit:cover}
-.up17-person.active.green .up17-circle{border-color:#2ddd70;box-shadow:0 0 0 3px #2ddd7022}
-.up17-person.active.blue .up17-circle{border-color:#249dff;box-shadow:0 0 0 3px #249dff22}
-.up17-person.active.purple .up17-circle{border-color:#b45cff;box-shadow:0 0 0 3px #b45cff22}
-.up17-person.add .up17-circle{border-style:dashed;background:transparent;font-size:30px}
-.up17-hero{background:linear-gradient(145deg,#10242c,#0c1a21);border:1px solid #1c3540;border-radius:22px;padding:15px;margin-bottom:12px}
-.up17-main{display:flex;align-items:center;gap:13px}
-.up17-photo{width:88px;height:88px;border-radius:24px;background:#17313b;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:40px;flex:none}
-.up17-main h2{font-size:24px;margin:0 0 3px}.up17-edit{font-size:18px;color:#2d9cff}
-.up17-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
-.up17-stats>div{background:#09181e;border-radius:16px;padding:13px}
-.up17-stats strong{display:block;font-size:19px;color:#f7fafb;margin-bottom:4px}.up17-stats span{font-size:12px;color:#8da1aa}
-.up17-tabs{display:flex;gap:7px;overflow-x:auto;padding:1px 0 12px;scrollbar-width:none}.up17-tabs::-webkit-scrollbar{display:none}
-.up17-tabs button{white-space:nowrap;border:0;background:#13242c;color:#a8b7bd;border-radius:999px;padding:9px 15px;font-weight:800}
-.up17-tabs button.active.green{background:#2ddd70;color:#06150b}.up17-tabs button.active.blue{background:#249dff;color:#fff}.up17-tabs button.active.purple{background:#a64df2;color:#fff}
-.up17-list{display:flex;flex-direction:column;gap:8px}
-.up17-row{width:100%;display:grid;grid-template-columns:42px 1fr 20px;align-items:center;text-align:left;border:1px solid #1a3039;background:#0d1c23;color:#f3f7f8;border-radius:17px;padding:13px}
-.up17-row>span{font-size:25px}.up17-row b{display:block;font-size:16px}.up17-row small{display:block;color:#899da6;margin-top:3px;font-size:12px}.up17-row i{font-size:26px;color:#718892;font-style:normal}
-.up17-empty{text-align:center;background:#0d1c23;border:1px solid #1b333d;border-radius:22px;padding:35px 15px}.up17-bigplus{width:72px;height:72px;border-radius:50%;border:2px dashed #3c5864;margin:auto;display:flex;align-items:center;justify-content:center;font-size:38px}
+
+/* ================= SIMEINYK V18 ================= */
+#v18Page{background:#061116;color:#f5f8fa;min-height:100vh;padding-bottom:108px}
+.v18-shell{max-width:760px;margin:0 auto;padding:18px 16px 32px}
+.v18-head{display:grid;grid-template-columns:50px 1fr 50px;align-items:center;gap:10px;margin-bottom:18px}
+.v18-head h1{font-size:30px;line-height:1.05;margin:0;font-weight:900;letter-spacing:-.7px}
+.v18-head small{display:block;color:#718791;margin-top:4px;font-weight:700}
+.v18-back,.v18-more{width:48px;height:48px;border-radius:50%;border:0;background:#10242d;color:#f4f8fa;font-size:32px;font-weight:700}
+.v18-more{font-size:18px;letter-spacing:2px}
+.v18-switch{display:flex;gap:14px;overflow-x:auto;padding:3px 2px 18px;scrollbar-width:none}
+.v18-switch::-webkit-scrollbar,.v18-tabs::-webkit-scrollbar{display:none}
+.v18-person{border:0;background:none;color:#82969f;min-width:72px;padding:0;display:flex;flex-direction:column;align-items:center;gap:6px}
+.v18-person b{font-size:12px;max-width:78px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.v18-circle{width:66px;height:66px;border-radius:50%;background:#10242d;border:2px solid #29414b;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:29px}
+.v18-circle img,.v18-photo img{width:100%;height:100%;object-fit:cover}
+.v18-person.active.pet .v18-circle{border-color:#35e67a;box-shadow:0 0 0 4px #35e67a20}
+.v18-person.active.car .v18-circle{border-color:#2a9fff;box-shadow:0 0 0 4px #2a9fff20}
+.v18-person.active.child .v18-circle{border-color:#ff5f9e;box-shadow:0 0 0 4px #ff5f9e20}
+.v18-person.active.property .v18-circle{border-color:#b36cff;box-shadow:0 0 0 4px #b36cff20}
+.v18-person.active.person .v18-circle{border-color:#37d6c5;box-shadow:0 0 0 4px #37d6c520}
+.v18-person.add .v18-circle{background:transparent;border-style:dashed;font-size:33px;color:#9eb0b8}
+.v18-hero{position:relative;overflow:hidden;background:linear-gradient(145deg,#10252e,#091920);border:1px solid #1d3640;border-radius:25px;padding:17px;margin-bottom:13px}
+.v18-hero:before{content:"";position:absolute;width:150px;height:150px;border-radius:50%;right:-70px;top:-80px;opacity:.12}
+.v18-hero.pet:before{background:#35e67a}.v18-hero.car:before{background:#2a9fff}.v18-hero.child:before{background:#ff5f9e}.v18-hero.property:before{background:#b36cff}.v18-hero.person:before{background:#37d6c5}
+.v18-main{display:flex;align-items:center;gap:14px;position:relative}
+.v18-photo{width:92px;height:92px;border-radius:27px;background:#17313a;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:42px;flex:none}
+.v18-main h2{margin:0 0 4px;font-size:25px;letter-spacing:-.3px}.v18-main p{margin:0;color:#8ca0a9;font-weight:600}
+.v18-photo-note{font-size:11px;color:#66808a;margin-top:5px}
+.v18-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.v18-stat{background:#07161c;border-radius:17px;padding:13px 14px;min-height:69px}
+.v18-stat strong{display:block;font-size:18px;margin-bottom:4px}.v18-stat span{font-size:12px;color:#82969f;font-weight:700}
+.v18-tabs{display:flex;gap:8px;overflow-x:auto;padding:1px 0 13px;scrollbar-width:none}
+.v18-tabs button{border:0;background:#11232b;color:#91a4ac;border-radius:999px;padding:9px 15px;font-weight:800;white-space:nowrap}
+.v18-tabs button.active.pet{background:#35e67a;color:#06150b}.v18-tabs button.active.car{background:#2a9fff;color:white}.v18-tabs button.active.child{background:#ff5f9e;color:white}.v18-tabs button.active.property{background:#a95cf5;color:white}.v18-tabs button.active.person{background:#37d6c5;color:#05201c}
+.v18-list{display:flex;flex-direction:column;gap:9px}
+.v18-row{width:100%;display:grid;grid-template-columns:45px 1fr 20px;align-items:center;text-align:left;border:1px solid #19313a;background:#0b1b22;color:#f4f8fa;border-radius:18px;padding:13px}
+.v18-row>span{font-size:26px}.v18-row b{display:block;font-size:16px}.v18-row small{display:block;color:#7f949d;margin-top:3px;font-size:12px}.v18-row i{font-size:26px;color:#667d87;font-style:normal}
+.v18-empty{border:1px solid #1b3540;background:#0b1b22;border-radius:24px;padding:35px 18px;text-align:center}
+.v18-empty-plus{width:78px;height:78px;border-radius:50%;border:2px dashed #45616c;display:flex;align-items:center;justify-content:center;font-size:40px;margin:0 auto 12px}
+.v18-empty h2{margin:0 0 6px}.v18-empty p{color:#81969f;margin:0}
+.v18-section-title{font-size:13px;color:#6f8791;font-weight:900;text-transform:uppercase;letter-spacing:.7px;margin:5px 3px 9px}
+.v18-family-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.v18-family-card{background:#0b1b22;border:1px solid #19313a;border-radius:20px;padding:16px;color:#f5f8fa;text-align:left}
+.v18-family-card span{font-size:28px}.v18-family-card b{display:block;margin-top:9px}.v18-family-card small{display:block;color:#7f949d;margin-top:4px}
+body.v18-open #quickFab{display:none!important}
 
 </style>
 </head>
 <body>
 <div class="app">
-<header><div><div class="logo">Сімейник</div><div class="sub">Family v17.2 · стабільний профільний дизайн</div></div><div>👶</div></header>
+<header><div><div class="logo">Сімейник</div><div class="sub">Family v18</div></div><div>👶</div></header>
 <main>
 <section id="authBox" class="card hero">
 <h2>Вхід</h2>
@@ -317,12 +337,12 @@ h1,h2,h3,b{color:var(--ink)}
 </div>
 
 <div class="hub-grid sortable15" id="homeHub15">
-<div class="hub-card" data-key="profile" onclick="openUnified17('profile')"><div class="hub-icon">👤</div><b>Мій профіль</b><span>Особисті дані, ліки, документи</span></div>
-<div class="hub-card" data-key="family" onclick="openHub('family')"><div class="hub-icon">👨‍👩‍👧‍👦</div><b>Сім’я</b><span>Учасники, дні народження, доступ</span></div>
+<div class="hub-card" data-key="profile" onclick="openV18('profile')"><div class="hub-icon">👤</div><b>Мій профіль</b><span>Особисті дані, ліки, документи</span></div>
+<div class="hub-card" data-key="family" onclick="openV18('family')"><div class="hub-icon">👨‍👩‍👧‍👦</div><b>Сім’я</b><span>Учасники, дні народження, доступ</span></div>
 <div class="hub-card" data-key="children" onclick="showBaby('today')"><div class="hub-icon">👶</div><b>Діти</b><span>Профілі дітей</span></div>
-<div class="hub-card" data-key="pets" onclick="openUnified17('pets')"><div class="hub-icon">🐾</div><b>Тварини</b><span>Профілі, здоров’я, досягнення</span></div>
-<div class="hub-card" data-key="cars" onclick="openUnified17('cars')"><div class="hub-icon">🚗</div><b>Авто</b><span>Машини, ТО, страховка, витрати</span></div>
-<div class="hub-card" data-key="properties" onclick="openUnified17('properties')"><div class="hub-icon">🏠</div><b>Нерухомість</b><span>Адреси, оренда, платежі</span></div>
+<div class="hub-card" data-key="pets" onclick="openV18('pets')"><div class="hub-icon">🐾</div><b>Тварини</b><span>Профілі, здоров’я, досягнення</span></div>
+<div class="hub-card" data-key="cars" onclick="openV18('cars')"><div class="hub-icon">🚗</div><b>Авто</b><span>Машини, ТО, страховка, витрати</span></div>
+<div class="hub-card" data-key="properties" onclick="openV18('properties')"><div class="hub-icon">🏠</div><b>Нерухомість</b><span>Адреси, оренда, платежі</span></div>
 <div class="hub-card" data-key="expenses" onclick="openHub('expenses')"><div class="hub-icon">💳</div><b>Витрати</b><span>Сімейні витрати та статистика</span></div>
 <div class="hub-card" data-key="calendar" onclick="openHub('calendar')"><div class="hub-icon">📅</div><b>Календар</b><span>Події всієї сім’ї</span></div>
 <div class="hub-card" data-key="reminders" onclick="openHub('reminders')"><div class="hub-icon">⏰</div><b>Нагадування</b><span>Ліки, платежі, справи</span></div>
@@ -1155,10 +1175,10 @@ function markNav16(k){activeNav16=k;setTimeout(()=>{document.querySelectorAll('#
 function navAction101(k){
  if(k==='home')return "markNav16('home');goHome()";
  if(k==='children')return "markNav16('children');showBaby('today')";
- if(k==='cars')return "markNav16('cars');openUnified17('cars')";
- if(k==='pets')return "markNav16('pets');openUnified17('pets')";
- if(k==='profile')return "markNav16('profile');openUnified17('profile')";
- if(k==='properties')return "markNav16('properties');openUnified17('properties')";
+ if(k==='cars')return "markNav16('cars');openHub('cars')";
+ if(k==='pets')return "markNav16('pets');openHub('pets')";
+ if(k==='profile')return "markNav16('profile');openHub('profile')";
+ if(k==='properties')return "markNav16('properties');openHub('properties')";
  return `markNav16('${k}');openHub('${k}')`
 }
 function renderNav101(){let el=$('bottom101');if(!el){el=document.createElement('div');el.id='bottom101';el.className='bottom-custom';document.body.appendChild(el)}el.innerHTML=nav101().map((k,i)=>`<button onclick="${navAction101(k)}" oncontextmenu="event.preventDefault();editNav101(${i})"><span class="ico">${NAV101[k][0]}</span>${NAV101[k][1]}</button>`).join('')}
@@ -1914,147 +1934,206 @@ setInterval(()=>{renderSleepTimer();updateLiveStatus()},1000);init();
 setTimeout(()=>renderNav101(),300);
 
 
-let up17Kind=null, up17Items=[], up17Id=null;
 
-function up17Cfg(kind){
+
+/* ================= SIMEINYK V18 ================= */
+let v18Kind=null, v18Items=[], v18Id=null, v18Tab='Огляд';
+
+function v18Cfg(kind){
   return {
-    profile:{title:'Мій профіль', icon:'👤', tabs:['Огляд','Здоров’я','Документи','Витрати'], accent:'green'},
-    pets:{title:'Тварини', icon:'🐾', tabs:['Огляд','Здоров’я','Харчування','Досягнення'], accent:'green'},
-    cars:{title:'Авто', icon:'🚗', tabs:['Огляд','Витрати','ТО','Документи'], accent:'blue'},
-    properties:{title:'Нерухомість', icon:'🏠', tabs:['Огляд','Платежі','Документи','Витрати'], accent:'purple'}
-  }[kind];
+    pets:{title:'Тварини',subtitle:'Профілі ваших тварин',cls:'pet',icon:'🐾',tabs:['Огляд','Здоров’я','Харчування','Досягнення']},
+    cars:{title:'Авто',subtitle:'Ваші автомобілі',cls:'car',icon:'🚗',tabs:['Огляд','Витрати','ТО','Документи']},
+    properties:{title:'Нерухомість',subtitle:'Ваші об’єкти',cls:'property',icon:'🏠',tabs:['Огляд','Платежі','Документи','Витрати']},
+    profile:{title:'Мій профіль',subtitle:'Особистий простір',cls:'person',icon:'👤',tabs:['Огляд','Здоров’я','Документи','Витрати']},
+    family:{title:'Сім’я',subtitle:'Спільний сімейний простір',cls:'person',icon:'👨‍👩‍👧‍👦',tabs:['Огляд','Календар','Документи','Доступи']}
+  }[kind]||null;
 }
-
-async function up17Load(kind){
+function v18FamilyIds(){ return (families||[]).map(x=>x.id).filter(Boolean) }
+async function v18Load(kind){
   try{
     if(kind==='profile'){
-      const {data:{user:u}}=await sb.auth.getUser();
-      if(!u)return [];
+      const {data:{user:u}}=await sb.auth.getUser(); if(!u)return [];
       const {data}=await sb.from('profiles').select('*').eq('id',u.id).limit(1);
       return data||[{id:u.id,name:u.email?.split('@')[0]||'Мій профіль'}];
     }
-    const table=kind==='cars'?'vehicles':kind==='pets'?'pets':'family_properties';
-    const {data,error}=await sb.from(table).select('*').in('family_id',families.map(f=>f.id));
+    if(kind==='family'){
+      const ids=v18FamilyIds(); if(!ids.length)return [];
+      const {data,error}=await sb.from('family_members').select('*').in('family_id',ids);
+      if(error){console.warn(error);return []}
+      return data||[];
+    }
+    const table=kind==='pets'?'pets':kind==='cars'?'vehicles':'family_properties';
+    const ids=v18FamilyIds(); if(!ids.length)return [];
+    const {data,error}=await sb.from(table).select('*').in('family_id',ids);
     if(error){console.warn(error);return []}
     return data||[];
   }catch(e){console.warn(e);return []}
 }
-
-function up17Name(x,kind){
+function v18Name(x,kind){
   if(kind==='cars')return x.name||[x.make,x.model].filter(Boolean).join(' ')||'Авто';
-  if(kind==='properties')return x.name||x.title||x.address||'Об’єкт';
+  if(kind==='properties')return x.name||x.title||x.address||'Нерухомість';
+  if(kind==='family')return x.name||x.full_name||x.email||x.role||'Член сім’ї';
   return x.name||x.full_name||x.nickname||'Профіль';
 }
-function up17Sub(x,kind){
+function v18Sub(x,kind){
   if(kind==='cars')return [x.make,x.model,x.year].filter(Boolean).join(' · ')||'Дані автомобіля';
-  if(kind==='pets')return [x.species,x.breed].filter(Boolean).join(' · ')||'Домашній улюбленець';
-  if(kind==='properties')return x.address||x.type||'Нерухомість';
+  if(kind==='pets')return [x.species,x.breed].filter(Boolean).join(' · ')||'Профіль тварини';
+  if(kind==='properties')return x.address||x.type||'Дані об’єкта';
+  if(kind==='family')return x.role==='owner'?'Власник сім’ї':'Член сім’ї';
   return x.birth_date?age15(x.birth_date):'Особисті дані';
 }
-async function up17Avatar(x,kind){
-  const u=await signedPhoto15(x.photo_path);
-  return u?`<img src="${u}" alt="">`:`<span>${up17Cfg(kind).icon}</span>`;
-}
-async function openUnified17(kind,id=null){
-  up17Kind=kind;
-  up17Items=await up17Load(kind);
-  up17Id=id||up17Items[0]?.id||null;
-  showAdult(up17Cfg(kind).title, '<div id="up17Root"></div>');
-  await renderUnified17();
-  top15();
-}
-async function renderUnified17(){
-  const cfg=up17Cfg(up17Kind), root=$('up17Root'); if(!root)return;
-  let sw='<div class="up17-switch">';
-  for(const x of up17Items){
-    sw+=`<button class="up17-person ${x.id===up17Id?'active '+cfg.accent:''}" onclick="up17Id='${x.id}';renderUnified17()">
-      <span class="up17-circle">${await up17Avatar(x,up17Kind)}</span>
-      <b>${esc(up17Name(x,up17Kind))}</b>
-    </button>`;
+async function v18Photo(x,kind){
+  if(x?.photo_path){
+    try{const u=await signedPhoto15(x.photo_path);if(u)return `<img src="${u}" alt="">`}catch(e){}
   }
-  if(up17Kind!=='profile') sw+=`<button class="up17-person add" onclick="up17Add()"><span class="up17-circle">+</span><b>Додати</b></button>`;
+  return `<span>${v18Cfg(kind)?.icon||'•'}</span>`;
+}
+function v18Table(kind){return kind==='pets'?'pets':kind==='cars'?'vehicles':kind==='properties'?'family_properties':'profiles'}
+function v18ShowPage(){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  $('v18Page').classList.add('active');
+  document.body.classList.add('v18-open');
+}
+async function openV18(kind,id=null){
+  const cfg=v18Cfg(kind); if(!cfg)return;
+  v18Kind=kind; v18Tab='Огляд'; v18Items=await v18Load(kind); v18Id=id||v18Items[0]?.id||null;
+  $('v18Title').textContent=cfg.title; $('v18Subtitle').textContent=cfg.subtitle;
+  v18ShowPage(); await renderV18(); top15();
+}
+async function switchV18(id){
+  v18Id=id; v18Tab='Огляд'; await renderV18(); top15();
+}
+async function renderV18(){
+  const root=$('v18Content'),cfg=v18Cfg(v18Kind); if(!root||!cfg)return;
+  if(v18Kind==='family'){await renderV18Family();return}
+  let sw='<div class="v18-switch">';
+  for(const x of v18Items){
+    sw+=`<button class="v18-person ${x.id===v18Id?'active '+cfg.cls:''}" onclick="switchV18('${x.id}')"><span class="v18-circle">${await v18Photo(x,v18Kind)}</span><b>${esc(v18Name(x,v18Kind))}</b></button>`;
+  }
+  if(v18Kind!=='profile')sw+=`<button class="v18-person add" onclick="v18Add()"><span class="v18-circle">+</span><b>Додати</b></button>`;
   sw+='</div>';
-
-  const x=up17Items.find(v=>v.id===up17Id);
+  const x=v18Items.find(a=>a.id===v18Id);
   if(!x){
-    root.innerHTML=sw+`<div class="up17-empty"><div class="up17-bigplus" onclick="up17Add()">+</div><h3>Додати перший профіль</h3></div>`;
+    root.innerHTML=sw+`<div class="v18-empty" onclick="v18Add()"><div class="v18-empty-plus">+</div><h2>Додати перший профіль</h2><p>${cfg.title}</p></div>`;
     return;
   }
-
-  let left='—', leftLab='', right='—', rightLab='';
-  if(up17Kind==='cars'){left=x.mileage?Number(x.mileage).toLocaleString('uk-UA')+' км':'—';leftLab='Пробіг';right='🔧';rightLab='Наступне ТО'}
-  else if(up17Kind==='pets'){left=x.birth_date?age15(x.birth_date):'—';leftLab='Вік';right='💉';rightLab='Вакцинація'}
-  else if(up17Kind==='properties'){left='📅';leftLab='Наступна оплата';right='📁';rightLab='Документи'}
-  else {left=x.birth_date?age15(x.birth_date):'—';leftLab='Вік';right='⏰';rightLab='Нагадування'}
-
-  const table=up17Kind==='cars'?'vehicles':up17Kind==='pets'?'pets':up17Kind==='properties'?'family_properties':'profiles';
+  let s1='—',l1='',s2='—',l2='';
+  if(v18Kind==='pets'){s1=x.birth_date?age15(x.birth_date):'—';l1='Вік';s2='💉';l2='Наступна вакцинація'}
+  if(v18Kind==='cars'){s1=x.mileage?Number(x.mileage).toLocaleString('uk-UA')+' км':'—';l1='Пробіг';s2='🔧';l2='Наступне ТО'}
+  if(v18Kind==='properties'){s1='📅';l1='Наступна оплата';s2='📁';l2='Документи'}
+  if(v18Kind==='profile'){s1=x.birth_date?age15(x.birth_date):'—';l1='Вік';s2='⏰';l2='Найближче нагадування'}
   const fid=x.family_id||familyId();
+  const table=v18Table(v18Kind);
+  const hero=`<div class="v18-hero ${cfg.cls}"><div class="v18-main">
+    <div class="v18-photo" onclick="changePhoto15('${table}','${x.id}','${fid}')">${await v18Photo(x,v18Kind)}</div>
+    <div><h2>${esc(v18Name(x,v18Kind))}</h2><p>${esc(v18Sub(x,v18Kind))}</p><div class="v18-photo-note">Натисніть фото, щоб змінити</div></div>
+  </div><div class="v18-stats"><div class="v18-stat"><strong>${s1}</strong><span>${l1}</span></div><div class="v18-stat"><strong>${s2}</strong><span>${l2}</span></div></div></div>`;
+  const tabs=`<div class="v18-tabs">${cfg.tabs.map(t=>`<button class="${t===v18Tab?'active '+cfg.cls:''}" onclick="v18SelectTab(this,'${t}')">${t}</button>`).join('')}</div>`;
+  root.innerHTML=sw+hero+tabs+`<div id="v18Body"></div>`; renderV18Body();
+}
+function v18SelectTab(btn,t){v18Tab=t;document.querySelectorAll('.v18-tabs button').forEach(b=>b.className='');btn.className='active '+v18Cfg(v18Kind).cls;renderV18Body()}
+function v18Rows(){
+ const m={
+  pets:{
+   'Огляд':[['💉','Здоров’я','Вакцинації, обробки та ліки','health'],['🍲','Харчування','Раціон і годування','pet'],['🏆','Досягнення','Команди та рівні','pet'],['📷','Фото та записи','Історія тварини','pet']],
+   'Здоров’я':[['💉','Вакцинації','Історія та наступні дати','health'],['💊','Ліки та обробки','Прийоми й нагадування','health'],['🩺','Ветеринар','Візити та призначення','health']],
+   'Харчування':[['🍲','Раціон','Основне харчування','pet'],['🥣','Годування','Історія годувань','pet']],
+   'Досягнення':[['🏆','Команди','Вивчені команди та рівні','pet'],['📸','Моменти','Фото досягнень','pet']]
+  },
+  cars:{
+   'Огляд':[['⛽','Заправки','Літри, ціна та пробіг','carcost'],['🔧','Сервіс','ТО, ремонт і шини','carcost'],['🛡️','Страхування','Поліси та терміни','docs'],['📄','Документи','Техпаспорт та файли','docs']],
+   'Витрати':[['💳','Витрати авто','Усі витрати автомобіля','expenses']],
+   'ТО':[['🔧','Обслуговування','Історія та наступне ТО','carcost']],
+   'Документи':[['📄','Документи авто','Файли та нагадування','docs']]
+  },
+  properties:{
+   'Огляд':[['💳','Платежі','Оренда та комунальні','expenses'],['📄','Документи','Договори та файли','docs'],['🧰','Обслуговування','Ремонти та роботи','property'],['💰','Витрати','Витрати на об’єкт','expenses']],
+   'Платежі':[['💳','Платежі','Історія та майбутні','expenses']],
+   'Документи':[['📄','Документи','Усі файли','docs']],
+   'Витрати':[['💰','Витрати','Історія витрат','expenses']]
+  },
+  profile:{
+   'Огляд':[['❤️','Здоров’я','Медичні дані та ліки','health'],['📄','Документи','Особисті файли','docs'],['💳','Витрати','Особисті витрати','expenses'],['⏰','Нагадування','Мої справи та події','reminders']],
+   'Здоров’я':[['❤️','Здоров’я','Медичні дані та ліки','health']],
+   'Документи':[['📄','Документи','Особисті файли','docs']],
+   'Витрати':[['💳','Витрати','Особисті витрати','expenses']]
+  }
+ }; return m[v18Kind]?.[v18Tab]||[];
+}
+function renderV18Body(){
+ const b=$('v18Body');if(!b)return;const rows=v18Rows();
+ b.innerHTML=`<div class="v18-list">${rows.map(r=>`<button class="v18-row" onclick="v18Open('${r[3]}')"><span>${r[0]}</span><div><b>${r[1]}</b><small>${r[2]}</small></div><i>›</i></button>`).join('')}</div>`;
+}
+function v18Open(k){
+ document.body.classList.remove('v18-open');
+ if(k==='expenses'){openHub('expenses');return}
+ if(k==='docs'){openDocuments();return}
+ if(k==='carcost'){openCarCosts101();return}
+ if(k==='reminders'){openHub('reminders');return}
+ if(k==='health'){openHub('health');return}
+}
+async function renderV18Family(){
+ const root=$('v18Content'),cfg=v18Cfg('family');
+ let sw='<div class="v18-switch">';
+ for(const x of v18Items)sw+=`<button class="v18-person ${x.id===v18Id?'active person':''}" onclick="switchV18('${x.id}')"><span class="v18-circle">👤</span><b>${esc(v18Name(x,'family'))}</b></button>`;
+ sw+=`<button class="v18-person add" onclick="openFamilyInvite101()"><span class="v18-circle">+</span><b>Запросити</b></button></div>`;
+ const cards=[['📅','Сімейний календар','Спільні події','calendar'],['📄','Документи','Спільні документи','docs'],['⏰','Нагадування','Сімейні справи','reminders'],['🔐','Доступи','Хто що може бачити','access']];
+ root.innerHTML=sw+`<div class="v18-section-title">Сімейні функції</div><div class="v18-family-grid">${cards.map(c=>`<button class="v18-family-card" onclick="v18FamilyOpen('${c[3]}')"><span>${c[0]}</span><b>${c[1]}</b><small>${c[2]}</small></button>`).join('')}</div>`;
+}
+function v18FamilyOpen(k){
+ document.body.classList.remove('v18-open');
+ if(k==='docs'){openDocuments();return}
+ if(k==='calendar'){openHub('calendar');return}
+ if(k==='reminders'){openHub('reminders');return}
+ if(k==='access'){openHub('family');return}
+}
+function v18Add(){
+ document.body.classList.remove('v18-open');
+ // Use existing working creation screens, never the old overview route.
+ if(v18Kind==='pets'){ if(typeof openPets101==='function'){openPets101();return} }
+ if(v18Kind==='cars'){ if(typeof openCars101==='function'){openCars101();return} }
+ if(v18Kind==='properties'){openHub('properties');return}
+}
+function v18More(){ alert('Редагування та додаткові дії будуть тут.'); }
 
-  const hero=`<div class="up17-hero ${cfg.accent}">
-    <div class="up17-main">
-      <div class="up17-photo" onclick="changePhoto15('${table}','${x.id}','${fid}')">${await up17Avatar(x,up17Kind)}</div>
-      <div><h2>${esc(up17Name(x,up17Kind))} <span class="up17-edit">✎</span></h2><div class="muted">${esc(up17Sub(x,up17Kind))}</div></div>
-    </div>
-    <div class="up17-stats">
-      <div><strong>${left}</strong><span>${leftLab}</span></div>
-      <div><strong>${right}</strong><span>${rightLab}</span></div>
-    </div>
-  </div>`;
 
-  const tabs=`<div class="up17-tabs">${cfg.tabs.map((t,i)=>`<button class="${i===0?'active '+cfg.accent:''}" onclick="up17Tab(this,'${t}')">${t}</button>`).join('')}</div>`;
-  root.innerHTML=sw+hero+tabs+`<div id="up17Body"></div>`;
-  up17Body('Огляд');
+
+function navAction101(k){
+ if(k==='home')return "document.body.classList.remove('v18-open');markNav16('home');goHome()";
+ if(k==='children')return "document.body.classList.remove('v18-open');markNav16('children');showBaby('today')";
+ if(k==='cars')return "markNav16('cars');openV18('cars')";
+ if(k==='pets')return "markNav16('pets');openV18('pets')";
+ if(k==='profile')return "markNav16('profile');openV18('profile')";
+ if(k==='properties')return "markNav16('properties');openV18('properties')";
+ if(k==='family')return "markNav16('family');openV18('family')";
+ return `document.body.classList.remove('v18-open');markNav16('${k}');openHub('${k}')`
 }
-function up17Tab(btn,tab){
-  document.querySelectorAll('.up17-tabs button').forEach(b=>b.className='');
-  btn.className='active '+up17Cfg(up17Kind).accent;
-  up17Body(tab);
-}
-function up17Body(tab){
-  const maps={
-    cars:{
-      'Огляд':[['⛽','Заправки','Пальне, літри, витрати','fuel'],['🔧','Сервіс','ТО, ремонт, шини','service'],['🛡️','Страхування','Поліси та терміни','docs'],['📄','Документи','Техпаспорт та файли','docs']],
-      'Витрати':[['💳','Витрати авто','Усі витрати автомобіля','expenses']],
-      'ТО':[['🔧','Обслуговування','Історія та наступне ТО','service']],
-      'Документи':[['📄','Документи авто','Файли та нагадування','docs']]
-    },
-    pets:{
-      'Огляд':[['🐾','Щоденник','Прогулянки, активність, фото','pet'],['💉','Здоров’я','Вакцинації, обробки, аналізи','health'],['🍲','Харчування','Раціон і годування','pet'],['🏆','Досягнення','Команди та рівні','pet']],
-      'Здоров’я':[['💉','Медичні дані','Вакцинації та ліки','health']],
-      'Харчування':[['🍲','Харчування','Раціон і записи','pet']],
-      'Досягнення':[['🏆','Досягнення','Команди та прогрес','pet']]
-    },
-    properties:{
-      'Огляд':[['💳','Платежі','Оренда та комунальні','expenses'],['📄','Документи','Договори та файли','docs'],['🧰','Обслуговування','Ремонти та роботи','property'],['💰','Витрати','Витрати на об’єкт','expenses']],
-      'Платежі':[['💳','Платежі','Історія та майбутні','expenses']],
-      'Документи':[['📄','Документи','Усі файли','docs']],
-      'Витрати':[['💰','Витрати','Історія витрат','expenses']]
-    },
-    profile:{
-      'Огляд':[['❤️','Здоров’я','Медичні дані та ліки','health'],['📄','Документи','Особисті файли','docs'],['💳','Витрати','Особисті витрати','expenses'],['⚙️','Налаштування','Профіль і доступ','profile']],
-      'Здоров’я':[['❤️','Здоров’я','Медичні дані та ліки','health']],
-      'Документи':[['📄','Документи','Особисті файли','docs']],
-      'Витрати':[['💳','Витрати','Особисті витрати','expenses']]
-    }
-  };
-  const rows=(maps[up17Kind]?.[tab]||maps[up17Kind]?.['Огляд']||[]);
-  $('up17Body').innerHTML=`<div class="up17-list">${rows.map(r=>`<button class="up17-row" onclick="up17Open('${r[3]}')"><span>${r[0]}</span><div><b>${r[1]}</b><small>${r[2]}</small></div><i>›</i></button>`).join('')}</div>`;
-}
-function up17Open(type){
-  if(type==='expenses'){openHub('expenses');return}
-  if(type==='docs'){openDocuments();return}
-  if(type==='health'){openHub('health');return}
-  if(type==='service'){openCarCosts101();return}
-  if(type==='fuel'){openCarCosts101();return}
-  if(type==='profile'){openAdultProfile();return}
-}
-function up17Add(){
-  if(up17Kind==='cars'){openCars101();return}
-  if(up17Kind==='pets'){openPets101();return}
-  if(up17Kind==='properties'){openHub('properties');return}
-}
+
+
+
+const _goHomeV18 = goHome;
+goHome = function(btn){
+ document.body.classList.remove('v18-open');
+ $('v18Page')?.classList.remove('active');
+ return _goHomeV18(btn);
+};
 
 </script>
+
+<section class="page" id="v18Page">
+  <div class="v18-shell">
+    <div class="v18-head">
+      <button class="v18-back" onclick="goHome()">‹</button>
+      <div>
+        <h1 id="v18Title">Профіль</h1>
+        <small id="v18Subtitle"></small>
+      </div>
+      <button class="v18-more" onclick="v18More()">•••</button>
+    </div>
+    <div id="v18Content"></div>
+  </div>
+</section>
+
 </body>
 </html>
 <style>
