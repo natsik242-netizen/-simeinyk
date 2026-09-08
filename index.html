@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f7f3">
-<title>Сімейник Family v18.2</title>
+<title>Сімейник Family v18.3</title>
 <style>
 :root{--bg:#f5f7f3;--card:#fff;--ink:#202820;--muted:#6f786f;--brand:#6e9079;--brand2:#e5eee7;--line:#e4e9e5;--danger:#a84f4f}
 *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
@@ -358,11 +358,29 @@ body.v18-open #quickFab,#babyPage.active ~ #quickFab{display:none!important}
 
 .v18-swipehint{text-align:center;color:#536b75;font-size:11px;font-weight:700;margin:-4px 0 10px}
 
+
+/* ===== v18.3 MULTI-FAMILY ===== */
+.v183-family-switch{display:flex;gap:9px;overflow-x:auto;padding:0 0 14px;scrollbar-width:none}
+.v183-family-switch::-webkit-scrollbar{display:none}
+.v183-family-chip{border:1px solid #203741;background:#0d1d24;color:#8fa2aa;border-radius:999px;padding:9px 14px;font-weight:800;white-space:nowrap}
+.v183-family-chip.active{background:#37d6c5;color:#05201c;border-color:#37d6c5}
+.v183-family-meta{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;background:#0b1b22;border:1px solid #19313a;border-radius:20px;padding:14px;margin-bottom:12px}
+.v183-family-meta h3{margin:0 0 4px;font-size:20px}.v183-family-meta p{margin:0;color:#81949d;font-size:12px}
+.v183-family-count{min-width:62px;text-align:center;background:#07161c;border-radius:15px;padding:10px}
+.v183-family-count strong{display:block;font-size:19px}.v183-family-count span{font-size:10px;color:#82969f}
+.v183-member-grid{display:flex;gap:11px;overflow-x:auto;padding:3px 0 14px;scrollbar-width:none}
+.v183-member-grid::-webkit-scrollbar{display:none}
+.v183-member{min-width:73px;border:0;background:none;color:#8da0a8;text-align:center}
+.v183-member-avatar{width:64px;height:64px;margin:auto;border-radius:50%;background:#10242d;border:2px solid #29414b;display:flex;align-items:center;justify-content:center;font-size:28px;overflow:hidden}
+.v183-member.active .v183-member-avatar{border-color:#37d6c5;box-shadow:0 0 0 4px #37d6c520}
+.v183-member b{display:block;font-size:11px;margin-top:5px;max-width:76px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.v183-role{font-size:10px;color:#647b85;margin-top:2px}
+
 </style>
 </head>
 <body>
 <div class="app">
-<header><div><div class="logo">Сімейник</div><div class="sub">Family v18.2</div></div><div>👶</div></header>
+<header><div><div class="logo">Сімейник</div><div class="sub">Family v18.3</div></div><div>👶</div></header>
 <main>
 <section id="authBox" class="card hero">
 <h2>Вхід</h2>
@@ -2106,7 +2124,7 @@ function v18ShowPage(){
 }
 async function openV18(kind,id=null){
   const cfg=v18Cfg(kind); if(!cfg)return;
-  v18Kind=kind; v18Tab='Огляд'; v18Items=await v18Load(kind); v18Id=id||v18Items[0]?.id||null;
+  v18Kind=kind; v18Tab='Огляд'; if(kind==='family')v183CurrentFamily(); v18Items=await v18Load(kind); v18Id=id||v18Items[0]?.id||null;
   $('v18Title').textContent=cfg.title; $('v18Subtitle').textContent=cfg.subtitle;
   v18ShowPage(); initV18Swipe(); await renderV18(); top15();
 }
@@ -2219,14 +2237,111 @@ function v18Open(k){
  if(k==='reminders'){openHub('reminders');return}
  if(k==='health'){openHub('health');return}
 }
-async function renderV18Family(){
- const root=$('v18Content'),cfg=v18Cfg('family');
- let sw='<div class="v18-switch">';
- for(const x of v18Items)sw+=`<button class="v18-person ${x.id===v18Id?'active person':''}" onclick="switchV18('${x.id}')"><span class="v18-circle">👤</span><b>${esc(v18Name(x,'family'))}</b></button>`;
- sw+=`<button class="v18-person add" onclick="openFamilyInvite101()"><span class="v18-circle">+</span><b>Запросити</b></button></div>`;
- const cards=[['📅','Сімейний календар','Спільні події','calendar'],['📄','Документи','Спільні документи','docs'],['⏰','Нагадування','Сімейні справи','reminders'],['🔐','Доступи','Хто що може бачити','access']];
- root.innerHTML=sw+`<div class="v18-section-title">Сімейні функції</div><div class="v18-family-grid">${cards.map(c=>`<button class="v18-family-card" onclick="v18FamilyOpen('${c[3]}')"><span>${c[0]}</span><b>${c[1]}</b><small>${c[2]}</small></button>`).join('')}</div>`;
+
+let v183FamilyId=null, v183MemberId=null;
+
+function v183CurrentFamily(){
+  if(!families?.length)return null;
+  if(!v183FamilyId || !families.some(f=>f.id===v183FamilyId)){
+    v183FamilyId = (typeof familyId==='function' && familyId()) || families[0]?.id || null;
+  }
+  return families.find(f=>f.id===v183FamilyId)||families[0]||null;
 }
+function v183FamilyName(f){
+  return f?.name || f?.title || 'Моя сім’я';
+}
+async function v183LoadMembers(fid){
+  try{
+    const {data,error}=await sb.from('family_members').select('*').eq('family_id',fid);
+    if(error){console.warn(error);return []}
+    return data||[];
+  }catch(e){console.warn(e);return []}
+}
+function v183MemberName(m){
+  return m.name||m.full_name||m.email||m.nickname||m.role||'Член сім’ї';
+}
+function v183RoleLabel(r){
+  const map={
+    owner:'Власник',admin:'Адміністратор',parent:'Батьки',mother:'Мама',father:'Тато',
+    grandmother:'Бабуся',grandfather:'Дідусь',child:'Дитина',member:'Учасник'
+  };
+  return map[r]||'Учасник';
+}
+async function v183SelectFamily(fid){
+  v183FamilyId=fid;
+  v183MemberId=null;
+  try{
+    if(typeof setFamily==='function') await setFamily(fid);
+    else localStorage.setItem('family_id',fid);
+  }catch(e){localStorage.setItem('family_id',fid)}
+  v18Items=await v183LoadMembers(fid);
+  v18Id=v18Items[0]?.id||null;
+  await renderV18Family();
+  top15();
+}
+async function v183SelectMember(id){
+  v183MemberId=id;
+  v18Id=id;
+  await renderV18Family();
+}
+
+async function renderV18Family(){
+ const root=$('v18Content');
+ if(!root)return;
+
+ const current=v183CurrentFamily();
+ if(!current){
+   root.innerHTML=`<div class="v18-empty"><div class="v18-empty-plus">+</div><h2>Створіть сім’ю</h2><p>Після створення тут з’являться члени сім’ї.</p></div>`;
+   return;
+ }
+
+ const familySwitch=`<div class="v183-family-switch">${(families||[]).map(f=>`
+   <button class="v183-family-chip ${f.id===current.id?'active':''}" onclick="v183SelectFamily('${f.id}')">${esc(v183FamilyName(f))}</button>
+ `).join('')}</div>`;
+
+ const members=await v183LoadMembers(current.id);
+ v18Items=members;
+ if(!v183MemberId || !members.some(m=>m.id===v183MemberId))v183MemberId=members[0]?.id||null;
+
+ const memberStrip=`<div class="v183-member-grid">${members.map(m=>`
+   <button class="v183-member ${m.id===v183MemberId?'active':''}" onclick="v183SelectMember('${m.id}')">
+     <div class="v183-member-avatar">👤</div>
+     <b>${esc(v183MemberName(m))}</b>
+     <div class="v183-role">${esc(v183RoleLabel(m.role))}</div>
+   </button>
+ `).join('')}
+ <button class="v183-member" onclick="openFamilyInvite101()">
+   <div class="v183-member-avatar">+</div>
+   <b>Запросити</b>
+   <div class="v183-role">нового члена</div>
+ </button></div>`;
+
+ const meta=`<div class="v183-family-meta"><div><h3>${esc(v183FamilyName(current))}</h3><p>Вибрана сім’я · можна перемикатися між кількома сім’ями</p></div><div class="v183-family-count"><strong>${members.length}</strong><span>учасників</span></div></div>`;
+
+ const cards=[
+  ['👥','Члени сім’ї','Ролі та профілі','members'],
+  ['🔐','Доступи','Хто що може бачити','access'],
+  ['📅','Сімейний календар','Спільні події','calendar'],
+  ['📄','Документи','Спільні файли','docs'],
+  ['⏰','Нагадування','Сімейні справи','reminders'],
+  ['➕','Запросити','Додати родича','invite']
+ ];
+ root.innerHTML=familySwitch+meta+`<div class="v18-section-title">Члени сім’ї</div>`+memberStrip+
+ `<div class="v18-section-title">Сімейні функції</div><div class="v18-family-grid">${cards.map(c=>`
+   <button class="v18-family-card" onclick="v183FamilyAction('${c[3]}')"><span>${c[0]}</span><b>${c[1]}</b><small>${c[2]}</small></button>
+ `).join('')}</div>`;
+}
+
+function v183FamilyAction(k){
+ document.body.classList.remove('v18-open');
+ if(k==='invite'){openFamilyInvite101();return}
+ if(k==='docs'){openDocuments();return}
+ if(k==='calendar'){openHub('calendar');return}
+ if(k==='reminders'){openHub('reminders');return}
+ if(k==='access'){openHub('family');return}
+ if(k==='members'){openHub('family');return}
+}
+
 function v18FamilyOpen(k){
  document.body.classList.remove('v18-open');
  if(k==='docs'){openDocuments();return}
