@@ -857,7 +857,7 @@ html,body{min-height:100%;}
 </div>
 </div>
 
-<button id="globalQuick15" class="quick15 hidden" onclick="openGlobalQuick15()">+</button>
+<button id="globalQuick15" class="quick15 hidden" onclick="contextQuick15()">+</button>
 <nav id="nav" class="nav hidden">
 <button class="active" onclick="goHome(this)"><b>⌂</b>Головна</button>
 <button onclick="showBaby('today',this)"><b>👶</b>Дитина</button>
@@ -907,7 +907,7 @@ async function addChild(){
  if(file)await uploadProfilePhoto15('child_profiles',row.id,file,row.family_id);
  $('newChildName').value='';$('newChildBirth').value='';if($('newChildPhoto15'))$('newChildPhoto15').value='';await loadChildren();
 }
-function goHome(btn){document.body.style.overflow='';$('v18Page')?.classList.remove('active');activeNav16='home';renderNav101();if(user)document.querySelector('header').style.display='none';$('quickFab')?.classList.add('hidden');if($('globalQuick15')){$('globalQuick15').onclick=()=>openGlobalQuick15();$('globalQuick15').classList.remove('hidden');}
+function goHome(btn){document.body.style.overflow='';$('v18Page')?.classList.remove('active');activeNav16='home';renderNav101();if(user)document.querySelector('header').style.display='none';$('quickFab')?.classList.add('hidden');if($('globalQuick15')){$('globalQuick15').classList.remove('hidden');}
  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$('homePage').classList.add('active');
  document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active')); if(btn)btn.classList.add('active'); window.scrollTo(0,0);if($('homePage')?.classList.contains('active'))loadDashboard();initHomeSort15();top15();
 }
@@ -2008,6 +2008,32 @@ async function openVehicleProfile15(id){
  const total=(exp.data||[]).reduce((s,x)=>s+Number(x.amount||0),0);
  showAdult('🚗 '+esc(c.name),`<div class="profile15"><div class="profile15-head">${a}<div class="grow"><h3 style="margin:0">${esc(c.name)}</h3><div class="muted">${esc([c.make,c.model,c.year].filter(Boolean).join(' '))}</div></div></div></div><div class="today-grid"><div class="today-mini"><span class="muted">Сервіс</span><b>${(svc.data||[]).length}</b></div><div class="today-mini"><span class="muted">Заправки</span><b>${(fuel.data||[]).length}</b></div><div class="today-mini"><span class="muted">Документи</span><b>${(docs.data||[]).length}</b></div><div class="today-mini"><span class="muted">Витрати</span><b>${total.toFixed(0)} ₴</b></div><div class="today-mini"><span class="muted">Нагадування</span><b>${(rem.data||[]).length}</b></div></div>`);
 }
+
+function contextQuick15(){
+  // If an entity profile page is currently open, + belongs to that section.
+  const v18=$('v18Page');
+  if(v18 && v18.classList.contains('active')){
+    if(v18Kind==='pets'){ openPets101(); return; }
+    if(v18Kind==='cars'){ openCars101(); return; }
+    if(v18Kind==='properties'){ v190PropertyAdd(); return; }
+  }
+
+  // Children section: + adds a child / opens the child add form.
+  const baby=$('babyPage');
+  if(baby && baby.classList.contains('active')){
+    if(typeof panel==='function'){ panel('children'); return; }
+    if(typeof showBaby==='function'){ showBaby('children'); return; }
+  }
+
+  // Expenses section: + adds an expense.
+  if(activeNav16==='expenses'){
+    if(typeof openExpenses==='function'){ openExpenses(); return; }
+  }
+
+  // Only on Home / non-context pages use the general quick-add menu.
+  openGlobalQuick15();
+}
+
 function openGlobalQuick15(){
  showAdult('➕ Швидко додати',`<div class="quick15-sheet"><button class="btn secondary" onclick="showBaby('children')">👶<br>Дитину</button><button class="btn secondary" onclick="openCompanions102()">🐕<br>Тварину</button><button class="btn secondary" onclick="openCars102()">🚗<br>Авто</button><button class="btn secondary" onclick="openExpenses()">💳<br>Витрату</button><button class="btn secondary" onclick="openReminders()">⏰<br>Нагадування</button><button class="btn secondary" onclick="openDocuments('all')">📄<br>Документ</button></div>`);
  $('adultPage')?.classList.add('quick-add-201');
@@ -2315,11 +2341,7 @@ function v18ShowPage(){
   window.scrollTo(0,0);
 
   const q=$('globalQuick15');
-  if(q){
-    q.classList.remove('hidden');
-    if(v18Kind==='pets'||v18Kind==='cars'||v18Kind==='properties') q.onclick=()=>v18Add();
-    else q.onclick=()=>openGlobalQuick15();
-  }
+  if(q) q.classList.remove('hidden');
 }
 async function openV18(kind,id=null){
   const cfg=v18Cfg(kind); if(!cfg)return;
