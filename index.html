@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f7f3">
-<title>Сімейник Family v18.4</title>
+<title>Сімейник Family v18.5</title>
 <style>
 :root{--bg:#f5f7f3;--card:#fff;--ink:#202820;--muted:#6f786f;--brand:#6e9079;--brand2:#e5eee7;--line:#e4e9e5;--danger:#a84f4f}
 *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
@@ -397,11 +397,26 @@ body.v18-open #quickFab,#babyPage.active ~ #quickFab{display:none!important}
 .v184-note{background:#111d22;border:1px solid #263942;border-radius:16px;padding:12px;color:#8da0a8;font-size:12px;margin-bottom:12px}
 .v184-save{width:100%;border:0;border-radius:16px;background:#37d6c5;color:#05201c;padding:13px;font-weight:900;margin-top:7px}
 
+
+/* ===== v18.5 SMART HOME ===== */
+.v185-today{margin:14px 0}
+.v185-title{display:flex;align-items:center;justify-content:space-between;margin:0 0 10px}
+.v185-title h2{margin:0;font-size:20px}.v185-title small{color:#738993}
+.v185-list{display:grid;gap:9px}
+.v185-item{width:100%;display:grid;grid-template-columns:42px 1fr auto;gap:10px;align-items:center;text-align:left;background:#0b1b22;border:1px solid #19313a;border-radius:18px;padding:12px;color:#f5f8fa}
+.v185-icon{width:42px;height:42px;border-radius:14px;background:#102730;display:flex;align-items:center;justify-content:center;font-size:21px}
+.v185-item b{display:block;font-size:14px}.v185-item small{display:block;color:#81959e;margin-top:3px}
+.v185-time{font-size:11px;color:#37d6c5;font-weight:900;white-space:nowrap}
+.v185-empty{background:#0b1b22;border:1px solid #19313a;border-radius:18px;padding:16px;color:#82969f;font-size:13px}
+.v185-quick{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}
+.v185-q{border:1px solid #1d343e;background:#0b1b22;color:#dce6ea;border-radius:16px;padding:11px 4px;font-weight:800;font-size:11px}
+.v185-q span{display:block;font-size:22px;margin-bottom:5px}
+
 </style>
 </head>
 <body>
 <div class="app">
-<header><div><div class="logo">Сімейник</div><div class="sub">Family v18.4</div></div><div>👶</div></header>
+<header><div><div class="logo">Сімейник</div><div class="sub">Family v18.5</div></div><div>👶</div></header>
 <main>
 <section id="authBox" class="card hero">
 <h2>Вхід</h2>
@@ -744,7 +759,7 @@ function msg(id,t,ok=true){$(id).className='msg '+(ok?'ok':'err');$(id).textCont
 async function register(){await ensureSB();const e=$('email').value.trim(),p=$('password').value;if(!e||p.length<6)return msg('authMsg','Введи email і пароль від 6 символів',false);const {data,error}=await sb.auth.signUp({email:e,password:p});if(error)return msg('authMsg',error.message,false);msg('authMsg','Акаунт створено');if(data.session){user=data.user;await afterLogin()}}
 async function login(){await ensureSB();const {data,error}=await sb.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error)return msg('authMsg',error.message,false);user=data.user;await afterLogin()}
 async function init(){await ensureSB();const {data:{session}}=await sb.auth.getSession();if(session){user=session.user;await afterLogin()}}
-async function afterLogin(){document.querySelector('header').style.display='none';$('authBox').classList.add('hidden');$('appBox').classList.remove('hidden');$('nav').classList.remove('hidden');$('globalQuick15')?.classList.remove('hidden');await loadFamilies();await loadChildren();await loadDashboard();await generateAutoReminders11();renderNav101();initHomeSort15();top15();}
+async function afterLogin(){document.querySelector('header').style.display='none';$('authBox').classList.add('hidden');$('appBox').classList.remove('hidden');$('nav').classList.remove('hidden');$('globalQuick15')?.classList.remove('hidden');await loadFamilies();await loadChildren();await loadDashboard();await renderSmartHome185();await generateAutoReminders11();renderNav101();initHomeSort15();top15();}
 async function loadFamilies(){const {data}=await sb.from('my_families').select('*');families=data||[];}
 function familyId(){const c=children.find(x=>x.id===$('childSelect')?.value);return c?.family_id||families[0]?.id||null}
 function childId(){return $('childSelect')?.value||children[0]?.id||null}
@@ -2492,6 +2507,109 @@ async function toggle184(type,id,mode){
   a184Rules.push(data);
   const members=await v183LoadMembers(a184FamilyId);
   renderAccess184(members);
+}
+
+
+
+/* ================= v18.5 SMART HOME ================= */
+function v185Date(v){
+  if(!v)return null;
+  const d=new Date(v);
+  return isNaN(d)?null:d;
+}
+function v185When(d){
+  if(!d)return '';
+  const now=new Date(), start=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  const day=new Date(d.getFullYear(),d.getMonth(),d.getDate());
+  const n=Math.round((day-start)/86400000);
+  if(n===0)return 'Сьогодні';
+  if(n===1)return 'Завтра';
+  if(n>1&&n<7)return `через ${n} дн.`;
+  return d.toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit'});
+}
+async function v185SmartItems(){
+  const fams=(families||[]).map(f=>f.id);
+  if(!fams.length)return [];
+  const items=[];
+  const safe=async(table,cols)=>{
+    try{
+      const {data}=await sb.from(table).select(cols).in('family_id',fams);
+      return data||[];
+    }catch(e){return []}
+  };
+
+  const [reminders,pets,cars,props]=await Promise.all([
+    safe('reminders','*'),
+    safe('pets','*'),
+    safe('vehicles','*'),
+    safe('family_properties','*')
+  ]);
+
+  for(const r of reminders){
+    const d=v185Date(r.remind_at||r.due_at||r.date||r.event_date);
+    if(!d)continue;
+    items.push({date:d,icon:'⏰',title:r.title||r.name||'Нагадування',sub:r.note||r.description||'Нагадування',go:"openHub('reminders')"});
+  }
+  for(const p of pets){
+    const d=v185Date(p.next_vaccination||p.vaccination_date||p.next_medicine||p.medicine_date);
+    if(!d)continue;
+    items.push({date:d,icon:'🐾',title:p.name||'Тварина',sub:'Вакцинація / ліки',go:"openV18('pets','"+p.id+"')"});
+  }
+  for(const c of cars){
+    const d=v185Date(c.next_service_date||c.insurance_until||c.insurance_date||c.service_date);
+    if(!d)continue;
+    items.push({date:d,icon:'🚗',title:c.name||[c.make,c.model].filter(Boolean).join(' ')||'Авто',sub:'ТО / страховка',go:"openV18('cars','"+c.id+"')"});
+  }
+  for(const p of props){
+    const d=v185Date(p.next_payment||p.payment_date||p.next_event_date);
+    if(!d)continue;
+    items.push({date:d,icon:'🏠',title:p.name||p.title||p.address||'Нерухомість',sub:'Платіж / подія',go:"openV18('properties','"+p.id+"')"});
+  }
+
+  const now=new Date();
+  const min=new Date(now.getFullYear(),now.getMonth(),now.getDate()-1);
+  return items.filter(x=>x.date>=min).sort((a,b)=>a.date-b.date).slice(0,6);
+}
+async function renderSmartHome185(){
+  const host=$('dashboard')||$('homePage')||$('appBox');
+  if(!host)return;
+  let box=$('smartToday185');
+  if(!box){
+    box=document.createElement('div');
+    box.id='smartToday185';
+    box.className='v185-today';
+    const target=host.querySelector('.home-grid,.dashboard-grid,.grid');
+    if(target)host.insertBefore(box,target);
+    else host.prepend(box);
+  }
+  const items=await v185SmartItems();
+  box.innerHTML=`
+    <div class="v185-title"><h2>Сьогодні</h2><small>найважливіше</small></div>
+    <div class="v185-quick">
+      <button class="v185-q" onclick="showBaby('today')"><span>👶</span>Діти</button>
+      <button class="v185-q" onclick="openV18('pets')"><span>🐾</span>Тварини</button>
+      <button class="v185-q" onclick="openV18('cars')"><span>🚗</span>Авто</button>
+      <button class="v185-q" onclick="openV18('family')"><span>👨‍👩‍👧</span>Сім’я</button>
+    </div>
+    ${items.length?`<div class="v185-list">${items.map(x=>`
+      <button class="v185-item" onclick="${x.go}">
+        <span class="v185-icon">${x.icon}</span>
+        <span><b>${esc(x.title)}</b><small>${esc(x.sub)}</small></span>
+        <span class="v185-time">${v185When(x.date)}</span>
+      </button>`).join('')}</div>`:
+      `<div class="v185-empty">На найближчий час важливих подій немає. Нові нагадування з’являтимуться тут автоматично.</div>`}
+  `;
+}
+
+
+
+const _goHome185 = typeof goHome==='function' ? goHome : null;
+if(_goHome185){
+  goHome = function(...args){
+    const r=_goHome185.apply(this,args);
+    Promise.resolve(r).then(()=>renderSmartHome185());
+    return r;
+  };
 }
 
 </script>
