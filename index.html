@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f7f3">
-<title>Сімейник Family v20.0</title>
+<title>Сімейник Family v20.2</title>
 <style>
 :root{--bg:#f5f7f3;--card:#fff;--ink:#202820;--muted:#6f786f;--brand:#6e9079;--brand2:#e5eee7;--line:#e4e9e5;--danger:#a84f4f}
 *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
@@ -501,6 +501,27 @@ body.v18-open main{padding-top:0!important}
 /* Home: remove duplicated catalog added by v19 */
 #allModules190{display:none!important}
 
+
+/* ===== PWA UI FIX v20.2 =====
+   v18Page is outside .app in the old document structure.
+   Make module pages true viewport layers so .app's min-height cannot push them down.
+*/
+#v18Page.active,#access184Page.active{
+  position:fixed!important;
+  inset:0!important;
+  z-index:25!important;
+  display:block!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  -webkit-overflow-scrolling:touch;
+  background:#061116!important;
+  padding:0 0 calc(96px + env(safe-area-inset-bottom,0px))!important;
+}
+#v18Page .v18-shell,#access184Page .v184-shell{
+  margin:0 auto!important;
+  padding-top:calc(env(safe-area-inset-top,0px) + 12px)!important;
+}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -880,7 +901,7 @@ async function addChild(){
  if(file)await uploadProfilePhoto15('child_profiles',row.id,file,row.family_id);
  $('newChildName').value='';$('newChildBirth').value='';if($('newChildPhoto15'))$('newChildPhoto15').value='';await loadChildren();
 }
-function goHome(btn){activeNav16='home';renderNav101();if(user)document.querySelector('header').style.display='none';$('quickFab')?.classList.add('hidden');
+function goHome(btn){activeNav16='home';renderNav101();if(user)document.querySelector('header').style.display='none';$('quickFab')?.classList.add('hidden');if($('globalQuick15')){$('globalQuick15').onclick=()=>openGlobalQuick15();$('globalQuick15').classList.remove('hidden');}
  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$('homePage').classList.add('active');
  document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active')); if(btn)btn.classList.add('active'); window.scrollTo(0,0);if($('homePage')?.classList.contains('active'))loadDashboard();initHomeSort15();top15();
 }
@@ -2257,8 +2278,21 @@ async function v18ChangeActivePhoto(table,id,fid){
 function v18Table(kind){return kind==='pets'?'pets':kind==='cars'?'vehicles':kind==='properties'?'family_properties':'profiles'}
 function v18ShowPage(){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  $('v18Page').classList.add('active');
+  const page=$('v18Page');
+  page.classList.add('active');
   document.body.classList.add('v18-open');
+  page.scrollTop=0;
+  window.scrollTo(0,0);
+
+  // The floating + follows the section context.
+  const q=$('globalQuick15');
+  if(q){
+    q.classList.remove('hidden');
+    if(v18Kind==='pets') q.onclick=()=>v18Add();
+    else if(v18Kind==='cars') q.onclick=()=>v18Add();
+    else if(v18Kind==='properties') q.onclick=()=>v18Add();
+    else q.onclick=()=>openGlobalQuick15();
+  }
 }
 async function openV18(kind,id=null){
   const cfg=v18Cfg(kind); if(!cfg)return;
@@ -2297,7 +2331,7 @@ function initV18Swipe(){
 }
 
 async function switchV18(id){
-  v18Id=id; v18Tab='Огляд'; await renderV18(); top15();
+  v18Id=id; v18Tab='Огляд'; await renderV18(); if($('v18Page'))$('v18Page').scrollTop=0; top15();
 }
 async function renderV18(){
   const root=$('v18Content'),cfg=v18Cfg(v18Kind); if(!root||!cfg)return;
